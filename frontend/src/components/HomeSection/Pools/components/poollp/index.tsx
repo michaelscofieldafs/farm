@@ -260,7 +260,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
       setIsLoadingDeposit(true);
 
-      await writeContract(
+      const hashApprove = await writeContract(
         wagmiAdapter.wagmiConfig,
         {
           abi: getTokenContractABIByChainId(chainId),
@@ -271,54 +271,58 @@ const FarmPoolCard = (props: { pool: any; }) => {
         }
       );
 
-      const urlParams = new URLSearchParams(location.search);
-      const addressValue = urlParams.get('refer');
-      let hasReferral = false;
-      let referralAddress = '';
+      const receiptApprove = await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, { hash: hashApprove })
 
-      if (addressValue) {
-        const decoded = base64Decode(addressValue);
-        if (isValidAddress(decoded)) {
-          hasReferral = true;
-          referralAddress = decoded;
+      if (receiptApprove.status === 'success') {
+
+        const urlParams = new URLSearchParams(location.search);
+        const addressValue = urlParams.get('refer');
+        let hasReferral = false;
+        let referralAddress = '';
+
+        if (addressValue) {
+          const decoded = base64Decode(addressValue);
+          if (isValidAddress(decoded)) {
+            hasReferral = true;
+            referralAddress = decoded;
+          }
         }
-      }
 
-      setStatusTranscation(StatusTransaction.DEPOSIT);
+        setStatusTranscation(StatusTransaction.DEPOSIT);
 
-      const hash = await writeContract(wagmiAdapter.wagmiConfig, {
-        abi: getMasterchefABIByChainId(chainId),
-        address: getMastChefAddressByChainId(chainId) as Address,
-        functionName: hasReferral ? 'depositReferral' : 'deposit',
-        args: hasReferral
-          ? [poolMasterchef, depositWithdrawValueWei, referralAddress]
-          : [poolMasterchef, depositWithdrawValueWei],
-        account: address,
-      })
-
-      const receipt = await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, { hash })
-
-      if (receipt.status === 'success') {
-        fetchLpWallet();
-        //fetchPoolDataByWalletConnect();
-        play();
-
-
-        toast("Deposit completed successfully!", {
-          type: 'success',
-          position: 'top-center',
-          style: { fontSize: 16, fontFamily: 'Trebuchet MS, sans-serif' },
-        });
-      } else {
-        toast('A deposit transaction error occurred.', {
-          position: 'top-center',
-          type: 'error'
+        const hash = await writeContract(wagmiAdapter.wagmiConfig, {
+          abi: getMasterchefABIByChainId(chainId),
+          address: getMastChefAddressByChainId(chainId) as Address,
+          functionName: hasReferral ? 'depositReferral' : 'deposit',
+          args: hasReferral
+            ? [poolMasterchef, depositWithdrawValueWei, referralAddress]
+            : [poolMasterchef, depositWithdrawValueWei],
+          account: address,
         })
+
+        const receipt = await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, { hash })
+
+        if (receipt.status === 'success') {
+          fetchLpWallet();
+          fetchPoolDataByWalletConnect();
+          play();
+
+
+          toast("Deposit completed successfully!", {
+            type: 'success',
+            position: 'top-center',
+            style: { fontSize: 16, fontFamily: 'Trebuchet MS, sans-serif' },
+          });
+        } else {
+          toast('A deposit transaction error occurred.', {
+            position: 'top-center',
+            type: 'error'
+          })
+        }
+
+        setDepositWithdrawValue(0);
+        setIsDeposit(false);
       }
-
-      setDepositWithdrawValue(0);
-      setIsDeposit(false);
-
     } catch (err) {
       toast('A deposit transaction error occurred.', {
         position: 'top-center',

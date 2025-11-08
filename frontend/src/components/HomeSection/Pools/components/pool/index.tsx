@@ -260,7 +260,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
       setIsLoadingDeposit(true);
       setStatusTranscation(StatusTransaction.APPOVING_DEPOSIT);
 
-      await writeContract(
+      const approveHash = await writeContract(
         wagmiAdapter.wagmiConfig,
         {
           abi: getTokenContractABIByChainId(chainId),
@@ -271,55 +271,59 @@ const FarmPoolCard = (props: { pool: any; }) => {
         }
       );
 
-      const urlParams = new URLSearchParams(location.search);
-      const addressValue = urlParams.get('refer');
-      let hasReferral = false;
-      let referralAddress = '';
+      const receiptApprove = await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, { hash: approveHash })
 
-      if (addressValue) {
-        const decoded = base64Decode(addressValue);
-        if (isValidAddress(decoded)) {
-          hasReferral = true;
-          referralAddress = decoded;
+      if (receiptApprove.status === 'success') {
+        const urlParams = new URLSearchParams(location.search);
+        const addressValue = urlParams.get('refer');
+        let hasReferral = false;
+        let referralAddress = '';
+
+        if (addressValue) {
+          const decoded = base64Decode(addressValue);
+          if (isValidAddress(decoded)) {
+            hasReferral = true;
+            referralAddress = decoded;
+          }
         }
+
+        setStatusTranscation(StatusTransaction.DEPOSIT);
+
+        const hash = await writeContract(wagmiAdapter.wagmiConfig, {
+          abi: getMasterchefABIByChainId(chainId),
+          address: getMastChefAddressByChainId(chainId) as Address,
+          functionName: hasReferral ? 'depositReferral' : 'deposit',
+          args: hasReferral
+            ? [poolMasterchef, depositWithdrawValueWei, referralAddress]
+            : [poolMasterchef, depositWithdrawValueWei],
+          account: address,
+        })
+
+        const receipt = await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, { hash })
+
+        if (receipt.status === 'success') {
+          fetchLpWallet();
+          //fetchPoolDataByWalletConnect();
+
+          play();
+
+          toast("Deposit completed successfully!", {
+            type: 'success',
+            position: 'top-center',
+            style: { fontSize: 16, fontFamily: 'Trebuchet MS, sans-serif' },
+          });
+        }
+        else {
+          toast('Transaction has been cancelled.', {
+            position: 'top-center',
+            type: 'warning'
+          });
+        }
+
+        setIsDeposit(false);
+        setDepositWithdrawValueWei(BigNumber.from(0));
+        setDepositWithdrawValue(0);
       }
-
-      setStatusTranscation(StatusTransaction.DEPOSIT);
-
-      const hash = await writeContract(wagmiAdapter.wagmiConfig, {
-        abi: getMasterchefABIByChainId(chainId),
-        address: getMastChefAddressByChainId(chainId) as Address,
-        functionName: hasReferral ? 'depositReferral' : 'deposit',
-        args: hasReferral
-          ? [poolMasterchef, depositWithdrawValueWei, referralAddress]
-          : [poolMasterchef, depositWithdrawValueWei],
-        account: address,
-      })
-
-      const receipt = await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, { hash })
-
-      if (receipt.status === 'success') {
-        fetchLpWallet();
-        //fetchPoolDataByWalletConnect();
-
-        play();
-
-        toast("Deposit completed successfully!", {
-          type: 'success',
-          position: 'top-center',
-          style: { fontSize: 16, fontFamily: 'Trebuchet MS, sans-serif' },
-        });
-      }
-      else {
-        toast('Transaction has been cancelled.', {
-          position: 'top-center',
-          type: 'warning'
-        });
-      }
-
-      setIsDeposit(false);
-      setDepositWithdrawValueWei(BigNumber.from(0));
-      setDepositWithdrawValue(0);
     } catch (err) {
       toast('Transaction has been cancelled.', {
         position: 'top-center',
