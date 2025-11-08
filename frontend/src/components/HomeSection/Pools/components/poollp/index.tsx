@@ -284,6 +284,8 @@ const FarmPoolCard = (props: { pool: any; }) => {
         }
       }
 
+      setStatusTranscation(StatusTransaction.DEPOSIT);
+
       const hash = await writeContract(wagmiAdapter.wagmiConfig, {
         abi: getMasterchefABIByChainId(chainId),
         address: getMastChefAddressByChainId(chainId) as Address,
