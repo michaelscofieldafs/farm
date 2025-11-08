@@ -394,7 +394,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
         const amountBN = BigNumber.from(amount);
         const farmBalanceBN = BigNumber.from(pool.farmBalance);
-        const tvlBN = utils.parseUnits(pool.tvl.toString(), 18);
+        const tvlBN = utils.parseUnits(pool.tvl.toString(), Number(token.decimals));
 
         let totalStakedBN = BigNumber.from(0);
 
@@ -503,11 +503,11 @@ const FarmPoolCard = (props: { pool: any; }) => {
   function formatPercentageFromFarm(
   ): string {
     const providerNum = BigNumber.isBigNumber(totalTokensDeposited)
-      ? parseFloat(utils.formatUnits(totalTokensDeposited, 18))
+      ? parseFloat(utils.formatUnits(totalTokensDeposited, Number(token.decimals)))
       : Number(totalTokensDeposited);
 
     const supplyNum = BigNumber.isBigNumber(totalSupply)
-      ? parseFloat(utils.formatUnits(totalSupply, 18))
+      ? parseFloat(utils.formatUnits(totalSupply, Number(token.decimals)))
       : Number(totalSupply);
 
     if (supplyNum <= 0 || providerNum <= 0 || isNaN(supplyNum) || isNaN(providerNum)) {

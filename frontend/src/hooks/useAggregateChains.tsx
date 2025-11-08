@@ -87,11 +87,12 @@ export const useAggregateChains = () => {
                             if (symbol === '' || symbol.endsWith('-LP') || symbol.includes('LP') || symbol.includes('UNI-V2')) {
                                 const pairContract = new web3.eth.Contract(getPairContractV2ABIByChainId(chain.id), lpToken);
 
-                                const [token0Address, token1Address, reserves, farmBalance, totalSupply] = await Promise.all([
+                                const [token0Address, token1Address, reserves, farmBalance, decimals, totalSupply] = await Promise.all([
                                     safeCall(pairContract.methods.token0()),
                                     safeCall(pairContract.methods.token1()),
                                     safeCall(pairContract.methods.getReserves(), [0, 0]),
                                     safeCall(pairContract.methods.balanceOf(masterChefAddress), 0),
+                                    safeCall(pairContract.methods.decimals(), 18),
                                     safeCall(pairContract.methods.totalSupply(), 1),
                                 ]);
 
@@ -113,7 +114,7 @@ export const useAggregateChains = () => {
                                 const tvlTotal = (Number(price0) * Number(reserves[0]) / 10 ** decimals0) +
                                     (Number(price1) * Number(reserves[1]) / 10 ** decimals1);
 
-                                const tvlFarm = ((Number(farmBalance) / 10 ** 18) * tvlTotal) / (Number(totalSupply) / 10 ** 18 || 1);
+                                const tvlFarm = ((Number(farmBalance) / 10 ** decimals) * tvlTotal) / (Number(totalSupply) / 10 ** decimals || 1);
                                 return tvlFarm;
                             }
 

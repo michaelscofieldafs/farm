@@ -60,8 +60,8 @@ const FarmPoolCard = (props: { pool: any; }) => {
   const [play] = useSound(transactionSound);
 
   const { pool } = props;
-  const totalSupply = Number(pool.farmBalance) / 10 ** 18;
   const { token0, token1, fee, multiplier, poolAddress, poolMasterchef, decimals } = pool;
+  const totalSupply = Number(pool.farmBalance) / 10 ** Number(decimals);
   const { farmTokenUSDCPrice } = useContext(AppContext);
 
   const transactionStatusText = useMemo(() => {
@@ -392,7 +392,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
         const amountBN = BigNumber.from(amount);
         const farmBalanceBN = BigNumber.from(pool.farmBalance);
-        const tvlBN = utils.parseUnits(pool.tvl.toString(), 18);
+        const tvlBN = utils.parseUnits(pool.tvl.toString(), Number(decimals));
 
         let totalStakedBN = BigNumber.from(0);
 
@@ -452,7 +452,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
   function formatTokenBalanceFromWalletUSDC(): string {
     const balanceReadable = parseFloat(utils.formatUnits(balanceWallet, decimals));
 
-    const totalValue = (pool.tvlTotal > 0 ? ((((balanceReadable) * 100 / (Number(pool.totalSupply) / 10 ** 18))) / 100) * pool.tvlTotal : 0);
+    const totalValue = (pool.tvlTotal > 0 ? ((((balanceReadable) * 100 / (Number(pool.totalSupply) / 10 ** Number(decimals)))) / 100) * pool.tvlTotal : 0);
 
     const formatter = new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -500,11 +500,11 @@ const FarmPoolCard = (props: { pool: any; }) => {
   function formatPercentageFromFarm(
   ): string {
     const providerNum = BigNumber.isBigNumber(totalTokensDeposited)
-      ? parseFloat(utils.formatUnits(totalTokensDeposited, 18))
+      ? parseFloat(utils.formatUnits(totalTokensDeposited, Number(decimals)))
       : Number(totalTokensDeposited);
 
     const supplyNum = BigNumber.isBigNumber(totalSupply)
-      ? parseFloat(utils.formatUnits(totalSupply, 18))
+      ? parseFloat(utils.formatUnits(totalSupply, Number(decimals)))
       : Number(totalSupply);
 
     if (supplyNum <= 0 || providerNum <= 0 || isNaN(supplyNum) || isNaN(providerNum)) {
@@ -513,7 +513,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
     const rawPercentage = (providerNum * 100) / supplyNum;
 
-    const factor = Math.pow(10, token0.decimals);
+    const factor = Math.pow(10, Number(decimals));
     const truncated = Math.floor(rawPercentage * factor) / factor;
 
     return `${truncated.toFixed(2)}%`;
