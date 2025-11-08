@@ -356,6 +356,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
     setDepositWithdrawValue(0);
     setDepositWithdrawValueWei(BigNumber.from(0));
     setIsDeposit(!isDeposit);
+    setIsLoading(false);
   }
 
   // Show withdraw modal
@@ -370,6 +371,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
     setDepositWithdrawValue(0);
     setDepositWithdrawValueWei(BigNumber.from(0));
     setIsWithdraw(!isWithdraw);
+    setIsLoading(false);
   }
 
   // Fetch the pool data based on the connected wallet
