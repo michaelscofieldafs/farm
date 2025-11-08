@@ -1,4 +1,5 @@
 import {
+    base,
     bsc,
     bscTestnet,
     mainnet,
@@ -21,6 +22,8 @@ export const getMasterchefABIByChainId = (chainId: number | string | undefined) 
         case sonic.id:
             return MASTERCHEF_V2_CONTRACT_ABI;
         case sonicBlazeTestnet.id:
+            return MASTERCHEF_V2_CONTRACT_ABI;
+        case base.id:
             return MASTERCHEF_V2_CONTRACT_ABI;
         default:
             // fallback: Sonic mainnet

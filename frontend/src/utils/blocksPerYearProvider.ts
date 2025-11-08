@@ -4,7 +4,8 @@ import {
     sepolia,
     mainnet,
     sonic,
-    sonicBlazeTestnet
+    sonicBlazeTestnet,
+    base
 } from '@reown/appkit/networks';
 
 export const getBlocksPerYearByChainId = (chainId?: number): number => {
@@ -21,6 +22,8 @@ export const getBlocksPerYearByChainId = (chainId?: number): number => {
             return Number(process.env.NEXT_PUBLIC_APP_SONIC_BPY) ?? 0
         case sonicBlazeTestnet.id:
             return Number(process.env.NEXT_PUBLIC_APP_SONIC_BPY) ?? 0
+        case base.id:
+            return Number(process.env.NEXT_PUBLIC_APP_BASE_BPY) ?? 0
         default:
             // fallback: Sonic mainnet
             return Number(process.env.NEXT_PUBLIC_APP_SONIC_BPY) ?? 0

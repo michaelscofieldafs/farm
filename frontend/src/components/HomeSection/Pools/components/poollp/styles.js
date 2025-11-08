@@ -21,12 +21,14 @@ export const HeaderContainer = styled.div`
 export const ImageToken = styled.img`
     width: 50px;
     height: 50px;
-    margin-right: 20px;
     border-radius: 40px;
+    position: absolute;
+    object-fit: contain;
+    background-color: #000;
   `;
 
 export const HeaderDetailsContainer = styled.div`
-    
+    margin-left: 94px;
   `;
 
 export const TokenContainer = styled.div`

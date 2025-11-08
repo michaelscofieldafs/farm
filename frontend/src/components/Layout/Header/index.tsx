@@ -108,29 +108,12 @@ const Header: React.FC = () => {
               aria-label='Close menu Modal'></button>
           </div>
           <nav className='flex flex-col items-start p-4'>
+            <div className="flex justify-center items-center mb-10" style={{ width: '100%' }}>
+              <WalletButton />
+            </div>
             {headerData.map((item, index) => (
               <MobileHeaderLink key={index} item={item} />
             ))}
-            <div className='mt-4 flex flex-col gap-4 w-full'>
-              <Link
-                href='#'
-                className='bg-transparent border border-primary text-primary px-4 py-2 rounded-lg hover:bg-blue-600 hover:text-white'
-                onClick={() => {
-                  setIsSignInOpen(true)
-                  setNavbarOpen(false)
-                }}>
-                Sign In
-              </Link>
-              <Link
-                href='#'
-                className='bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700'
-                onClick={() => {
-                  setIsSignUpOpen(true)
-                  setNavbarOpen(false)
-                }}>
-                Sign Up
-              </Link>
-            </div>
           </nav>
         </div>
       </div>

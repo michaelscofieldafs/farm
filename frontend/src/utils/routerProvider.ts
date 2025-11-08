@@ -4,7 +4,8 @@ import {
     sepolia,
     mainnet,
     sonic,
-    sonicBlazeTestnet
+    sonicBlazeTestnet,
+    base
 } from '@reown/appkit/networks';
 
 export const getRouterAddressByChainId = (chainId: number): string => {
@@ -21,6 +22,8 @@ export const getRouterAddressByChainId = (chainId: number): string => {
             return process.env.NEXT_PUBLIC_APP_SONIC_ROUTER_ADDRESS ?? '';
         case sonicBlazeTestnet.id:
             return process.env.NEXT_PUBLIC_APP_SONIC_BLAZE_ROUTER_ADDRESS ?? '';
+        case base.id:
+            return process.env.NEXT_PUBLIC_APP_BASE_ROUTER_ADDRESS ?? '';
         default:
             // fallback: Sonic mainnet
             return process.env.NEXT_PUBLIC_APP_SONIC_ROUTER_ADDRESS ?? '';

@@ -19,29 +19,33 @@ export interface ModalDepositProps {
   handleValue: (value: Number | BigNumber | string) => void;
   isLoading: boolean;
   buttonTitle: string;
+  decimals: number;
 }
 
-const ModalDeposit = ({ show, title, balance, balanceValue, handleDeposit, handleShow, value, handleValue, isLoading, buttonTitle }: ModalDepositProps) => {
+const ModalDeposit = ({ show, title, balance, balanceValue, handleDeposit, handleShow, value, handleValue, isLoading, buttonTitle, decimals }: ModalDepositProps) => {
   const [displayValue, setDisplayValue] = useState('');
 
-  const handleChange = (e: any) => {
-    let input = e.target.value.replace(/\D/g, '');
-    if (input === '') {
-      setDisplayValue('');
-      return;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let input = e.target.value;
+
+    input = input.replace(/[^0-9.]/g, '');
+
+    const parts = input.split('.');
+    if (parts.length > 2) {
+      input = parts[0] + '.' + parts.slice(1).join('');
     }
 
-    const formatted = (parseFloat(input) / 100).toFixed(2);
+    if (parts[1]?.length > decimals) {
+      input = parts[0] + '.' + parts[1].slice(0, decimals);
+    }
 
-    handleValue(formatted);
-    setDisplayValue(formatted);
+    setDisplayValue(input);
+    handleValue(input);
   };
 
   const handleMax = () => {
-    const formatted = (Number(balanceValue)).toFixed(2);
-
     handleValue(balanceValue);
-    setDisplayValue(formatted);
+    setDisplayValue(String(balanceValue));
   }
 
   useEffect(() => {

@@ -4,7 +4,8 @@ import {
     sepolia,
     mainnet,
     sonic,
-    sonicBlazeTestnet
+    sonicBlazeTestnet,
+    base
 } from '@reown/appkit/networks';
 
 export const getMastChefAddressByChainId = (chainId?: number | string): string => {
@@ -21,6 +22,8 @@ export const getMastChefAddressByChainId = (chainId?: number | string): string =
             return process.env.NEXT_PUBLIC_APP_SONIC_MASTER_CHEF_ADDRESS ?? '';
         case sonicBlazeTestnet.id:
             return process.env.NEXT_PUBLIC_APP_SONIC_BLAZE_MASTER_CHEF_ADDRESS ?? '';
+        case base.id:
+            return process.env.NEXT_PUBLIC_APP_BASE_MASTER_CHEF_ADDRESS ?? '';
         default:
             // fallback: Sonic mainnet
             return process.env.NEXT_PUBLIC_APP_SONIC_MASTER_CHEF_ADDRESS ?? '';

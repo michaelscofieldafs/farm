@@ -55,14 +55,14 @@ const SavvyFarmIntro = () => {
         {
           params: {
             vs_currency: 'usd',
-            order: 'market_cap_desc',
-            per_page: 150,
+            order: 'gecko_desc',
+            per_page: 500,
             page: 1,
           },
         }
       );
 
-      const data = response.data.filter((item: { name: string }) => item.name == 'Bitcoin' || item.name == 'Ethereum' || item.name == 'BNB' || item.name == 'Sonic');
+      const data = response.data.filter((item: { name: string }) => item.name == 'Bitcoin' || item.name == 'Ethereum' || item.name == 'BNB' || item.name == 'Solana' || item.name == 'TRON' || item.name == 'Sui' || item.name == 'Avalanche' || item.name == 'Sonic');
 
       setCoins(data);
     } catch (err) {
@@ -155,8 +155,8 @@ const SavvyFarmIntro = () => {
                         formatValue={(value: number) => `${Number(value).toLocaleString('en-US', {
                           style: 'currency',
                           currency: 'USD',
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
+                          minimumFractionDigits: 4,
+                          maximumFractionDigits: 4,
                         })}`}
                       />}</span>
                   </p>

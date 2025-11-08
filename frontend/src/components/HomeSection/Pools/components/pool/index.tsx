@@ -7,7 +7,7 @@
 import { wagmiAdapter } from "@/components/Web3Provider";
 import { AppContext } from "@/context/appContext";
 import { useAppKitNetwork } from "@reown/appkit/react";
-import { writeContract } from '@wagmi/core';
+import { writeContract, waitForTransactionReceipt } from '@wagmi/core';
 // @ts-ignore
 import AnimatedNumber from "animated-number-react";
 import { BigNumber, ethers, utils } from 'ethers';
@@ -28,6 +28,7 @@ import { openInNewTab } from "@/utils/functions";
 import { getTokenContractABIByChainId } from "@/utils/tokenContractABIProvider";
 import { getRpcProviderByChainId } from "@/utils/rpcProviderUtils";
 import ModalDeposit from "@/components/ModalDeposit";
+import { fetchImageByAddress } from "@/utils/fetchTokenImage";
 const transactionSound = '/sounds/transaction.mp3';
 
 enum StatusTransaction {
@@ -111,22 +112,28 @@ const FarmPoolCard = (props: { pool: any; }) => {
         }
       });
 
-      await writeContract(
-        wagmiAdapter.wagmiConfig,
-        {
-          abi: getMasterchefABIByChainId(chainId),
-          address: getMastChefAddressByChainId(chainId) as Address,
-          functionName: 'deposit',
-          args: [poolMasterchef, amountToDeposit],
-          account: address,
-        }
-      );
+      const hash = await writeContract(wagmiAdapter.wagmiConfig, {
+        abi: getMasterchefABIByChainId(chainId),
+        address: getMastChefAddressByChainId(chainId) as Address,
+        functionName: 'deposit',
+        args: [poolMasterchef, amountToDeposit],
+        account: address,
+      })
 
-      await fetchLpWallet();
-      await fetchPoolDataByWalletConnect();
+      const receipt = await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, { hash })
 
-      play();
-
+      if (receipt.status === 'success') {
+        setBalanceWallet(BigNumber.from(0));
+        fetchLpWallet();
+        fetchPoolDataByWalletConnect();
+        play();
+      } else {
+        toast.dismiss();
+        toast('Transaction has been cancelled.', {
+          position: 'top-center',
+          type: 'warning'
+        })
+      }
       setDepositWithdrawValueWei(BigNumber.from(0));
     }
     catch (err) {
@@ -163,39 +170,45 @@ const FarmPoolCard = (props: { pool: any; }) => {
       setIsLoadingDeposit(true);
       setStatusTranscation(StatusTransaction.WITHDRAWING);
 
-      await writeContract(
-        wagmiAdapter.wagmiConfig,
-        {
-          abi: getMasterchefABIByChainId(chainId),
-          address: getMastChefAddressByChainId(chainId) as Address,
-          functionName: 'withdraw',
-          args: [poolMasterchef, depositWithdrawValueWei],
-          account: address,
-        }
-      );
+      const hash = await writeContract(wagmiAdapter.wagmiConfig, {
+        abi: getMasterchefABIByChainId(chainId),
+        address: getMastChefAddressByChainId(chainId) as Address,
+        functionName: 'withdraw',
+        args: [poolMasterchef, depositWithdrawValueWei],
+        account: address,
+      })
 
-      await fetchLpWallet();
-      await fetchPoolDataByWalletConnect();
+
+      const receipt = await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, { hash })
+
+      if (receipt.status === 'success') {
+        fetchLpWallet();
+        fetchPoolDataByWalletConnect();
+        play();
+
+        toast("Withdrawal completed successfully!", {
+          type: 'success',
+          position: 'top-center',
+          style: {
+            fontSize: 16,
+            fontFamily: 'Trebuchet MS, sans-serif',
+          }
+        });
+      } else {
+        toast('Transaction has been cancelled.', {
+          position: 'top-center',
+          type: 'warning'
+        })
+      }
+
       setIsWithdraw(false);
       setDepositWithdrawValueWei(BigNumber.from(0));
-
-      play();
-
-      toast("Withdrawal completed successfully!", {
-        type: 'success',
-        position: 'top-center',
-        style: {
-          fontSize: 16,
-          fontFamily: 'Trebuchet MS, sans-serif',
-        }
-      });
     }
     catch (err) {
       toast('Transaction has been cancelled.', {
         position: 'top-center',
         type: 'warning'
       })
-
       setIsWithdraw(false);
     }
     finally {
@@ -273,33 +286,40 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
       setStatusTranscation(StatusTransaction.DEPOSIT);
 
-      await writeContract(
-        wagmiAdapter.wagmiConfig,
-        {
-          abi: getMasterchefABIByChainId(chainId),
-          address: getMastChefAddressByChainId(chainId) as Address,
-          functionName: hasReferral ? 'depositReferral' : 'deposit',
-          args: hasReferral
-            ? [poolMasterchef, depositWithdrawValueWei, referralAddress]
-            : [poolMasterchef, depositWithdrawValueWei],
-          account: address,
-        }
-      );
+      const hash = await writeContract(wagmiAdapter.wagmiConfig, {
+        abi: getMasterchefABIByChainId(chainId),
+        address: getMastChefAddressByChainId(chainId) as Address,
+        functionName: hasReferral ? 'depositReferral' : 'deposit',
+        args: hasReferral
+          ? [poolMasterchef, depositWithdrawValueWei, referralAddress]
+          : [poolMasterchef, depositWithdrawValueWei],
+        account: address,
+      })
 
-      await fetchLpWallet();
-      await fetchPoolDataByWalletConnect();
+      const receipt = await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, { hash })
+
+      if (receipt.status === 'success') {
+        fetchLpWallet();
+        fetchPoolDataByWalletConnect();
+
+        play();
+
+        toast("Deposit completed successfully!", {
+          type: 'success',
+          position: 'top-center',
+          style: { fontSize: 16, fontFamily: 'Trebuchet MS, sans-serif' },
+        });
+      }
+      else {
+        toast('Transaction has been cancelled.', {
+          position: 'top-center',
+          type: 'warning'
+        });
+      }
+
       setIsDeposit(false);
       setDepositWithdrawValueWei(BigNumber.from(0));
       setDepositWithdrawValue(0);
-
-      play();
-
-      toast("Deposit completed successfully!", {
-        type: 'success',
-        position: 'top-center',
-        style: { fontSize: 16, fontFamily: 'Trebuchet MS, sans-serif' },
-      });
-
     } catch (err) {
       toast('Transaction has been cancelled.', {
         position: 'top-center',
@@ -507,12 +527,12 @@ const FarmPoolCard = (props: { pool: any; }) => {
   return <div style={cardStyle}>
     <ModalDeposit show={isDeposit} title={`DEPOSIT $${token.symbol.toUpperCase()}`}
       balance={`${formatTokenBalanceFromWallet()} / ${(formatTokenBalanceFromWalletUSDC())}`} handleDeposit={handleDeposit}
-      handleShow={handleIsDeposit} value={depositWithdrawValue} handleValue={handleDeposiWithdrawValue} buttonTitle={transactionStatusText} balanceValue={fromWeiWithDecimals(balanceWallet)} isLoading={isLoadingDeposit} />
+      handleShow={handleIsDeposit} value={depositWithdrawValue} handleValue={handleDeposiWithdrawValue} decimals={token.decimals} buttonTitle={transactionStatusText} balanceValue={fromWeiWithDecimals(balanceWallet)} isLoading={isLoadingDeposit} />
     <ModalDeposit show={isWithdraw} title={`WITHDRAW $${token.symbol.toUpperCase()}`}
       balance={`${formatTokenBalanceFromFarm()} / ${(formatTokenBalanceFromFarmUSDC())}`} handleDeposit={handleWithdraw}
-      handleShow={handleIsWithdraw} value={depositWithdrawValue} handleValue={handleDeposiWithdrawValue} buttonTitle={transactionStatusText} balanceValue={fromWeiWithDecimals(totalTokensDeposited)} isLoading={isLoadingDeposit} />
+      handleShow={handleIsWithdraw} value={depositWithdrawValue} handleValue={handleDeposiWithdrawValue} decimals={token.decimals} buttonTitle={transactionStatusText} balanceValue={fromWeiWithDecimals(totalTokensDeposited)} isLoading={isLoadingDeposit} />
     <HeaderContainer>
-      <ImageToken src={'https://www.soniclabs.com/apple-icon.png?0afb6d97a9fd9393'} />
+      <ImageToken src={fetchImageByAddress(token.id)} />
       <HeaderDetailsContainer style={{ zIndex: 999 }}>
         <div onClick={() => { }} style={{ display: 'flex', alignContent: 'center', justifyContent: 'start' }}>
           <h3 className='text-white sm:text-18 text-18 font-bold' style={{ textShadow: '1px 1px 1px #fff', textAlign: 'start', marginRight: 4 }}>

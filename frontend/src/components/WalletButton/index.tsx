@@ -61,7 +61,7 @@ const WalletButton: React.FC<WalletButtonProps> = () => {
             key={isConnected ? 'connected' : 'disconnected'}
             className="flex flex-col items-center justify-center gap-3"
         >
-            {isConnected && caipNetwork && <span className="inline-block text-sm font-small text-white bg-[#202F34] rounded-full shadow-md px-4 py-1">
+            {!isConnected && caipNetwork && <span className="inline-block text-sm font-small text-white bg-[#202F34] rounded-full shadow-md px-4 py-1">
                 {`Current network: ${caipNetwork?.name}`}
             </span>}
             {isConnected &&

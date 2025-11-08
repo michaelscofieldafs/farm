@@ -75,7 +75,7 @@ const SavvyFarmReferral = () => {
   }, [chainId])
 
   return (
-    <section className='md:p-10' id='work'>
+    <section className='md:p-10 pt-10' id='work'>
       <div className='container px-4 mx-auto lg:max-w-(--breakpoint-xl) px-4'>
         <div ref={ref} className='grid grid-cols-12 items-center'>
           <motion.div

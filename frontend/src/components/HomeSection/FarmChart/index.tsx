@@ -4,6 +4,7 @@ import { useAggregateChains } from '@/hooks/useAggregateChains';
 import {
     bsc,
     bscTestnet,
+    form,
     mainnet,
     plasma,
     plasmaTestnet,
@@ -16,16 +17,13 @@ import { CircleLoader } from 'react-spinners';
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer } from 'recharts';
 // @ts-ignore
 import AnimatedNumber from "animated-number-react"
+import { utils } from 'ethers';
 
 const COLORS = [
     '#1E90FF', // Sonic
     '#F3BA2F', // BNB Smart Chain
     '#627EEA', // Ethereum (mainnet)
-    '#00CFFF', // Plasma
-    '#FF6B3A', // Sonic Blaze Testnet
-    '#FFE58F', // BNB Smart Chain Testnet
-    '#C695FF', // Sepolia
-    '#99E6FF', // Plasma Testnet
+    '#00CFFF', // Base
 ];
 
 export interface TableDataItem {
@@ -87,6 +85,35 @@ export default function SavvyFarmStatisticsDashboard() {
         return () => clearInterval(interval);
     }, []);
 
+    function formatTokenBalanceFromFarm(value: number): string {
+
+        const formatter = new Intl.NumberFormat('en-US', {
+            notation: 'compact',
+            compactDisplay: 'short',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2,
+        });
+
+        const formattedValue = formatter.format(value);
+
+        return formattedValue;
+    }
+
+    function formatTokenBalanceFromWalletUSDC(value: number): string {
+
+        const formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            notation: 'compact',
+            compactDisplay: 'short',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
+
+        return formatter.format(value);
+    }
+
+
     return (
         <div id='charts' className="bg-gradient-to-b from-[#071019] to-[#0b1418] text-white p-10">
             <header className="max-w-6xl mx-auto mb-4">
@@ -110,10 +137,10 @@ export default function SavvyFarmStatisticsDashboard() {
                             <table className="min-w-full text-center">
                                 <thead>
                                     <tr className="text-slate-300 text-lg">
-                                        <th className="py-4">Chain</th>
-                                        <th className="py-4">TVL (USD)</th>
-                                        <th className="py-4">Market Cap</th>
-                                        <th className="py-4">Circulating Supply</th>
+                                        <th className="py-4 px-6">Chain</th>
+                                        <th className="py-4 px-6">TVL (USD)</th>
+                                        <th className="py-4 px-6">Market Cap</th>
+                                        <th className="py-4 px-6">Circulating Supply</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -125,7 +152,7 @@ export default function SavvyFarmStatisticsDashboard() {
 
                                         return (
                                             <tr key={name} className="border-t border-white/2">
-                                                <td className="py-5 text-md">{name}</td>
+                                                <td className="py-5 px-6 text-md">{name}</td>
                                                 <td className="py-5">
                                                     <AnimatedNumber
                                                         includeComma
@@ -134,12 +161,7 @@ export default function SavvyFarmStatisticsDashboard() {
                                                             duration: 4,
                                                         })}
                                                         value={tvl}
-                                                        formatValue={(value: number) => `${Number(value).toLocaleString('en-US', {
-                                                            style: 'currency',
-                                                            currency: 'USD',
-                                                            minimumFractionDigits: 2,
-                                                            maximumFractionDigits: 2,
-                                                        })}`}
+                                                        formatValue={(value: number) => formatTokenBalanceFromWalletUSDC(value)}
                                                     />
                                                 </td>
                                                 <td className="py-5">
@@ -150,12 +172,7 @@ export default function SavvyFarmStatisticsDashboard() {
                                                             duration: 4,
                                                         })}
                                                         value={marketCap}
-                                                        formatValue={(value: number) => `${Number(value).toLocaleString('en-US', {
-                                                            style: 'currency',
-                                                            currency: 'USD',
-                                                            minimumFractionDigits: 2,
-                                                            maximumFractionDigits: 2,
-                                                        })}`}
+                                                        formatValue={(value: number) => formatTokenBalanceFromWalletUSDC(value)}
                                                     /></td>
                                                 <td className="py-5">
                                                     <AnimatedNumber
@@ -165,12 +182,7 @@ export default function SavvyFarmStatisticsDashboard() {
                                                             duration: 4,
                                                         })}
                                                         value={circulatingSupply}
-                                                        formatValue={(value: number) => `${Number(value).toLocaleString('en-US', {
-                                                            style: 'currency',
-                                                            currency: 'USD',
-                                                            minimumFractionDigits: 2,
-                                                            maximumFractionDigits: 2,
-                                                        })}`}
+                                                        formatValue={(value: number) => formatTokenBalanceFromFarm(value)}
                                                     /></td>
                                             </tr>
                                         );
@@ -180,59 +192,97 @@ export default function SavvyFarmStatisticsDashboard() {
                         </div>
                     </section>
 
-                    <section className="bg-black/30 rounded-2xl p-6 shadow-lg ring-1 ring-white/3 grid grid-cols-1 md:grid-cols-7 gap-6">
-                        <div className="md:col-span-3 flex flex-col">
-                            <h3 className="text-xl font-semibold mb-4">TVL distribution</h3>
-                            <div className="flex-1 flex flex-col items-center justify-center">
-                                <ResponsiveContainer width="100%" height={200}>
+                    <section className="bg-black/30 rounded-2xl p-6 shadow-lg ring-1 ring-white/3 overflow-x-auto">
+                        <div className="grid grid-cols-1 md:grid-cols-7 gap-6">
+                            {/* --- MOBILE (legenda acima do gráfico) --- */}
+                            <div className="flex flex-col items-center justify-center md:hidden">
+                                <h3 className="text-xl font-semibold mb-4">TVL distribution</h3>
+
+                                <ResponsiveContainer width="100%" height={300}>
                                     <PieChart>
-                                        <Pie data={pieData} dataKey="tvl" nameKey="name" outerRadius={70} innerRadius={30} paddingAngle={3}>
+                                        <Legend
+                                            layout="horizontal"
+                                            verticalAlign="top"
+                                            align="center"
+                                            wrapperStyle={{
+                                                fontSize: '13px',
+                                                paddingBottom: '10px',
+                                            }}
+                                        />
+                                        <Pie
+                                            data={pieData}
+                                            dataKey="tvl"
+                                            nameKey="name"
+                                            outerRadius={80}
+                                            innerRadius={35}
+                                            paddingAngle={3}
+                                        >
                                             {pieData.map((entry, index) => (
                                                 <Cell key={`cell-${index}`} fill={COLORS[index]} />
                                             ))}
                                         </Pie>
-                                        <Legend layout="vertical" align="left" verticalAlign="middle" />
                                     </PieChart>
                                 </ResponsiveContainer>
                             </div>
-                        </div>
 
-                        <div className="md:col-span-4 grid grid-cols-2 lg:grid-cols-2 gap-2">
-                            <div className="rounded-xl p-4 text-center">
-                                <p className="text-md text-slate-400">TVL (Aggregate)</p>
-                                <p className="text-2xl font-semibold text-[#99E39E] mt-2">
-                                    <AnimatedNumber
-                                        includeComma
-                                        transitions={() => ({
-                                            type: "spring",
-                                            duration: 4,
-                                        })}
-                                        value={totalTvl}
-                                        formatValue={(value: number) => `${Number(value).toLocaleString('en-US', {
-                                            style: 'currency',
-                                            currency: 'USD',
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2,
-                                        })}`}
-                                    /></p>
+                            {/* --- DESKTOP (layout original) --- */}
+                            <div className="hidden md:flex md:col-span-3 flex-col">
+                                <h3 className="text-xl font-semibold mb-4">TVL distribution</h3>
+                                <div className="flex-1 flex flex-col items-center justify-center">
+                                    <ResponsiveContainer width="100%" height={200}>
+                                        <PieChart>
+                                            <Pie
+                                                data={pieData}
+                                                dataKey="tvl"
+                                                nameKey="name"
+                                                outerRadius={70}
+                                                innerRadius={30}
+                                                paddingAngle={3}
+                                            >
+                                                {pieData.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={COLORS[index]} />
+                                                ))}
+                                            </Pie>
+                                            <Legend layout="vertical" align="left" verticalAlign="middle" />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </div>
                             </div>
-                            <div className="rounded-xl p-4 text-center">
-                                <p className="text-md text-slate-400">Market Cap (Aggregate)</p>
-                                <p className="text-2xl font-semibold text-[#99E39E] mt-2">
-                                    <AnimatedNumber
-                                        includeComma
-                                        transitions={() => ({
-                                            type: "spring",
-                                            duration: 4,
-                                        })}
-                                        value={totalMarketCap}
-                                        formatValue={(value: number) => `${Number(value).toLocaleString('en-US', {
-                                            style: 'currency',
-                                            currency: 'USD',
-                                            minimumFractionDigits: 2,
-                                            maximumFractionDigits: 2,
-                                        })}`}
-                                    /></p>
+
+                            {/* --- Métricas (TVL e Market Cap) --- */}
+                            <div className="md:col-span-4 grid grid-cols-2 lg:grid-cols-2 gap-2">
+                                <div className="rounded-xl p-4 text-center">
+                                    <p className="text-md text-slate-400">TVL (Aggregate)</p>
+                                    <p className="text-2xl font-semibold text-[#99E39E] mt-2">
+                                        <AnimatedNumber
+                                            includeComma
+                                            transitions={() => ({
+                                                type: 'spring',
+                                                duration: 4,
+                                            })}
+                                            value={totalTvl}
+                                            formatValue={(value: number) =>
+                                                formatTokenBalanceFromWalletUSDC(value)
+                                            }
+                                        />
+                                    </p>
+                                </div>
+                                <div className="rounded-xl p-4 text-center">
+                                    <p className="text-md text-slate-400">Market Cap (Aggregate)</p>
+                                    <p className="text-2xl font-semibold text-[#99E39E] mt-2">
+                                        <AnimatedNumber
+                                            includeComma
+                                            transitions={() => ({
+                                                type: 'spring',
+                                                duration: 4,
+                                            })}
+                                            value={totalMarketCap}
+                                            formatValue={(value: number) =>
+                                                formatTokenBalanceFromWalletUSDC(value)
+                                            }
+                                        />
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </section>

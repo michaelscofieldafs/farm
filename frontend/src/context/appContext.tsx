@@ -23,6 +23,7 @@ import { getRouterAddressByChainId } from '../utils/routerProvider';
 import { getRpcProviderByChainId } from '../utils/rpcProviderUtils';
 import { getSavvyTokenByChainId, getStableTokenByChainId, getUSDTTokenByChainId } from '../utils/tokenAddressProvider';
 import { PoolLP, PoolSingle } from './interfaces';
+import { base, bsc, bscTestnet } from 'viem/chains';
 
 interface AppContextType {
   stableTokenUSDCPrice: number;
@@ -103,7 +104,7 @@ const AppContextProvider = ({ children }: any) => {
             const symbol = (await safeCall(tokenContract.methods.symbol(), '')).toUpperCase();
 
             // LP Pool
-            if (symbol.endsWith('-LP')) {
+            if (symbol === '' || symbol.endsWith('-LP') || symbol.includes('LP') || symbol.includes('UNI-V2')) {
               const pairContract = new web3Ref.current.eth.Contract(getPairContractV2ABIByChainId(chainId), lpToken);
 
               // Fetch base if of pair contract
@@ -146,6 +147,8 @@ const AppContextProvider = ({ children }: any) => {
                 (Number(price1) * Number(reserves[1]) / 10 ** decimals1);
 
               const tvlFarm = ((Number(farmBalance) / 10 ** 18) * tvlTotal) / (Number(totalSupply) / 10 ** 18 || 1);
+
+              console.log(`token ${name0} \ ${name1}\n${price0} \ ${price1} \ Tvl: ${tvlFarm}`)
 
               // Calculate APR of pool
               const blocksPerYear: number = getBlocksPerYearByChainId(chainId);
@@ -231,13 +234,13 @@ const AppContextProvider = ({ children }: any) => {
 
 
   // Fetch token price v2
-  const fetchTokenPriceV2 = async (address: string, tokenPrice = farmTokenUSDCPrice, stableTokenPriceUSDC = stableTokenUSDCPrice) => {
+  const fetchTokenPriceV2 = async (address: string, savvyPriceUSDC = farmTokenUSDCPrice, stableTokenPriceUSDC = stableTokenUSDCPrice) => {
     try {
-      if (getSavvyTokenByChainId(chainId) == address.toLowerCase()) return tokenPrice;
-      if (getStableTokenByChainId(chainId) == address.toLowerCase()) return stableTokenPriceUSDC;
+      if (getSavvyTokenByChainId(chainId).toLowerCase() == address.toLowerCase()) return savvyPriceUSDC;
+      if (getStableTokenByChainId(chainId).toLowerCase() == address.toLowerCase()) return stableTokenPriceUSDC;
 
-      const price = await calcSavvyTokenPriceInStableToken(address);
-      return price * stableTokenPriceUSDC;
+      const price = await calcTokenPrice(address, stableTokenPriceUSDC);
+      return price;
     } catch (err) {
       return 0;
     }
@@ -247,20 +250,52 @@ const AppContextProvider = ({ children }: any) => {
   const fetchDataFarm = async () => {
     try {
       // Prices of stable token prices in USDC
-      const [stableTokenPriceUSD, savvyTokenStablePrice] = await Promise.all([
-        calcStableTokenPriceInUSDC(),
-        calcSavvyTokenPriceInStableToken(getSavvyTokenByChainId(Number(chainIdRef.current)))
-      ]);
+      console.log("carregando os precos da chain " + chainIdRef.current)
+      switch (chainIdRef.current) {
+        case bsc.id:
+        case bscTestnet.id:
+        case base.id: {
+          // Prices of stable token prices in USDC
+          const [stableTokenPriceUSD, savvyTokenStablePrice] = await Promise.all([
+            calcStableTokenPriceInUSDCPancake(),
+            calcTokenPriceInStableTokenPancake(getSavvyTokenByChainId(Number(chainIdRef.current)))
+          ]);
 
-      const farmTokenUSDC = savvyTokenStablePrice * stableTokenPriceUSD;
+          const farmTokenUSDC = savvyTokenStablePrice * stableTokenPriceUSD;
 
-      setStableTokenUSDCPrice(stableTokenPriceUSD);
-      setFarmTokenPrice(savvyTokenStablePrice);
-      setFarmTokenUSDCPrice(farmTokenUSDC);
+          console.log("Preço stable token usdc " + stableTokenPriceUSD);
+          console.log("Preço savvy token em stable token " + savvyTokenStablePrice);
+          console.log("Preço savvy token usdc " + farmTokenUSDC);
+
+          setStableTokenUSDCPrice(stableTokenPriceUSD);
+          setFarmTokenPrice(savvyTokenStablePrice);
+          setFarmTokenUSDCPrice(farmTokenUSDC);
 
 
-      fetchCirculatingSupply(farmTokenUSDC);
-      await fetchPoolsFromMasterchef(farmTokenUSDC, stableTokenPriceUSD);
+          fetchCirculatingSupply(farmTokenUSDC);
+          await fetchPoolsFromMasterchef(farmTokenUSDC, stableTokenPriceUSD);
+
+          break;
+        }
+
+        default: {
+          const [stableTokenPriceUSD, savvyTokenPrice] = await Promise.all([
+            calcStableTokenPriceInUSDC(),
+            calcTokenPriceUSDCSingleCall(getSavvyTokenByChainId(Number(chainIdRef.current)))
+          ]);
+
+          setStableTokenUSDCPrice(stableTokenPriceUSD);
+          setFarmTokenUSDCPrice(savvyTokenPrice);
+
+          console.log("Preço stable token usdc " + stableTokenPriceUSD);
+          console.log("Preço savvy token usdc " + savvyTokenPrice);
+
+          fetchCirculatingSupply(savvyTokenPrice);
+          await fetchPoolsFromMasterchef(savvyTokenPrice, stableTokenPriceUSD);
+
+          break;
+        }
+      }
     } catch (err) {
       throw err;
     }
@@ -292,19 +327,72 @@ const AppContextProvider = ({ children }: any) => {
     }
   }
 
+  // Calculate the price of any token except Savvy and stable tokens
+  const calcTokenPrice = async (tokenAddress: string, stableTokenPriceUSDC = stableTokenUSDCPrice): Promise<number> => {
+    switch (chainIdRef.current) {
+      case bsc.id:
+      case bscTestnet.id:
+      case base.id: {
+        const price = await calcTokenPriceInStableTokenPancake(tokenAddress);
+
+        return price * stableTokenPriceUSDC;
+      }
+      default: {
+        return calcTokenPriceUSDCSingleCall(tokenAddress);
+      }
+    }
+  }
+
   /**
-   * 
-   * @param tokenAddress Address of the token that will be pegged to the stablecoin.
-   * @returns Return the price of a specific token based on the chain's stablecoin
-   */
-  const calcSavvyTokenPriceInStableToken = async (tokenAddress: string): Promise<number> => {
+ * 
+ * @param tokenAddress Address of the token that will be pegged to the stablecoin.
+ * @returns Return the price of a specific token based on the chain's stablecoin
+ */
+  const calcTokenPriceUSDCSingleCall = async (tokenAddress: string): Promise<number> => {
     let tokenToSell = web3Ref.current.utils.toWei("1", "ether");
 
     let amountOut;
     try {
       let router = new web3Ref.current.eth.Contract(getRouterABIByChainId(Number(chainIdRef.current)), getRouterAddressByChainId(Number(chainIdRef.current)).toLowerCase());
-      amountOut = await router.methods.getAmountsOut(tokenToSell, [tokenAddress, getStableTokenByChainId(Number(chainIdRef.current))]).call() as any;
-      amountOut = Number(amountOut[1]) / 10 ** 18;
+      const tokenContract = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(Number(chainIdRef.current)), getUSDTTokenByChainId(Number(chainIdRef.current)));
+
+      const decimals = await safeCall(tokenContract.methods.decimals(), 6);
+
+      const tokenIn = tokenAddress;
+      const tokenOut = getStableTokenByChainId(Number(chainIdRef.current));
+      const amountIn = tokenToSell;
+
+      const routes = [[tokenIn, tokenOut, false], [tokenOut, getUSDTTokenByChainId(Number(chainIdRef.current)), false]];
+
+      amountOut = await router.methods.getAmountsOut(amountIn, routes).call();
+      amountOut = Number(amountOut![2]) / 10 ** Number(decimals);
+
+      return amountOut;
+    } catch (error: any) {
+      return 0;
+    }
+  }
+
+  /**
+   * 
+   * @param tokenAddress Address of the token that will be pegged to the stablecoin.
+   * @returns Return the price of a specific token based on the chain's stablecoin
+   */
+  const calcTokenPriceInStableToken = async (tokenAddress: string): Promise<number> => {
+    let tokenToSell = web3Ref.current.utils.toWei("1", "ether");
+
+    let amountOut;
+    try {
+      let router = new web3Ref.current.eth.Contract(getRouterABIByChainId(Number(chainIdRef.current)), getRouterAddressByChainId(Number(chainIdRef.current)).toLowerCase());
+
+      const tokenIn = tokenAddress;
+      const tokenOut = getStableTokenByChainId(Number(chainIdRef.current));
+      const amountIn = tokenToSell;
+
+      const routes = [[tokenIn, tokenOut, false]];
+
+      amountOut = await router.methods.getAmountsOut(amountIn, routes).call();
+      amountOut = Number(amountOut![1]) / 10 ** 18;
 
       return amountOut;
     } catch (error: any) {
@@ -321,10 +409,62 @@ const AppContextProvider = ({ children }: any) => {
     let amountOut;
     try {
       let router = new web3Ref.current.eth.Contract(getRouterABIByChainId(Number(chainIdRef.current)), getRouterAddressByChainId(Number(chainIdRef.current)));
+      const tokenContract = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(Number(chainIdRef.current)), getUSDTTokenByChainId(Number(chainIdRef.current)));
+
+      const decimals = await safeCall(tokenContract.methods.decimals(), 6);
+      const amountIn = tokenToSell;
+
+      const routes = [[getStableTokenByChainId(Number(chainIdRef.current)), getUSDTTokenByChainId(Number(chainIdRef.current)), false]];
+
+      amountOut = await router.methods.getAmountsOut(amountIn, routes).call();
+      amountOut = Number(amountOut![1]) / 10 ** Number(decimals);
+
+      return amountOut;
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  /**
+ * 
+ * @param tokenAddress Address of the token that will be pegged to the stablecoin.
+ * @returns Return the price of a specific token based on the chain's stablecoin
+ */
+  const calcTokenPriceInStableTokenPancake = async (tokenAddress: string): Promise<number> => {
+    let tokenToSell = web3Ref.current.utils.toWei("1", "ether");
+
+    let amountOut;
+    try {
+      let router = new web3Ref.current.eth.Contract(getRouterABIByChainId(Number(chainIdRef.current)), getRouterAddressByChainId(Number(chainIdRef.current)).toLowerCase());
+      const tokenContract = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(Number(chainIdRef.current)), tokenAddress);
+
+      const decimals = await safeCall(tokenContract.methods.decimals(), 18);
+
+      amountOut = await router.methods.getAmountsOut(tokenToSell, [tokenAddress, getStableTokenByChainId(Number(chainIdRef.current))]).call() as any;
+      amountOut = Number(amountOut[1]) / 10 ** Number(decimals);
+
+      return amountOut;
+    } catch (error: any) {
+      return 0;
+    }
+  }
+
+  /**
+   * 
+   * @returns Returns the value of the chain’s stablecoin in USDC
+   */
+  const calcStableTokenPriceInUSDCPancake = async (): Promise<number> => {
+    let tokenToSell = web3Ref.current.utils.toWei("1", "ether");
+    let amountOut;
+    try {
+      let router = new web3Ref.current.eth.Contract(getRouterABIByChainId(Number(chainIdRef.current)), getRouterAddressByChainId(Number(chainIdRef.current)));
+      const tokenContract = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(Number(chainIdRef.current)), getUSDTTokenByChainId(Number(chainIdRef.current)));
+
+      const decimals = await safeCall(tokenContract.methods.decimals(), 6);
 
       amountOut = await router.methods.getAmountsOut(tokenToSell, [getStableTokenByChainId(Number(chainIdRef.current)),
       getUSDTTokenByChainId(Number(chainIdRef.current))]).call() as any;
-      amountOut = Number(amountOut[1]) / 10 ** 18;
+      amountOut = Number(amountOut[1]) / 10 ** Number(decimals);
 
       return amountOut;
     } catch (error) {
@@ -334,6 +474,7 @@ const AppContextProvider = ({ children }: any) => {
 
   // Clear all farm data
   const clearFarmData = (): void => {
+    console.log('clear farm data');
     setTvl(0);
     setMarketCap(0);
     setCirculatingSupply(0);
@@ -368,6 +509,7 @@ const AppContextProvider = ({ children }: any) => {
     const unwatch = watchBlocks(wagmiAdapter.wagmiConfig, {
       chainId: Number(chainIdRef.current),
       blockTag: 'latest',
+      pollingInterval: 10000,
       onBlock(block) {
         console.log(`Block ${block.number} of ${chainIdRef.current}`);
         fetchDataFarm();

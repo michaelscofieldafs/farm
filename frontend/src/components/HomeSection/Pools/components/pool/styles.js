@@ -23,6 +23,8 @@ export const ImageToken = styled.img`
     height: 50px;
     margin-right: 20px;
     border-radius: 40px;
+    object-fit: contain;
+    background-color: #000;
   `;
 
 export const HeaderDetailsContainer = styled.div`

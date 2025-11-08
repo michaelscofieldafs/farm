@@ -13,7 +13,7 @@ import { getMastChefAddressByChainId } from "@/utils/masterchefAddressProvider";
 import { getRpcProviderByChainId } from "@/utils/rpcProviderUtils";
 import { getTokenContractABIByChainId } from "@/utils/tokenContractABIProvider";
 import { useAppKitNetwork } from "@reown/appkit/react";
-import { writeContract } from '@wagmi/core';
+import { writeContract, waitForTransactionReceipt } from '@wagmi/core';
 // @ts-ignore
 import AnimatedNumber from "animated-number-react";
 import { BigNumber, ethers, utils } from 'ethers';
@@ -28,6 +28,7 @@ import { Address } from "viem";
 import { useAccount } from "wagmi";
 import Web3 from "web3";
 import { ActionButtonSeparator, ActionButtonWalletContainer, ActionContainer, FeeContainer, FeeValueContainer, HeaderContainer, HeaderDetailsContainer, ImageToken, PoolContainer, PoolSectionContainer, PoolSectionValueContainer, PoolSectionValueDescriptionContainer, Separator, TokenContainer, WalletContainer, WalletTitleContainer, WalletValueContainer, WalletValueDescriptionContainer, cardStyle } from "./styles";
+import { fetchImageByAddress } from "@/utils/fetchTokenImage";
 const transactionSound = '/sounds/transaction.mp3';
 
 enum StatusTransaction {
@@ -111,21 +112,27 @@ const FarmPoolCard = (props: { pool: any; }) => {
         }
       });
 
-      await writeContract(
-        wagmiAdapter.wagmiConfig,
-        {
-          abi: getMasterchefABIByChainId(chainId),
-          address: getMastChefAddressByChainId(chainId) as Address,
-          functionName: 'deposit',
-          args: [poolMasterchef, amountToDeposit],
-          account: address,
-        }
-      );
+      const hash = await writeContract(wagmiAdapter.wagmiConfig, {
+        abi: getMasterchefABIByChainId(chainId),
+        address: getMastChefAddressByChainId(chainId) as Address,
+        functionName: 'deposit',
+        args: [poolMasterchef, amountToDeposit],
+        account: address,
+      })
 
-      await fetchLpWallet();
-      await fetchPoolDataByWalletConnect();
+      const receipt = await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, { hash })
 
-      play();
+      if (receipt.status === 'success') {
+        setBalanceWallet(BigNumber.from(0));
+        fetchLpWallet();
+        fetchPoolDataByWalletConnect();
+        play();
+      } else {
+        toast('A rewards withdrawal transaction error occurred.', {
+          position: 'top-center',
+          type: 'error'
+        })
+      }
 
       setDepositWithdrawValue(0);
     }
@@ -161,32 +168,38 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
       setIsLoadingDeposit(true);
 
-      await writeContract(
-        wagmiAdapter.wagmiConfig,
-        {
-          abi: getMasterchefABIByChainId(chainId),
-          address: getMastChefAddressByChainId(chainId) as Address,
-          functionName: 'withdraw',
-          args: [poolMasterchef, depositWithdrawValueWei],
-          account: address,
-        }
-      );
+      const hash = await writeContract(wagmiAdapter.wagmiConfig, {
+        abi: getMasterchefABIByChainId(chainId),
+        address: getMastChefAddressByChainId(chainId) as Address,
+        functionName: 'withdraw',
+        args: [poolMasterchef, depositWithdrawValueWei],
+        account: address,
+      })
 
-      fetchLpWallet();
-      fetchPoolDataByWalletConnect();
+      const receipt = await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, { hash })
+
+      if (receipt.status === 'success') {
+        fetchLpWallet();
+        fetchPoolDataByWalletConnect();
+        play();
+
+        toast("Withdrawal completed successfully!", {
+          type: 'success',
+          position: 'top-center',
+          style: {
+            fontSize: 16,
+            fontFamily: 'Trebuchet MS, sans-serif',
+          }
+        });
+      } else {
+        toast('A withdrawal transaction error occurred.', {
+          position: 'top-center',
+          type: 'error'
+        })
+      }
+
       setIsWithdraw(false);
       setDepositWithdrawValue(0);
-
-      play();
-
-      toast("Withdrawal completed successfully!", {
-        type: 'success',
-        position: 'top-center',
-        style: {
-          fontSize: 16,
-          fontFamily: 'Trebuchet MS, sans-serif',
-        }
-      });
     }
     catch (err) {
       toast('A withdrawal transaction error occurred.', {
@@ -271,31 +284,38 @@ const FarmPoolCard = (props: { pool: any; }) => {
         }
       }
 
-      await writeContract(
-        wagmiAdapter.wagmiConfig,
-        {
-          abi: getMasterchefABIByChainId(chainId),
-          address: getMastChefAddressByChainId(chainId) as Address,
-          functionName: hasReferral ? 'depositReferral' : 'deposit',
-          args: hasReferral
-            ? [poolMasterchef, depositWithdrawValueWei, referralAddress]
-            : [poolMasterchef, depositWithdrawValueWei],
-          account: address,
-        }
-      );
+      const hash = await writeContract(wagmiAdapter.wagmiConfig, {
+        abi: getMasterchefABIByChainId(chainId),
+        address: getMastChefAddressByChainId(chainId) as Address,
+        functionName: hasReferral ? 'depositReferral' : 'deposit',
+        args: hasReferral
+          ? [poolMasterchef, depositWithdrawValueWei, referralAddress]
+          : [poolMasterchef, depositWithdrawValueWei],
+        account: address,
+      })
 
-      await fetchLpWallet();
-      await fetchPoolDataByWalletConnect();
+      const receipt = await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, { hash })
+
+      if (receipt.status === 'success') {
+        fetchLpWallet();
+        fetchPoolDataByWalletConnect();
+        play();
+
+
+        toast("Deposit completed successfully!", {
+          type: 'success',
+          position: 'top-center',
+          style: { fontSize: 16, fontFamily: 'Trebuchet MS, sans-serif' },
+        });
+      } else {
+        toast('A deposit transaction error occurred.', {
+          position: 'top-center',
+          type: 'error'
+        })
+      }
+
       setDepositWithdrawValue(0);
       setIsDeposit(false);
-
-      play();
-
-      toast("Deposit completed successfully!", {
-        type: 'success',
-        position: 'top-center',
-        style: { fontSize: 16, fontFamily: 'Trebuchet MS, sans-serif' },
-      });
 
     } catch (err) {
       toast('A deposit transaction error occurred.', {
@@ -505,12 +525,13 @@ const FarmPoolCard = (props: { pool: any; }) => {
   return <div style={cardStyle}>
     <ModalDeposit show={isDeposit} title={`DEPOSIT ${token0.symbol.toUpperCase()}/${token1.symbol.toUpperCase()}`}
       balance={`${formatTokenBalanceFromWallet()} / ${formatTokenBalanceFromWalletUSDC()}`} handleDeposit={handleDeposit}
-      handleShow={handleIsDeposit} value={depositWithdrawValue} handleValue={handleDeposiWithdrawValue} buttonTitle={transactionStatusText} balanceValue={fromWeiWithDecimals(balanceWallet)} isLoading={isLoadingDeposit} />
+      handleShow={handleIsDeposit} value={depositWithdrawValue} handleValue={handleDeposiWithdrawValue} decimals={decimals} buttonTitle={transactionStatusText} balanceValue={fromWeiWithDecimals(balanceWallet)} isLoading={isLoadingDeposit} />
     <ModalDeposit show={isWithdraw} title={`WITHDRAW LP ${token0.symbol.toUpperCase()} / ${token1.symbol.toUpperCase()}`}
       balance={`${formatTokenBalanceFromFarm()} / ${formatTokenBalanceFromFarmUSDC()}`} handleDeposit={handleWithdraw}
-      handleShow={handleIsWithdraw} value={depositWithdrawValue} handleValue={handleDeposiWithdrawValue} buttonTitle={transactionStatusText} balanceValue={fromWeiWithDecimals(totalTokensDeposited)} isLoading={isLoadingDeposit} />
+      handleShow={handleIsWithdraw} value={depositWithdrawValue} handleValue={handleDeposiWithdrawValue} decimals={decimals} buttonTitle={transactionStatusText} balanceValue={fromWeiWithDecimals(totalTokensDeposited)} isLoading={isLoadingDeposit} />
     <HeaderContainer>
-      <ImageToken src={'https://www.soniclabs.com/apple-icon.png?0afb6d97a9fd9393'} />
+      <ImageToken src={fetchImageByAddress(token0.id)} />
+      <ImageToken style={{ marginLeft: 35 }} src={fetchImageByAddress(token1.id)} />
       <HeaderDetailsContainer style={{ zIndex: 999 }}>
         <div onClick={() => { }} className='clickable-title-div' style={{ display: 'flex', alignContent: 'center', justifyContent: 'start' }}>
           <h3 className='text-white sm:text-18 text-18 font-bold' style={{ textShadow: '1px 1px 1px #fff', textAlign: 'start', marginRight: 4 }}>
@@ -619,8 +640,8 @@ const FarmPoolCard = (props: { pool: any; }) => {
                     formatValue={(value: any) => `${pool.tvl > 0 && pool.tvl < 0.01 ? '~ ' : ''}${Number(value).toLocaleString('en-US', {
                       style: 'currency',
                       currency: 'USD',
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
+                      minimumFractionDigits: 4,
+                      maximumFractionDigits: 4,
                     })}`}
                   />
                 </div>}

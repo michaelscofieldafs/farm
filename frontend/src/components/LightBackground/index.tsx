@@ -9,7 +9,7 @@ export const BackgroundBeatiful = () => {
     const { chain } = useAccount();
     const [isShow, setIsShow] = useState(false);
 
-    const [play] = useSound(transactionSound);
+    const [play, { sound }] = useSound(transactionSound);
 
     useEffect(() => {
         if (chain?.id === 146 || chain?.id === 57054) {
@@ -19,7 +19,8 @@ export const BackgroundBeatiful = () => {
 
             const timeout = setTimeout(() => {
                 setIsShow(false);
-            }, 7000);
+                sound.fade(1, 0, 1000);
+            }, 2400);
 
             return () => clearTimeout(timeout);
         }
@@ -202,5 +203,5 @@ export const Lightning = ({ hue = 230, xOffset = 0, speed = 1, intensity = 1, si
         };
     }, [hue, xOffset, speed, intensity, size]);
 
-    return <canvas ref={canvasRef} className="lightning-container" style={{ opacity: 0.7, mixBlendMode: 'screen' }} />;
+    return <canvas ref={canvasRef} className="lightning-container" style={{ opacity: 0.24, mixBlendMode: 'screen' }} />;
 };

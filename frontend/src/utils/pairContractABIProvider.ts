@@ -1,4 +1,5 @@
 import {
+    base,
     bsc,
     bscTestnet,
     mainnet,
@@ -21,6 +22,8 @@ export const getPairContractV2ABIByChainId = (chainId: number | string | undefin
         case sonic.id:
             return UNISWAP_V2_PAIR_CONTRACT_ABI;
         case sonicBlazeTestnet.id:
+            return UNISWAP_V2_PAIR_CONTRACT_ABI;
+        case base.id:
             return UNISWAP_V2_PAIR_CONTRACT_ABI;
         default:
             // fallback: Sonic mainnet

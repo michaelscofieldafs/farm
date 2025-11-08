@@ -5,6 +5,7 @@ import {
     mainnet,
     sonic,
     sonicBlazeTestnet,
+    base,
 } from '@reown/appkit/networks';
 
 export const getRpcProviderByChainId = (chainId?: number | string): string => {
@@ -21,6 +22,8 @@ export const getRpcProviderByChainId = (chainId?: number | string): string => {
             return process.env.NEXT_PUBLIC_APP_SONIC_PROVIDER ?? '';
         case sonicBlazeTestnet.id:
             return process.env.NEXT_PUBLIC_APP_SONIC_BLAZE_PROVIDER ?? '';
+        case base.id:
+            return process.env.NEXT_PUBLIC_APP_BASE_PROVIDER ?? '';
         default:
             // fallback: Sonic mainnet
             return process.env.NEXT_PUBLIC_APP_SONIC_PROVIDER ?? '';
