@@ -58,8 +58,8 @@ const FarmPoolCard = (props: { pool: any; }) => {
   const [statusTranscation, setStatusTranscation] = useState<StatusTransaction | null>(null);
 
   const { pool } = props;
-  const totalSupply = Number(pool.farmBalance) / 10 ** 18;
   const { token, fee, multiplier, poolAddress, poolMasterchef } = pool;
+  const totalSupply = Number(pool.farmBalance) / 10 ** token.decimals;
   const { farmTokenUSDCPrice } = useContext(AppContext);
 
   const [play] = useSound(transactionSound);
