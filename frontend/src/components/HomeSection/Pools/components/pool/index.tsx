@@ -300,7 +300,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
       if (receipt.status === 'success') {
         fetchLpWallet();
-        fetchPoolDataByWalletConnect();
+        //fetchPoolDataByWalletConnect();
 
         play();
 
