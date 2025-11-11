@@ -88,9 +88,11 @@ const FarmPoolCard = (props: { pool: any; }) => {
   const handleRewards = async () => {
     try {
       if (rewards === 0) {
+        toast.dismiss();
         toast("You don't have rewards to withdraw.", {
           type: 'warning',
           position: 'top-center',
+          delay: 2000,
           style: {
             fontSize: 16,
             fontFamily: 'Trebuchet MS, sans-serif',
@@ -103,9 +105,11 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
       setIsLoadingDeposit(true);
 
+      toast.dismiss();
       toast("We are processing your reward claim.", {
         type: 'success',
         position: 'top-center',
+        delay: 2000,
         style: {
           fontSize: 16,
           fontFamily: 'Trebuchet MS, sans-serif',
@@ -128,8 +132,10 @@ const FarmPoolCard = (props: { pool: any; }) => {
         fetchPoolDataByWalletConnect();
         play();
       } else {
+        toast.dismiss();
         toast('A rewards withdrawal transaction error occurred.', {
           position: 'top-center',
+          delay: 2000,
           type: 'error'
         })
       }
@@ -137,8 +143,10 @@ const FarmPoolCard = (props: { pool: any; }) => {
       setDepositWithdrawValue(0);
     }
     catch (err) {
+      toast.dismiss();
       toast('A rewards withdrawal transaction error occurred.', {
         position: 'top-center',
+        delay: 2000,
         type: 'error'
       })
     }
@@ -150,17 +158,21 @@ const FarmPoolCard = (props: { pool: any; }) => {
   const handleWithdraw = async () => {
     try {
       if (depositWithdrawValueWei.lte(BigNumber.from(0))) {
+        toast.dismiss();
         toast("Enter the amount of tokens you want to deposit.", {
           type: 'warning',
           position: 'top-center',
+          delay: 2000,
           style: { fontSize: 16, fontFamily: 'Trebuchet MS, sans-serif' },
         });
         return;
       }
       else if (depositWithdrawValueWei.gt(totalTokensDeposited)) {
+        toast.dismiss();
         toast("You don't have the amount of tokens you want to withdraw in this pool.", {
           type: 'warning',
           position: 'top-center',
+          delay: 2000,
           style: { fontSize: 16, fontFamily: 'Trebuchet MS, sans-serif' }
         });
         return;
@@ -183,17 +195,21 @@ const FarmPoolCard = (props: { pool: any; }) => {
         fetchPoolDataByWalletConnect();
         play();
 
+        toast.dismiss();
         toast("Withdrawal completed successfully!", {
           type: 'success',
           position: 'top-center',
+          delay: 2000,
           style: {
             fontSize: 16,
             fontFamily: 'Trebuchet MS, sans-serif',
           }
         });
       } else {
+        toast.dismiss();
         toast('A withdrawal transaction error occurred.', {
           position: 'top-center',
+          delay: 2000,
           type: 'error'
         })
       }
@@ -202,8 +218,10 @@ const FarmPoolCard = (props: { pool: any; }) => {
       setDepositWithdrawValue(0);
     }
     catch (err) {
+      toast.dismiss();
       toast('A withdrawal transaction error occurred.', {
         position: 'top-center',
+        delay: 2000,
         type: 'error'
       })
     }
@@ -237,20 +255,24 @@ const FarmPoolCard = (props: { pool: any; }) => {
   const handleDeposit = async () => {
     try {
       if (depositWithdrawValueWei.lte(BigNumber.from(0))) {
+        toast.dismiss();
         toast("Enter the amount of tokens you want to deposit.", {
           type: 'warning',
           position: 'top-center',
+          delay: 2000,
           style: { fontSize: 16, fontFamily: 'Trebuchet MS, sans-serif' },
         });
         return;
       }
 
       else if (balanceWallet.lte(BigNumber.from(0)) || depositWithdrawValueWei.gt(balanceWallet)) {
+        toast.dismiss();
         toast(
           "You do not have enough tokens in your portfolio to deposit. Click to go to the liquidity pools and get more tokens.",
           {
             type: 'warning',
             position: 'top-center',
+            delay: 2000,
             style: { fontSize: 16, fontFamily: 'Trebuchet MS, sans-serif' },
             onClick: () => handleAddLiquidity(),
           }
@@ -307,15 +329,18 @@ const FarmPoolCard = (props: { pool: any; }) => {
           fetchPoolDataByWalletConnect();
           play();
 
-
+          toast.dismiss();
           toast("Deposit completed successfully!", {
             type: 'success',
             position: 'top-center',
+            delay: 2000,
             style: { fontSize: 16, fontFamily: 'Trebuchet MS, sans-serif' },
           });
         } else {
+          toast.dismiss();
           toast('A deposit transaction error occurred.', {
             position: 'top-center',
+            delay: 2000,
             type: 'error'
           })
         }
@@ -324,8 +349,10 @@ const FarmPoolCard = (props: { pool: any; }) => {
         setIsDeposit(false);
       }
     } catch (err) {
+      toast.dismiss();
       toast('A deposit transaction error occurred.', {
         position: 'top-center',
+        delay: 2000,
         type: 'error'
       })
     } finally {
@@ -344,6 +371,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
       setDepositWithdrawValueWei(valueInWei);
     } catch (error) {
+      toast.dismiss();
       toast('Invalid input value', { type: 'error' });
     }
   };
@@ -759,6 +787,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
     </PoolContainer>
     <div className="clickable-div" style={{ display: 'flex', alignItems: 'center', marginTop: 20 }} onClick={() => {
       navigator.clipboard.writeText(token0.id);
+      toast.dismiss();
       toast('Copied address', {
         position: 'top-center'
       })
@@ -769,6 +798,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
     </div>
     <div className="clickable-div" style={{ display: 'flex', alignItems: 'center', marginTop: 4 }} onClick={() => {
       navigator.clipboard.writeText(token1.id);
+      toast.dismiss();
       toast('Copied address', {
         position: 'top-center'
       })

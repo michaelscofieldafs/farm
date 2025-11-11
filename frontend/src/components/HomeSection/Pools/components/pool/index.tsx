@@ -29,6 +29,7 @@ import { getTokenContractABIByChainId } from "@/utils/tokenContractABIProvider";
 import { getRpcProviderByChainId } from "@/utils/rpcProviderUtils";
 import ModalDeposit from "@/components/ModalDeposit";
 import { fetchImageByAddress } from "@/utils/fetchTokenImage";
+import { ElectricBorderShow } from "@/components/ElectricBorder";
 const transactionSound = '/sounds/transaction.mp3';
 
 enum StatusTransaction {
@@ -56,6 +57,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
   const [totalTokensDepositedBalance, setTotalTokensDepositedBalance] = useState<BigNumber>(BigNumber.from(0));
   const [isLoadingDeposit, setIsLoadingDeposit] = useState(false);
   const [statusTranscation, setStatusTranscation] = useState<StatusTransaction | null>(null);
+  const [isShowTransactionEffect, setIsShowTransactionEffect] = useState(false);
 
   const { pool } = props;
   const { token, fee, multiplier, poolAddress, poolMasterchef } = pool;
@@ -88,9 +90,11 @@ const FarmPoolCard = (props: { pool: any; }) => {
   const handleRewards = async (): Promise<void> => {
     try {
       if (rewards === 0) {
+        toast.dismiss();
         toast("You don't have rewards to withdraw.", {
           type: 'warning',
           position: 'top-center',
+          delay: 2000,
           style: {
             fontSize: 16,
             fontFamily: 'Trebuchet MS, sans-serif',
@@ -103,9 +107,11 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
       setIsLoadingDeposit(true);
 
+      toast.dismiss();
       toast("We are processing your reward claim.", {
         type: 'success',
         position: 'top-center',
+        delay: 2000,
         style: {
           fontSize: 16,
           fontFamily: 'Trebuchet MS, sans-serif',
@@ -127,10 +133,12 @@ const FarmPoolCard = (props: { pool: any; }) => {
         fetchLpWallet();
         fetchPoolDataByWalletConnect();
         play();
+        showTransactionEffect();
       } else {
         toast.dismiss();
         toast('Transaction has been cancelled.', {
           position: 'top-center',
+          delay: 2000,
           type: 'warning'
         })
       }
@@ -140,6 +148,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
       toast.dismiss();
       toast('Transaction has been cancelled.', {
         position: 'top-center',
+        delay: 2000,
         type: 'warning'
       })
     }
@@ -151,17 +160,21 @@ const FarmPoolCard = (props: { pool: any; }) => {
   const handleWithdraw = async (): Promise<void> => {
     try {
       if (depositWithdrawValueWei.lte(BigNumber.from(0))) {
+        toast.dismiss();
         toast("Enter the amount of tokens you want to deposit.", {
           type: 'warning',
           position: 'top-center',
+          delay: 2000,
           style: { fontSize: 16, fontFamily: 'Trebuchet MS, sans-serif' },
         });
         return;
       }
       else if (depositWithdrawValueWei.gt(totalTokensDeposited)) {
+        toast.dismiss();
         toast("You don't have the amount of tokens you want to withdraw in this pool.", {
           type: 'warning',
           position: 'top-center',
+          delay: 2000,
           style: { fontSize: 16, fontFamily: 'Trebuchet MS, sans-serif' }
         });
         return;
@@ -185,18 +198,22 @@ const FarmPoolCard = (props: { pool: any; }) => {
         fetchLpWallet();
         fetchPoolDataByWalletConnect();
         play();
-
+        showTransactionEffect();
+        toast.dismiss();
         toast("Withdrawal completed successfully!", {
           type: 'success',
           position: 'top-center',
+          delay: 2000,
           style: {
             fontSize: 16,
             fontFamily: 'Trebuchet MS, sans-serif',
           }
         });
       } else {
+        toast.dismiss();
         toast('Transaction has been cancelled.', {
           position: 'top-center',
+          delay: 2000,
           type: 'warning'
         })
       }
@@ -207,6 +224,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
     catch (err) {
       toast('Transaction has been cancelled.', {
         position: 'top-center',
+        delay: 2000,
         type: 'warning'
       })
       setIsWithdraw(false);
@@ -240,6 +258,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
         toast("Enter the amount of tokens you want to deposit.", {
           type: 'warning',
           position: 'top-center',
+          delay: 2000,
           style: { fontSize: 16, fontFamily: 'Trebuchet MS, sans-serif' },
         });
         return;
@@ -251,6 +270,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
           {
             type: 'warning',
             position: 'top-center',
+            delay: 2000,
             style: { fontSize: 16, fontFamily: 'Trebuchet MS, sans-serif' },
           }
         );
@@ -307,15 +327,21 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
           play();
 
+          showTransactionEffect();
+
+          toast.dismiss();
           toast("Deposit completed successfully!", {
             type: 'success',
             position: 'top-center',
+            delay: 2000,
             style: { fontSize: 16, fontFamily: 'Trebuchet MS, sans-serif' },
           });
         }
         else {
+          toast.dismiss();
           toast('Transaction has been cancelled.', {
             position: 'top-center',
+            delay: 2000,
             type: 'warning'
           });
         }
@@ -325,8 +351,10 @@ const FarmPoolCard = (props: { pool: any; }) => {
         setDepositWithdrawValue(0);
       }
     } catch (err) {
+      toast.dismiss();
       toast('Transaction has been cancelled.', {
         position: 'top-center',
+        delay: 2000,
         type: 'warning'
       })
 
@@ -346,6 +374,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
       setDepositWithdrawValueWei(valueInWei);
     } catch (error) {
+      toast.dismiss();
       toast('Invalid input value', { type: 'error' });
     }
   };
@@ -526,286 +555,301 @@ const FarmPoolCard = (props: { pool: any; }) => {
     return ethers.utils.formatUnits(valueInWei, token.decimais);
   }
 
+  const showTransactionEffect = (): void => {
+    setIsShowTransactionEffect(true);
+
+    setTimeout(() => {
+      setIsShowTransactionEffect(false);
+    }, 3400)
+  }
+
   useEffect(() => {
     fetchLpWallet();
     fetchPoolDataByWalletConnect();
   }, [isConnected, address, pool, chainId]);
 
-
-  return <div style={cardStyle}>
-    <ModalDeposit show={isDeposit} title={`DEPOSIT $${token.symbol.toUpperCase()}`}
-      balance={`${formatTokenBalanceFromWallet()} / ${(formatTokenBalanceFromWalletUSDC())}`} handleDeposit={handleDeposit}
-      handleShow={handleIsDeposit} value={depositWithdrawValue} handleValue={handleDeposiWithdrawValue} decimals={token.decimals} buttonTitle={transactionStatusText} balanceValue={fromWeiWithDecimals(balanceWallet)} isLoading={isLoadingDeposit} />
-    <ModalDeposit show={isWithdraw} title={`WITHDRAW $${token.symbol.toUpperCase()}`}
-      balance={`${formatTokenBalanceFromFarm()} / ${(formatTokenBalanceFromFarmUSDC())}`} handleDeposit={handleWithdraw}
-      handleShow={handleIsWithdraw} value={depositWithdrawValue} handleValue={handleDeposiWithdrawValue} decimals={token.decimals} buttonTitle={transactionStatusText} balanceValue={fromWeiWithDecimals(totalTokensDeposited)} isLoading={isLoadingDeposit} />
-    <HeaderContainer>
-      <ImageToken src={fetchImageByAddress(token.id)} />
-      <HeaderDetailsContainer style={{ zIndex: 999 }}>
-        <div onClick={() => { }} style={{ display: 'flex', alignContent: 'center', justifyContent: 'start' }}>
-          <h3 className='text-white sm:text-18 text-18 font-bold' style={{ textShadow: '1px 1px 1px #fff', textAlign: 'start', marginRight: 4 }}>
-            {token.symbol.toUpperCase()}
-          </h3>
-        </div>
-        <TokenContainer>
-          <h3 className='text-white sm:text-14 text-14 font-normal'>
-            {token.name}
-          </h3>
-        </TokenContainer>
-        <div style={{ display: 'flex' }}>
-          <a className="fee">        <FeeContainer>
-            <FeeValueContainer style={{ display: 'flex' }}>
-              <h3 className='text-white sm:text-14 text-14 font-normal'>
-                {fee > 0 ? `${fee}% Fee` : 'No fees!'}
-              </h3>
-            </FeeValueContainer>
-          </FeeContainer></a>
-          <Tooltip style={{ zIndex: 999 }} anchorSelect=".fee" place="top">
-            {`This is the fee reserved for the developer, it is a way to support and encourage the farm.`}
+  return <ElectricBorderShow
+    color="#7df9ff"
+    speed={1}
+    chaos={0.5}
+    thickness={2}
+    style={{ borderRadius: 16 }}
+    isShow={isShowTransactionEffect}
+  > <div style={cardStyle}>
+      <ModalDeposit show={isDeposit} title={`DEPOSIT $${token.symbol.toUpperCase()}`}
+        balance={`${formatTokenBalanceFromWallet()} / ${(formatTokenBalanceFromWalletUSDC())}`} handleDeposit={handleDeposit}
+        handleShow={handleIsDeposit} value={depositWithdrawValue} handleValue={handleDeposiWithdrawValue} decimals={token.decimals} buttonTitle={transactionStatusText} balanceValue={fromWeiWithDecimals(balanceWallet)} isLoading={isLoadingDeposit} />
+      <ModalDeposit show={isWithdraw} title={`WITHDRAW $${token.symbol.toUpperCase()}`}
+        balance={`${formatTokenBalanceFromFarm()} / ${(formatTokenBalanceFromFarmUSDC())}`} handleDeposit={handleWithdraw}
+        handleShow={handleIsWithdraw} value={depositWithdrawValue} handleValue={handleDeposiWithdrawValue} decimals={token.decimals} buttonTitle={transactionStatusText} balanceValue={fromWeiWithDecimals(totalTokensDeposited)} isLoading={isLoadingDeposit} />
+      <HeaderContainer>
+        <ImageToken src={fetchImageByAddress(token.id)} />
+        <HeaderDetailsContainer style={{ zIndex: 999 }}>
+          <div onClick={() => { }} style={{ display: 'flex', alignContent: 'center', justifyContent: 'start' }}>
+            <h3 className='text-white sm:text-18 text-18 font-bold' style={{ textShadow: '1px 1px 1px #fff', textAlign: 'start', marginRight: 4 }}>
+              {token.symbol.toUpperCase()}
+            </h3>
+          </div>
+          <TokenContainer>
+            <h3 className='text-white sm:text-14 text-14 font-normal'>
+              {token.name}
+            </h3>
+          </TokenContainer>
+          <div style={{ display: 'flex' }}>
+            <a className="fee">        <FeeContainer>
+              <FeeValueContainer style={{ display: 'flex' }}>
+                <h3 className='text-white sm:text-14 text-14 font-normal'>
+                  {fee > 0 ? `${fee}% Fee` : 'No fees!'}
+                </h3>
+              </FeeValueContainer>
+            </FeeContainer></a>
+            <Tooltip style={{ zIndex: 999 }} anchorSelect=".fee" place="top">
+              {`This is the fee reserved for the developer, it is a way to support and encourage the farm.`}
+            </Tooltip>
+          </div>
+        </HeaderDetailsContainer>
+        <Separator />
+      </HeaderContainer>
+      <PoolContainer style={{ zIndex: 999 }}>
+        <PoolSectionContainer>
+          <PoolSectionValueContainer>
+            <a className="totalSupply" style={{ display: 'flex', flex: 1 }}>
+              <PoolSectionValueDescriptionContainer>
+                <h3 className='text-white sm:text-16 text-16 font-bold'>
+                  APR:
+                </h3>
+              </PoolSectionValueDescriptionContainer>
+              <Separator />
+              <PoolSectionValueDescriptionContainer>
+                <h3 className='text-white sm:text-16 text-16 font-bold'>
+                  {isLoading ? <SkeletonTheme baseColor="#202020" highlightColor="#444">
+                    <Skeleton count={1} height={5} width={45} />
+                  </SkeletonTheme> :
+                    <AnimatedNumber
+                      includeComma
+                      transitions={(index: any) => ({
+                        type: "spring",
+                        duration: 4,
+                      })}
+                      value={pool.apr}
+                      formatValue={(value: any) => `${Number(value).toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).replace('$', '')}%`}
+                    />}
+                </h3>
+              </PoolSectionValueDescriptionContainer>
+            </a>
+            <Tooltip style={{ zIndex: 999 }} anchorSelect=".totalSupply" place="top">
+              {`APR (Annual Percentage Rate) is the annual return rate of an investment in cryptocurrencies, calculated without considering compound interest. It's commonly used in yield farming and staking to indicate simple earnings.`}
+            </Tooltip>
+          </PoolSectionValueContainer>
+        </PoolSectionContainer>
+        <PoolSectionContainer>
+          <PoolSectionValueContainer>
+            <a className="mutiplier" style={{ display: 'flex', flex: 1 }}>
+              <PoolSectionValueDescriptionContainer>
+                <h3 className='text-white sm:text-16 text-16 font-bold'>
+                  Multiplier:
+                </h3>
+              </PoolSectionValueDescriptionContainer>
+              <Separator />
+              <PoolSectionValueDescriptionContainer>
+                <h3 className='text-white sm:text-16 text-16 font-bold'>
+                  {isLoading ? <SkeletonTheme baseColor="#202020" highlightColor="#444">
+                    <Skeleton count={1} height={5} width={45} />
+                  </SkeletonTheme> : `${multiplier}x`}
+                </h3>
+              </PoolSectionValueDescriptionContainer></a>
+          </PoolSectionValueContainer>
+          <Tooltip style={{ zIndex: 999 }} anchorSelect=".mutiplier" place="top">
+            {`Multiplier defines the importance of a given pool in relation to others in the distribution of rewards.`}
           </Tooltip>
-        </div>
-      </HeaderDetailsContainer>
-      <Separator />
-    </HeaderContainer>
-    <PoolContainer style={{ zIndex: 999 }}>
-      <PoolSectionContainer>
-        <PoolSectionValueContainer>
-          <a className="totalSupply" style={{ display: 'flex', flex: 1 }}>
-            <PoolSectionValueDescriptionContainer>
-              <h3 className='text-white sm:text-16 text-16 font-bold'>
-                APR:
+        </PoolSectionContainer>
+        <PoolSectionContainer>
+          <PoolSectionValueContainer>
+            <a className="tvl" style={{ display: 'flex', flex: 1, zIndex: 999 }}>
+              <PoolSectionValueDescriptionContainer>
+                <h3 className='text-white sm:text-16 text-16 font-bold'>
+                  Total Value Locked (TVL):
+                </h3>
+              </PoolSectionValueDescriptionContainer>
+              <Separator />
+              <PoolSectionValueDescriptionContainer>
+                <h3 className='text-white sm:text-16 text-16 font-bold'>
+                  {isLoading ? <SkeletonTheme baseColor="#202020" highlightColor="#444">
+                    <Skeleton count={1} height={5} width={45} />
+                  </SkeletonTheme> : <div style={{ display: 'flex' }}>
+                    <AnimatedNumber
+                      includeComma
+                      transitions={(index: any) => ({
+                        type: "spring",
+                        duration: 4,
+                      })}
+                      value={pool.tvl > 0.01 ? pool.tvl : 0}
+                      formatValue={(value: any) => `${pool.tvl > 0 && pool.tvl < 0.01 ? '~ ' : ''}${Number(value).toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}`}
+                    />
+                  </div>}
+                </h3>
+              </PoolSectionValueDescriptionContainer></a>
+            <Tooltip style={{ zIndex: 999 }} anchorSelect=".tvl" place="top">
+              {`TVL (Total Value Locked) refers to the total amount of assets, usually in dollars, locked in a DeFi platform's smart contracts. It represents the overall liquidity and trust in the protocol.`}
+            </Tooltip>
+          </PoolSectionValueContainer>
+        </PoolSectionContainer>
+        <img src={'/images/timeline/border.png'} style={{ width: 370, height: 100, marginTop: -35, marginLeft: -15 }} />
+        <div style={{ display: 'flex', paddingTop: 20, marginTop: -60, }}>
+          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <h3 className='text-white sm:text-14 text-14 font-bold'>
+                You staked
               </h3>
-            </PoolSectionValueDescriptionContainer>
-            <Separator />
-            <PoolSectionValueDescriptionContainer>
-              <h3 className='text-white sm:text-16 text-16 font-bold'>
+              <h3 className='logo-2' style={{ color: '#fff' }}>
+                {isLoading ? <SkeletonTheme baseColor="#202020" highlightColor="#444">
+                  <Skeleton count={1} height={5} width={45} />
+                </SkeletonTheme> : `${formatPercentageFromFarm()}`}
+              </h3>
+              <h3 className='logo-2' style={{ color: '#fff' }}>
                 {isLoading ? <SkeletonTheme baseColor="#202020" highlightColor="#444">
                   <Skeleton count={1} height={5} width={45} />
                 </SkeletonTheme> :
-                  <AnimatedNumber
-                    includeComma
-                    transitions={(index: any) => ({
-                      type: "spring",
-                      duration: 4,
-                    })}
-                    value={pool.apr}
-                    formatValue={(value: any) => `${Number(value).toLocaleString('en-US', {
-                      style: 'currency',
-                      currency: 'USD',
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }).replace('$', '')}%`}
-                  />}
+                  <div style={{ display: 'flex' }}>
+                    <AnimatedNumber
+                      includeComma
+                      transitions={(index: any) => ({
+                        type: "spring",
+                        duration: 4,
+                      })}
+                      value={totalTokensDepositedBalance}
+                      formatValue={(value: any) => formatTokenBalanceFromFarmUSDC()}
+                    />
+                  </div>}
               </h3>
-            </PoolSectionValueDescriptionContainer>
-          </a>
-          <Tooltip style={{ zIndex: 999 }} anchorSelect=".totalSupply" place="top">
-            {`APR (Annual Percentage Rate) is the annual return rate of an investment in cryptocurrencies, calculated without considering compound interest. It's commonly used in yield farming and staking to indicate simple earnings.`}
-          </Tooltip>
-        </PoolSectionValueContainer>
-      </PoolSectionContainer>
-      <PoolSectionContainer>
-        <PoolSectionValueContainer>
-          <a className="mutiplier" style={{ display: 'flex', flex: 1 }}>
-            <PoolSectionValueDescriptionContainer>
-              <h3 className='text-white sm:text-16 text-16 font-bold'>
-                Multiplier:
-              </h3>
-            </PoolSectionValueDescriptionContainer>
-            <Separator />
-            <PoolSectionValueDescriptionContainer>
-              <h3 className='text-white sm:text-16 text-16 font-bold'>
-                {isLoading ? <SkeletonTheme baseColor="#202020" highlightColor="#444">
-                  <Skeleton count={1} height={5} width={45} />
-                </SkeletonTheme> : `${multiplier}x`}
-              </h3>
-            </PoolSectionValueDescriptionContainer></a>
-        </PoolSectionValueContainer>
-        <Tooltip style={{ zIndex: 999 }} anchorSelect=".mutiplier" place="top">
-          {`Multiplier defines the importance of a given pool in relation to others in the distribution of rewards.`}
-        </Tooltip>
-      </PoolSectionContainer>
-      <PoolSectionContainer>
-        <PoolSectionValueContainer>
-          <a className="tvl" style={{ display: 'flex', flex: 1, zIndex: 999 }}>
-            <PoolSectionValueDescriptionContainer>
-              <h3 className='text-white sm:text-16 text-16 font-bold'>
-                Total Value Locked (TVL):
-              </h3>
-            </PoolSectionValueDescriptionContainer>
-            <Separator />
-            <PoolSectionValueDescriptionContainer>
-              <h3 className='text-white sm:text-16 text-16 font-bold'>
-                {isLoading ? <SkeletonTheme baseColor="#202020" highlightColor="#444">
-                  <Skeleton count={1} height={5} width={45} />
-                </SkeletonTheme> : <div style={{ display: 'flex' }}>
-                  <AnimatedNumber
-                    includeComma
-                    transitions={(index: any) => ({
-                      type: "spring",
-                      duration: 4,
-                    })}
-                    value={pool.tvl > 0.01 ? pool.tvl : 0}
-                    formatValue={(value: any) => `${pool.tvl > 0 && pool.tvl < 0.01 ? '~ ' : ''}${Number(value).toLocaleString('en-US', {
-                      style: 'currency',
-                      currency: 'USD',
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}`}
-                  />
-                </div>}
-              </h3>
-            </PoolSectionValueDescriptionContainer></a>
-          <Tooltip style={{ zIndex: 999 }} anchorSelect=".tvl" place="top">
-            {`TVL (Total Value Locked) refers to the total amount of assets, usually in dollars, locked in a DeFi platform's smart contracts. It represents the overall liquidity and trust in the protocol.`}
-          </Tooltip>
-        </PoolSectionValueContainer>
-      </PoolSectionContainer>
-      <img src={'/images/timeline/border.png'} style={{ width: 370, height: 100, marginTop: -35, marginLeft: -15 }} />
-      <div style={{ display: 'flex', paddingTop: 20, marginTop: -60, }}>
-        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, alignItems: 'flex-start' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
             <h3 className='text-white sm:text-14 text-14 font-bold'>
-              You staked
+              Your rewards
             </h3>
-            <h3 className='logo-2' style={{ color: '#fff' }}>
-              {isLoading ? <SkeletonTheme baseColor="#202020" highlightColor="#444">
-                <Skeleton count={1} height={5} width={45} />
-              </SkeletonTheme> : `${formatPercentageFromFarm()}`}
-            </h3>
-            <h3 className='logo-2' style={{ color: '#fff' }}>
+            <h3 className={rewards > 0 ? 'logo-3' : ''} style={{ color: '#228345', textShadow: '1px 1px 1px #fff' }}>
               {isLoading ? <SkeletonTheme baseColor="#202020" highlightColor="#444">
                 <Skeleton count={1} height={5} width={45} />
               </SkeletonTheme> :
                 <div style={{ display: 'flex' }}>
+                  &nbsp;
                   <AnimatedNumber
                     includeComma
                     transitions={(index: any) => ({
                       type: "spring",
                       duration: 4,
                     })}
-                    value={totalTokensDepositedBalance}
-                    formatValue={(value: any) => formatTokenBalanceFromFarmUSDC()}
+                    value={rewards}
+                    formatValue={(value: any) => {
+                      const formatter = new Intl.NumberFormat('en-US', {
+                        notation: 'compact',
+                        compactDisplay: 'short',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 2,
+                      });
+
+                      return formatter.format(value);
+                    }}
                   />
-                </div>}
+                  &nbsp;
+                  {`$${process.env.NEXT_PUBLIC_APP_NAME?.toUpperCase()}`}
+                  &nbsp;
+                  <AnimatedNumber
+                    includeComma
+                    transitions={(index: any) => ({
+                      type: "spring",
+                      duration: 4,
+                    })}
+                    value={Number(rewards * farmTokenUSDCPrice)}
+                    formatValue={(value: any) => `$${numeral(value).format('0.00a')}`}
+                  />
+                </div>
+              }
             </h3>
+            {!isLoading &&
+              <button
+                disabled={rewards === 0 || isLoadingDeposit}
+                className='clickable-rewards-div bg-transparent border-none'
+                onClick={handleRewards}
+              >
+                {isLoading ? (
+                  <SkeletonTheme baseColor="#202020" highlightColor="#444">
+                    <Skeleton count={1} height={5} width={45} />
+                  </SkeletonTheme>
+                ) : (
+                  <h3
+                    className={`${rewards > 0 ? 'logo-2 ' : ''} font-bold text-[16px] ${rewards === 0 ? 'line-through text-[#bfbfbf]' : 'text-[#99E39E] underline'
+                      }`}
+                    style={{ background: 'transparent', border: 'none' }}
+                  >
+                    CLAIM REWARDS
+                  </h3>
+                )}
+              </button>
+            }
           </div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-          <h3 className='text-white sm:text-14 text-14 font-bold'>
-            Your rewards
-          </h3>
-          <h3 className={rewards > 0 ? 'logo-3' : ''} style={{ color: '#228345', textShadow: '1px 1px 1px #fff' }}>
-            {isLoading ? <SkeletonTheme baseColor="#202020" highlightColor="#444">
-              <Skeleton count={1} height={5} width={45} />
-            </SkeletonTheme> :
-              <div style={{ display: 'flex' }}>
-                &nbsp;
-                <AnimatedNumber
-                  includeComma
-                  transitions={(index: any) => ({
-                    type: "spring",
-                    duration: 4,
-                  })}
-                  value={rewards}
-                  formatValue={(value: any) => {
-                    const formatter = new Intl.NumberFormat('en-US', {
-                      notation: 'compact',
-                      compactDisplay: 'short',
-                      minimumFractionDigits: 0,
-                      maximumFractionDigits: 2,
-                    });
-
-                    return formatter.format(value);
-                  }}
-                />
-                &nbsp;
-                {`$${process.env.NEXT_PUBLIC_APP_NAME?.toUpperCase()}`}
-                &nbsp;
-                <AnimatedNumber
-                  includeComma
-                  transitions={(index: any) => ({
-                    type: "spring",
-                    duration: 4,
-                  })}
-                  value={Number(rewards * farmTokenUSDCPrice)}
-                  formatValue={(value: any) => `$${numeral(value).format('0.00a')}`}
-                />
-              </div>
-            }
-          </h3>
-          {!isLoading &&
-            <button
-              disabled={rewards === 0 || isLoadingDeposit}
-              className='clickable-rewards-div bg-transparent border-none'
-              onClick={handleRewards}
-            >
-              {isLoading ? (
-                <SkeletonTheme baseColor="#202020" highlightColor="#444">
-                  <Skeleton count={1} height={5} width={45} />
-                </SkeletonTheme>
-              ) : (
-                <h3
-                  className={`${rewards > 0 ? 'logo-2 ' : ''} font-bold text-[16px] ${rewards === 0 ? 'line-through text-[#bfbfbf]' : 'text-[#99E39E] underline'
-                    }`}
-                  style={{ background: 'transparent', border: 'none' }}
-                >
-                  CLAIM REWARDS
-                </h3>
-              )}
-            </button>
-          }
-        </div>
-      </div>
-    </PoolContainer>
-    <div className="clickable-div" style={{ display: 'flex', alignItems: 'center', marginTop: 20 }} onClick={() => {
-      navigator.clipboard.writeText(token.id);
-      toast('Copied address', {
-        position: 'top-center'
-      })
-    }}>
-      <h3 className='text-white sm:text-14 text-14 font-normal' style={{ marginRight: 10 }}>
-        {token ? token.symbol.toUpperCase() : ''}: {pool.token ? `${token.id.substring(0, 10)}...${token.id.substring(token.id.length - 10, token.id.length)}` : ''}
-      </h3>
-    </div>
-    <WalletContainer>
-      <WalletTitleContainer style={{ display: 'flex' }}>
-        <h3 className='text-white sm:text-14 text-14 font-normal' style={{ flex: 1 }}>
-          Your wallet tokens balance
+      </PoolContainer>
+      <div className="clickable-div" style={{ display: 'flex', alignItems: 'center', marginTop: 20 }} onClick={() => {
+        navigator.clipboard.writeText(token.id);
+        toast.dismiss();
+        toast('Copied address', {
+          position: 'top-center'
+        })
+      }}>
+        <h3 className='text-white sm:text-14 text-14 font-normal' style={{ marginRight: 10 }}>
+          {token ? token.symbol.toUpperCase() : ''}: {pool.token ? `${token.id.substring(0, 10)}...${token.id.substring(token.id.length - 10, token.id.length)}` : ''}
         </h3>
-      </WalletTitleContainer>
-      <WalletValueContainer>
-        <WalletValueDescriptionContainer>
-          <h3 className='text-white sm:text-14 text-14 font-normal'>
-            {`${formatTokenBalanceFromWallet()} / ${formatTokenBalanceFromWalletUSDC()}`}
+      </div>
+      <WalletContainer>
+        <WalletTitleContainer style={{ display: 'flex' }}>
+          <h3 className='text-white sm:text-14 text-14 font-normal' style={{ flex: 1 }}>
+            Your wallet tokens balance
           </h3>
-        </WalletValueDescriptionContainer>
-      </WalletValueContainer>
-    </WalletContainer>
-    {isConnected ?
-      <ActionContainer>
-        <div style={{ flex: 1 }}>
-          <button className='clickable-div' onClick={handleIsDeposit} disabled={isLoadingDeposit} type="button" style={{
-            width: '100%', padding: 10, borderRadius: 10, border: 'none',
-            background: 'linear-gradient(to right, #29317D, #019CAD)'
-          }}><h3 color={'white'} style={{ color: '#fff' }}>
-              DEPOSIT
-            </h3></button>
-        </div>
-        <ActionButtonSeparator />
-        <div style={{ flex: 1 }}>
-          <button className='clickable-div' onClick={handleIsWithdraw} disabled={isLoadingDeposit} type="button" style={{
-            width: '100%', padding: 10, borderRadius: 10, border: 'none',
-            background: 'linear-gradient(to right, #29317D, #FFA62E)'
-          }}><h3 color={'white'} style={{ color: '#fff' }}>
-              WITHDRAW
-            </h3></button>
-        </div>
-      </ActionContainer> : <ActionButtonWalletContainer>
-        <appkit-button size="sm" label='' loadingLabel=''></appkit-button>
-      </ActionButtonWalletContainer>}
-    <style>
-      {`
+        </WalletTitleContainer>
+        <WalletValueContainer>
+          <WalletValueDescriptionContainer>
+            <h3 className='text-white sm:text-14 text-14 font-normal'>
+              {`${formatTokenBalanceFromWallet()} / ${formatTokenBalanceFromWalletUSDC()}`}
+            </h3>
+          </WalletValueDescriptionContainer>
+        </WalletValueContainer>
+      </WalletContainer>
+      {isConnected ?
+        <ActionContainer>
+          <div style={{ flex: 1 }}>
+            <button className='clickable-div' onClick={handleIsDeposit} disabled={isLoadingDeposit} type="button" style={{
+              width: '100%', padding: 10, borderRadius: 10, border: 'none',
+              background: 'linear-gradient(to right, #29317D, #019CAD)'
+            }}><h3 color={'white'} style={{ color: '#fff' }}>
+                DEPOSIT
+              </h3></button>
+          </div>
+          <ActionButtonSeparator />
+          <div style={{ flex: 1 }}>
+            <button className='clickable-div' onClick={handleIsWithdraw} disabled={isLoadingDeposit} type="button" style={{
+              width: '100%', padding: 10, borderRadius: 10, border: 'none',
+              background: 'linear-gradient(to right, #29317D, #FFA62E)'
+            }}><h3 color={'white'} style={{ color: '#fff' }}>
+                WITHDRAW
+              </h3></button>
+          </div>
+        </ActionContainer> : <ActionButtonWalletContainer>
+          <appkit-button size="sm" label='' loadingLabel=''></appkit-button>
+        </ActionButtonWalletContainer>}
+      <style>
+        {`
   :root {
     --shadow-color: #FF9E9E;
     --shadow-color-light: white;
@@ -875,8 +919,9 @@ const FarmPoolCard = (props: { pool: any; }) => {
     transform: translateZ(0);
   }
 `}
-    </style>
-  </div>
+      </style>
+    </div>
+  </ElectricBorderShow>
 }
 
 export default FarmPoolCard;

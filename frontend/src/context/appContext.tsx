@@ -146,7 +146,7 @@ const AppContextProvider = ({ children }: any) => {
               const tvlTotal = (Number(price0) * Number(reserves[0]) / 10 ** decimals0) +
                 (Number(price1) * Number(reserves[1]) / 10 ** decimals1);
 
-              const tvlFarm = ((Number(farmBalance) / 10 ** 18) * tvlTotal) / (Number(totalSupply) / 10 ** 18 || 1);
+              const tvlFarm = ((Number(farmBalance) / 10 ** Number(decimals)) * tvlTotal) / (Number(totalSupply) / 10 ** 18 || 1);
 
               console.log(`token ${name0} \ ${name1}\n${price0} \ ${price1} \ Tvl: ${tvlFarm}`)
 
@@ -509,7 +509,7 @@ const AppContextProvider = ({ children }: any) => {
     const unwatch = watchBlocks(wagmiAdapter.wagmiConfig, {
       chainId: Number(chainIdRef.current),
       blockTag: 'latest',
-      pollingInterval: 3000,
+      pollingInterval: 2000,
       onBlock(block) {
         console.log(`Block ${block.number} of ${chainIdRef.current}`);
         fetchDataFarm();

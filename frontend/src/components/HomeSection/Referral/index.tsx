@@ -51,8 +51,10 @@ const SavvyFarmReferral = () => {
     const url = `http://localhost:3000/?refer=${encodedText}`;
 
     navigator.clipboard.writeText(url);
+    toast.dismiss();
     toast('Copied link', {
-      position: 'top-center'
+      position: 'top-center',
+      delay: 2000
     })
   }
 
