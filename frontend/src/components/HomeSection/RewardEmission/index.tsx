@@ -12,9 +12,9 @@ const SavvyFarmRewardEmission = () => {
       <div className='container px-4'>
         <div className='grid lg:grid-cols-2 sm:gap-0 gap-10 items-center'>
           <div>
-            <p className='text-white sm:text-28 text-18 mb-3'><span className='text-primary'>Halving</span> System</p>
+            <p className='text-white sm:text-28 text-18 mb-3'><span className='text-primary'>Emission</span> Control</p>
             <h2 className='text-white sm:text-40 text-30  font-medium mb-5'>
-              Controle inflation and increase long-term token value.
+              Controls inflation and increases long-term token value.
             </h2>
             <p className='text-muted/60 text-18 mb-7'>
               A mechanism that periodically reduces reward emissions, helping to control inflation and increase long-term token value.

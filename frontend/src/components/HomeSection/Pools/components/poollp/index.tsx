@@ -72,17 +72,17 @@ const FarmPoolCard = (props: { pool: any; }) => {
       case StatusTransaction.APPROVE:
         return 'APPROVE';
       case StatusTransaction.APPROVE_DEPOSIT:
-        return 'APPROVE DEPOSIT';
+        return 'APPROVE';
       case StatusTransaction.APPOVING_DEPOSIT:
-        return 'PROCESSING APPROVE DEPOSIT...';
+        return 'PROCESSING APPROVE...';
       case StatusTransaction.DEPOSIT:
-        return 'WAITING DEPOSIT';
+        return 'DEPOSIT';
       case StatusTransaction.DEPOSITING:
         return 'DEPOSITING...';
       case StatusTransaction.APPROVE_WITHDRAW:
-        return 'APPROVE WITHDRAW';
+        return 'WITHDRAW';
       case StatusTransaction.WITHDRAWING:
-        return 'PROCESSING WITHDRAW...';
+        return 'WITHDRAWING...';
       default:
         return '';
     }
