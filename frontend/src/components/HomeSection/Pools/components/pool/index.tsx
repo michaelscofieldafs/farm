@@ -7,7 +7,7 @@
 import { wagmiAdapter } from "@/components/Web3Provider";
 import { AppContext } from "@/context/appContext";
 import { useAppKitNetwork } from "@reown/appkit/react";
-import { writeContract, waitForTransactionReceipt } from '@wagmi/core';
+import { writeContract, waitForTransactionReceipt, readContract } from '@wagmi/core';
 // @ts-ignore
 import AnimatedNumber from "animated-number-react";
 import { BigNumber, ethers, utils } from 'ethers';
@@ -17,7 +17,7 @@ import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { toast } from "react-toastify";
 import { Tooltip } from 'react-tooltip';
-import { Address } from "viem";
+import { Address, formatUnits } from "viem";
 import { useAccount } from "wagmi";
 import Web3 from "web3";
 import { ActionButtonSeparator, ActionButtonWalletContainer, ActionContainer, FeeContainer, FeeValueContainer, HeaderContainer, HeaderDetailsContainer, ImageToken, PoolContainer, PoolSectionContainer, PoolSectionValueContainer, PoolSectionValueDescriptionContainer, Separator, TokenContainer, WalletContainer, WalletTitleContainer, WalletValueContainer, WalletValueDescriptionContainer, cardStyle } from "./styles";
@@ -75,7 +75,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
       case StatusTransaction.APPOVING_DEPOSIT:
         return 'PROCESSING APPROVE DEPOSIT...';
       case StatusTransaction.DEPOSIT:
-        return 'WAITING DEPOSIT...';
+        return 'WAITING DEPOSIT';
       case StatusTransaction.DEPOSITING:
         return 'DEPOSITING...';
       case StatusTransaction.APPROVE_WITHDRAW:
@@ -277,21 +277,43 @@ const FarmPoolCard = (props: { pool: any; }) => {
         return;
       }
 
-      setIsLoadingDeposit(true);
-      setStatusTranscation(StatusTransaction.APPOVING_DEPOSIT);
+      let receiptApprove;
 
-      const approveHash = await writeContract(
+      const allowanceWei: any = await readContract(
         wagmiAdapter.wagmiConfig,
         {
           abi: getTokenContractABIByChainId(chainId),
           address: poolAddress,
-          functionName: 'approve',
-          args: [getMastChefAddressByChainId(chainId), depositWithdrawValueWei],
+          functionName: 'allowance',
+          args: [
+            address,
+            getMastChefAddressByChainId(chainId)
+          ],
           account: address,
         }
       );
 
-      const receiptApprove = await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, { hash: approveHash })
+      setIsLoadingDeposit(true);
+
+      if (allowanceWei != depositWithdrawValueWei) {
+        setStatusTranscation(StatusTransaction.APPOVING_DEPOSIT);
+
+        const approveHash = await writeContract(
+          wagmiAdapter.wagmiConfig,
+          {
+            abi: getTokenContractABIByChainId(chainId),
+            address: poolAddress,
+            functionName: 'approve',
+            args: [getMastChefAddressByChainId(chainId), depositWithdrawValueWei],
+            account: address,
+          }
+        );
+
+        receiptApprove = await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, { hash: approveHash })
+      }
+      else {
+        receiptApprove = { status: 'success' };
+      }
 
       if (receiptApprove.status === 'success') {
         const urlParams = new URLSearchParams(location.search);
@@ -380,16 +402,41 @@ const FarmPoolCard = (props: { pool: any; }) => {
   };
 
   // Show deposit modal
-  const handleIsDeposit = (): void => {
+  const handleIsDeposit = async (): Promise<void> => {
+    setIsDeposit(!isDeposit);
+
     if (!isDeposit) {
-      setStatusTranscation(StatusTransaction.APPROVE_DEPOSIT);
+      const allowanceWei: any = await readContract(
+        wagmiAdapter.wagmiConfig,
+        {
+          abi: getTokenContractABIByChainId(chainId),
+          address: poolAddress,
+          functionName: 'allowance',
+          args: [
+            address,
+            getMastChefAddressByChainId(chainId)
+          ],
+          account: address,
+        }
+      );
+
+      const allowanceEth = formatUnits(allowanceWei as any, token.decimals)
+
+      setDepositWithdrawValueWei(BigNumber.from(allowanceWei));
+      setDepositWithdrawValue(Number(allowanceEth));
+
+      if (allowanceWei > 0) {
+        setStatusTranscation(StatusTransaction.DEPOSIT)
+      }
+      else {
+        setStatusTranscation(StatusTransaction.APPROVE_DEPOSIT);
+      }
     }
     else {
       setStatusTranscation(null);
+      setDepositWithdrawValue(0);
+      setDepositWithdrawValueWei(BigNumber.from(0));
     }
-    setDepositWithdrawValue(0);
-    setDepositWithdrawValueWei(BigNumber.from(0));
-    setIsDeposit(!isDeposit);
 
     setIsLoading(false);
   }

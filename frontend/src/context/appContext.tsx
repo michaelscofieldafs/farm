@@ -509,7 +509,7 @@ const AppContextProvider = ({ children }: any) => {
     const unwatch = watchBlocks(wagmiAdapter.wagmiConfig, {
       chainId: Number(chainIdRef.current),
       blockTag: 'latest',
-      pollingInterval: 2000,
+      pollingInterval: 4000,
       onBlock(block) {
         console.log(`Block ${block.number} of ${chainIdRef.current}`);
         fetchDataFarm();

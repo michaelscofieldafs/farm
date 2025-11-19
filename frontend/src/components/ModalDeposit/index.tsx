@@ -15,7 +15,7 @@ export interface ModalDepositProps {
   balanceValue: number | BigNumber | string;
   handleDeposit: () => void;
   handleShow: () => void;
-  value: Number;
+  value: Number | BigNumber | string;
   handleValue: (value: Number | BigNumber | string) => void;
   isLoading: boolean;
   buttonTitle: string;
@@ -49,7 +49,26 @@ const ModalDeposit = ({ show, title, balance, balanceValue, handleDeposit, handl
   }
 
   useEffect(() => {
-    if (show) {
+    if (String(title).toUpperCase().includes("DEPOSIT")) {
+      let input = String(value);
+
+      input = input.replace(/[^0-9.]/g, '');
+
+      const parts = input.split('.');
+      if (parts.length > 2) {
+        input = parts[0] + '.' + parts.slice(1).join('');
+      }
+
+      if (parts[1]?.length > decimals) {
+        input = parts[0] + '.' + parts[1].slice(0, decimals);
+      }
+
+      setDisplayValue(input);
+    }
+  }, [value])
+
+  useEffect(() => {
+    if (!show) {
       setDisplayValue('');
     }
   }, [show])
@@ -122,7 +141,7 @@ const ModalDeposit = ({ show, title, balance, balanceValue, handleDeposit, handl
             disabled={isLoading}
             className="text-darkmode font-medium text-18 bg-primary w-full border border-primary rounded-lg py-3 hover:text-primary hover:bg-transparent transition"
           >
-            {buttonTitle} {isLoading && <CircleLoader color="#fff" loading={isLoading} size={18} />}
+            {buttonTitle == '' || buttonTitle == null ? "LOADING..." : buttonTitle} {isLoading && <CircleLoader color="#fff" loading={isLoading} size={18} />}
           </button>
         </div>
       </div>
