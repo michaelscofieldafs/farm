@@ -9,7 +9,7 @@ import SavvyFarmStatisticsDashboard from '@/components/HomeSection/FarmChart'
 import SavvyFarmMarketing from '@/components/HomeSection/Marketing'
 import SavvyFarmEcosystem from '@/components/HomeSection/EcoSystem'
 export const metadata: Metadata = {
-  title: 'SavvyYield',
+  title: 'SavvyGirl.app',
 }
 
 export default function Home() {

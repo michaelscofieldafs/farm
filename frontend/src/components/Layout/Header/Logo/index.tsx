@@ -5,10 +5,10 @@ const Logo: React.FC = () => {
   return (
     <Link href="/">
       <Image
-        src="/images/logo/savvy-logo.png"
+        src="/images/logo/savvygirlapplogo.png"
         alt="logo"
-        width={100}
-        height={100}
+        width={200}
+        height={200}
         quality={100}
       />
     </Link>
