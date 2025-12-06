@@ -12,7 +12,7 @@ export const headerData: HeaderItem[] = [
   { label: "Home", href: "/" },
   { label: "Games", href: "/games" },
   { label: "Farm", href: "/farm" },
-  { label: "Shop", href: "shop" },
+  { label: "Shop", href: "/shop" },
   { label: "Dex", href: "#" },
   { label: "Docs & Contracts", href: "/documentation#version" },
 ];
