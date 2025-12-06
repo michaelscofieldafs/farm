@@ -1,4 +1,4 @@
-'use client'
+
 import { useRef, useEffect, useState } from 'react';
 import './Lightning.css';
 import { useAccount } from 'wagmi';

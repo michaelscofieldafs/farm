@@ -810,7 +810,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
                     }}
                   />
                   &nbsp;
-                  {`$${process.env.NEXT_PUBLIC_APP_NAME?.toUpperCase()}`}
+                  {`$${process.env.VITE_APP_SAVVY_NAME?.toUpperCase()}`}
                   &nbsp;
                   <AnimatedNumber
                     includeComma

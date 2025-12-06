@@ -1,6 +1,5 @@
 import React from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
+import { Link } from "react-router-dom";
 
 const NotFound = () => {
   return (
@@ -9,13 +8,11 @@ const NotFound = () => {
         <div className='-mx-4 flex flex-wrap items-center'>
           <div className='w-full px-4 md:w-5/12 lg:w-6/12'>
             <div className='relative mx-auto aspect-129/138 max-w-[357px] text-center'>
-              <Image
+              <img
                 src='/images/404.svg'
                 alt='image'
                 width={0}
                 height={0}
-                layout='responsive'
-                quality={100}
                 className='mx-auto max-w-full'
               />
             </div>
@@ -59,7 +56,7 @@ const NotFound = () => {
                 been moved or deleted.
               </p>
               <Link
-                href='/'
+                to='/'
                 className='rounded-md px-7 py-3 text-base font-medium text-white transition hover:bg-blue-700 bg-primary'>
                 Go To Home
               </Link>

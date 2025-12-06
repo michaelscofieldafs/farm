@@ -1,8 +1,6 @@
 import Footer from '@/components/Layout/Footer'
 import Header from '@/components/Layout/Header'
 import ScrollToTop from '@/components/ScrollToTop'
-import { ThemeProvider } from 'next-themes'
-import { DM_Sans } from 'next/font/google'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import './globals.css'
@@ -10,7 +8,6 @@ import { Web3Provider } from '@/components/Web3Provider'
 import { AppContextProvider } from '../context/appContext';
 import { BackgroundBeatiful } from '@/components/LightBackground'
 
-const font = DM_Sans({ subsets: ['latin'] })
 
 export default function RootLayout({
   children,
@@ -19,19 +16,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={font.className}>
+      <body>
         <Web3Provider>
           <AppContextProvider>
-            <ThemeProvider attribute="class" enableSystem defaultTheme="system">
-              <div className="fixed inset-0 z-[9999] pointer-events-none">
-                <BackgroundBeatiful
-                />
-              </div>
-              <Header />
-              {children}
-              <Footer />
-              <ScrollToTop />
-            </ThemeProvider>
+            <div className="fixed inset-0 z-[9999] pointer-events-none">
+              <BackgroundBeatiful
+              />
+            </div>
+            <Header />
+            {children}
+            <Footer />
+            <ScrollToTop />
             <ToastContainer />
           </AppContextProvider>
         </Web3Provider>

@@ -1,20 +1,42 @@
-'use client'
+
 
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { bsc, bscTestnet, mainnet, sepolia, sonic, sonicBlazeTestnet, plasma, plasmaTestnet, base } from '@reown/appkit/networks'
 import { createAppKit } from '@reown/appkit/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactNode } from 'react'
+import { defineChain } from 'viem'
 import { WagmiProvider } from 'wagmi'
 
 const projectId = '289396e9ac5e2ccac060651fad3b0f90'
+
+export const sonicTestnet = /*#__PURE__*/ defineChain({
+    id: 14601,
+    name: 'Sonic Testnet',
+    nativeCurrency: {
+        decimals: 18,
+        name: 'Sonic',
+        symbol: 'S',
+    },
+    rpcUrls: {
+        default: { http: ['https://rpc.testnet.soniclabs.com'] },
+    },
+    blockExplorers: {
+        default: {
+            name: 'Sonic Testnet Explorer',
+            url: 'https://testnet.soniclabs.com/',
+        },
+    },
+    testnet: true,
+})
+
 
 export function Web3Provider({ children }: { children: ReactNode }) {
     const queryClient = new QueryClient()
 
     createAppKit({
         adapters: [wagmiAdapter],
-        allowUnsupportedChain: false,
+        allowUnsupportedChain: true,
         defaultNetwork: sonic,
         themeVariables: {
             '--w3m-font-family': 'DM Sans, sans-serif',
@@ -27,9 +49,10 @@ export function Web3Provider({ children }: { children: ReactNode }) {
             '--w3m-qr-color': '#99E39E',
         },
         enableReconnect: true,
-        networks: [mainnet, bsc, sonic, base],
+        networks: [sonicTestnet, sonic, base],
         chainImages: {
             146: 'https://resources.cryptocompare.com/asset-management/17157/1727687183179.png',
+            64_165: 'https://resources.cryptocompare.com/asset-management/17157/1727687183179.png',
             57054: 'https://resources.cryptocompare.com/asset-management/17157/1727687183179.png',
             97: 'https://cdn-icons-png.flaticon.com/128/12114/12114208.png',
             9745: 'https://cdn-icons-png.flaticon.com/128/12114/12114208.png',
@@ -51,6 +74,6 @@ export function Web3Provider({ children }: { children: ReactNode }) {
 }
 
 export const wagmiAdapter = new WagmiAdapter({
-    networks: [mainnet, sepolia, bsc, bscTestnet, sonic, sonicBlazeTestnet, plasma, plasmaTestnet, base],
+    networks: [sonicTestnet, sonic, base],
     projectId,
 })

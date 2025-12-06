@@ -1,5 +1,4 @@
 import { perksData } from '@/app/api/data'
-import Image from 'next/image'
 
 const SavvyFarmMarketing = () => {
   return (
@@ -19,7 +18,7 @@ const SavvyFarmMarketing = () => {
                 key={index}
                 className='text-center flex items-center justify-end flex-col'>
                 <div className='bg-primary/25 backdrop-blur-xs p-4 rounded-full w-fit'>
-                  <Image
+                  <img
                     src={item.icon}
                     alt={item.title}
                     width={44}

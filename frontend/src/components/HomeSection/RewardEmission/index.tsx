@@ -1,4 +1,4 @@
-'use client'
+
 import { upgradeData } from '@/app/api/data'
 import { AppContext } from '@/context/appContext'
 import { Icon } from '@iconify/react'

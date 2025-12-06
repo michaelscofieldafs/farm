@@ -1,4 +1,4 @@
-'use client'
+
 
 import { useAggregateChains } from '@/hooks/useAggregateChains';
 import {

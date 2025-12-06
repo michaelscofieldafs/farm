@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { Link } from "react-router-dom";
 import { BreadcrumbProps } from '../../types/breadcrumb' // Adjust the import path based on your project structure
 
 const Breadcrumb: React.FC<BreadcrumbProps> = ({
@@ -22,7 +22,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({
               <ul className='flex items-center justify-center gap-[10px]'>
                 <li>
                   <Link
-                    href='/'
+                    to='/'
                     className='text-black flex items-center gap-[10px] text-base font-medium dark:text-white dark:text-opacity-50'>
                     Home
                   </Link>

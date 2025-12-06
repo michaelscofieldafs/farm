@@ -1,9 +1,8 @@
-'use client'
+
 import { Icon } from '@iconify/react/dist/iconify.js'
 // @ts-ignore
 import AnimatedNumber from "animated-number-react"
 import { motion } from 'framer-motion'
-import Image from 'next/image'
 import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import CardSlider from './slider'
 import { AppContext } from '@/context/appContext'
@@ -104,14 +103,14 @@ const SavvyFarmIntro = () => {
         <div className='grid grid-cols-8'>
           <motion.div {...leftAnimation} className='lg:col-span-5 col-span-12'>
             <div className='flex gap-6 items-center lg:justify-start justify-center mb-5 mt-24'>
-              <Image
-                src='/images/icons/icon-bag.svg'
+              <img
+                src='/images/logo/savvy-logo.png'
                 alt='icon'
-                width={40}
-                height={40}
+                width={65}
+                height={65}
               />
               <p className='text-white sm:text-28 text-18 mb-0'>
-                The best multichain yieldfarm of <span className='text-primary'>SonicLabs</span>
+                The best multichain yieldfarm <span className='text-primary'></span>
               </p>
             </div>
             <h1 className='font-medium lg:text-76 md:text-70 text-54 lg:text-start text-center text-white mb-10'>
@@ -222,7 +221,7 @@ const SavvyFarmIntro = () => {
             {...rightAnimation}
             className='col-span-3 lg:block hidden'>
             <div className='mx-auto flex justify-center items-center h-full'>
-              <Image
+              <img
                 src='/images/hero/rocket.gif'
                 alt='Banner'
                 width={310}

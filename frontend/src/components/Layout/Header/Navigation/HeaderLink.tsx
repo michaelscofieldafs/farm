@@ -1,12 +1,12 @@
 "use client";
 import { useState } from "react";
-import Link from "next/link";
+import { Link, useLocation } from "react-router-dom";
 import { HeaderItem } from "../../../../types/menu";
-import { usePathname } from "next/navigation";
 
 const HeaderLink: React.FC<{ item: HeaderItem }> = ({ item }) => {
   const [submenuOpen, setSubmenuOpen] = useState(false);
-  const path = usePathname();
+  const location = useLocation();
+  const path = location.pathname;
 
   const handleMouseEnter = () => {
     if (item.submenu) setSubmenuOpen(true);
@@ -48,7 +48,7 @@ const HeaderLink: React.FC<{ item: HeaderItem }> = ({ item }) => {
       onMouseLeave={handleMouseLeave}
     >
       <Link
-        href={!item.isUrl ? item.href : '#'}
+        to={!item.isUrl ? item.href : '#'}
         onClick={handleClick}
         className={`text-17 flex font-medium hover:text-primary capitalized ${path === item.href ? 'text-primary' : 'text-muted'
           }`}
@@ -81,10 +81,10 @@ const HeaderLink: React.FC<{ item: HeaderItem }> = ({ item }) => {
           {item.submenu?.map((subItem, index) => (
             <Link
               key={index}
-              href={subItem.href}
+              to={subItem.href}
               className={`block px-4 py-2 ${path === subItem.href
-                  ? 'bg-primary text-white'
-                  : 'text-black dark:text-white hover:bg-primary'
+                ? 'bg-primary text-white'
+                : 'text-black dark:text-white hover:bg-primary'
                 }`}
             >
               {subItem.label}

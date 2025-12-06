@@ -5,27 +5,41 @@ import {
     mainnet,
     sonic,
     sonicBlazeTestnet,
-    base
+    base,
 } from '@reown/appkit/networks';
+
+const env = import.meta.env; // atalho
+
+const getNumber = (value: any) => {
+    const n = Number(value);
+    return isNaN(n) ? 0 : n;
+};
 
 export const getBlocksPerYearByChainId = (chainId?: number): number => {
     switch (chainId) {
         case mainnet.id:
-            return Number(process.env.NEXT_PUBLIC_APP_ETH_BPY) ?? 0
+            return getNumber(env.VITE_APP_SAVVY_ETH_BPY);
+
         case sepolia.id:
-            return Number(process.env.NEXT_PUBLIC_APP_SEPOLIA_BPY) ?? 0
+            return getNumber(env.VITE_APP_SAVVY_SEPOLIA_BPY);
+
         case bsc.id:
-            return Number(process.env.NEXT_PUBLIC_APP_BSC_BPY) ?? 0
+            return getNumber(env.VITE_APP_SAVVY_BSC_BPY);
+
         case bscTestnet.id:
-            return Number(process.env.NEXT_PUBLIC_APP_BSC_TESTNET_BPY) ?? 0
+            return getNumber(env.VITE_APP_SAVVY_BSC_TESTNET_BPY);
+
         case sonic.id:
-            return Number(process.env.NEXT_PUBLIC_APP_SONIC_BPY) ?? 0
+            return getNumber(env.VITE_APP_SAVVY_SONIC_BPY);
+
         case sonicBlazeTestnet.id:
-            return Number(process.env.NEXT_PUBLIC_APP_SONIC_BPY) ?? 0
+            return getNumber(env.VITE_APP_SAVVY_SONIC_BPY);
+
         case base.id:
-            return Number(process.env.NEXT_PUBLIC_APP_BASE_BPY) ?? 0
+            return getNumber(env.VITE_APP_SAVVY_BASE_BPY);
+
         default:
-            // fallback: Sonic mainnet
-            return Number(process.env.NEXT_PUBLIC_APP_SONIC_BPY) ?? 0
+            // fallback
+            return getNumber(env.VITE_APP_SAVVY_SONIC_BPY);
     }
 };

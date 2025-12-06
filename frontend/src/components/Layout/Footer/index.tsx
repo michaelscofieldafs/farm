@@ -1,18 +1,21 @@
 import { Icon } from '@iconify/react'
-import Link from 'next/link'
+import { Link } from "react-router-dom";
 import { FC } from 'react'
 import Logo from '../Header/Logo'
 import { headerData } from '../Header/Navigation/menuData'
 
 const Footer: FC = () => {
   return (
-    <footer className='pt-16 bg-darkmode'>
+    <footer className='pt-16 bg-gradient-to-b from-[#071019] to-[#0b1418]'>
       <div className='container px-4'>
-        <div className='grid grid-cols-1 sm:grid-cols-12 lg:gap-20 md:gap-6 sm:gap-12 gap-6  pb-16'>
-          <div className='lg:col-span-4 md:col-span-6 col-span-6'>
+        {/* Flex container principal: esquerda (logo) e direita (links) */}
+        <div className='flex flex-col lg:flex-row justify-between items-start lg:items-center gap-12'>
+
+          {/* Coluna esquerda: logo, redes e copyright */}
+          <div className='flex flex-col gap-8'>
             <Logo />
-            <div className='flex gap-6 items-center mt-8 relative z-1'>
-              <Link href='#' className='group'>
+            <div className='flex gap-6 items-center'>
+              <Link to='#' className='group'>
                 <Icon
                   icon='fa6-brands:telegram'
                   width='24'
@@ -20,7 +23,7 @@ const Footer: FC = () => {
                   className='text-white group-hover:text-primary'
                 />
               </Link>
-              <Link href='#' className='group'>
+              <Link to='#' className='group'>
                 <Icon
                   icon='fa6-brands:x-twitter'
                   width='24'
@@ -29,25 +32,28 @@ const Footer: FC = () => {
                 />
               </Link>
             </div>
-            <h3 className='text-white text-24 font-medium sm:mt-20 mt-12'>
-              2025 Copright
-            </h3>
-            <Link className='text-white text-24 font-medium sm:mt-20 mt-12 hover:text-primary' target='_blank' href="#">SavvyYield</Link>
+            <div className='flex-col sm:flex-row sm:gap-4 mt-4 mb-10'>
+              <h3 className='text-white text-24 font-medium'>
+                2025 Copyright
+              </h3>
+              <Link className='text-white text-24 font-medium hover:text-primary' to="/">
+                SavvyGirl.app
+              </Link>
+            </div>
           </div>
-          <div className='lg:col-span-2 md:col-span-3 col-span-6'>
-            <h4 className='text-white mb-4 font-medium text-24'>Links</h4>
-            <ul>
-              {headerData.map((item, index) => (
-                <li key={index} className='pb-4'>
-                  <Link
-                    href={item.href}
-                    className='text-white hover:text-primary text-17'>
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+
+          {/* Coluna direita: lista de links horizontal */}
+          <div className='flex flex-wrap gap-6'>
+            {headerData.map((item, index) => (
+              <Link
+                key={index}
+                to={item.href}
+                className='text-white hover:text-primary text-17'>
+                {item.label}
+              </Link>
+            ))}
           </div>
+
         </div>
       </div>
     </footer>

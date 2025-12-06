@@ -1,11 +1,10 @@
-'use client'
+
 import { getMasterchefABIByChainId } from '@/utils/masterChefABIProvider'
 import { getMastChefAddressByChainId } from '@/utils/masterchefAddressProvider'
 import { getRpcProviderByChainId } from '@/utils/rpcProviderUtils'
 import { useAppKitNetwork } from '@reown/appkit/react'
 import { Web3Button } from '@web3modal/react'
 import { motion, useInView } from 'framer-motion'
-import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from "react-toastify"
 import { useAccount } from 'wagmi'
@@ -94,7 +93,7 @@ const SavvyFarmReferral = () => {
               {services.map((service, index) => (
                 <div key={index} className='flex items-center gap-5'>
                   <div className='px-5 py-5 bg-light_grey/30 rounded-full'>
-                    <Image
+                    <img
                       src={service.icon}
                       alt={`${service.text} icon`}
                       width={40}
@@ -110,12 +109,11 @@ const SavvyFarmReferral = () => {
             <div className='2xl:-mr-40 mt-9 flex flex-col justify-center items-center relative'>
               <div className="flex items-center justify-center z-10">
                 <div className="animate-border-gradient aspect-square rounded-full border-4 border-[#99e39e] flex flex-col items-center justify-center text-center p-6">
-                  <Image
+                  <img
                     src="/images/icons/savvy-icon.png"
                     alt="logo"
                     width={41}
                     height={41}
-                    quality={100}
                     className="absolute opacity-24"
                   />
                   <p className="text-[20px] font-bold leading-none text-white">{feeToReferral}%</p>

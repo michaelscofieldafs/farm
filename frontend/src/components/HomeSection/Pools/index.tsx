@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-key */
-'use client'
+
 import { AppContext } from '@/context/appContext'
 import { motion } from 'framer-motion'
 import { useContext, useState } from 'react'
@@ -31,7 +31,11 @@ const SavvyFarmPools = () => {
   }
 
   return (
-    <section className='md:pt-20 pt-9' id='pools'>
+    <section className='md:pt-20 pt-9 bg-gradient-to-b from-[#071019] to-[#0b1418]' id='pools'>
+      <div className="pointer-events-none fixed inset-0 opacity-40">
+        <div className="absolute -top-40 -left-40 size-[520px] rounded-full bg-emerald-500 blur-[140px]" />
+        <div className="absolute top-1/2 -right-40 size-[520px] rounded-full bg-cyan-500 blur-[160px]" />
+      </div>
       <div className='lg:px-16 px-4'>
         <div className='text-center'>
           <motion.div

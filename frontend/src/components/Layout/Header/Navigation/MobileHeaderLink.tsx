@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { HeaderItem } from "../../../../types/menu";
 
 const MobileHeaderLink: React.FC<{ item: HeaderItem }> = ({ item }) => {
@@ -12,7 +12,7 @@ const MobileHeaderLink: React.FC<{ item: HeaderItem }> = ({ item }) => {
   return (
     <div className="relative w-full">
       <Link
-        href={item.href}
+        to={item.href}
         onClick={item.submenu ? handleToggle : undefined}
         className="flex items-center justify-between w-full py-2 text-muted focus:outline-hidden"
       >
@@ -40,7 +40,7 @@ const MobileHeaderLink: React.FC<{ item: HeaderItem }> = ({ item }) => {
           {item.submenu.map((subItem, index) => (
             <Link
               key={index}
-              href={subItem.href}
+              to={subItem.href}
               className="block py-2 text-gray-500 hover:bg-gray-200"
             >
               {subItem.label}

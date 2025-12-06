@@ -1,11 +1,7 @@
-'use client'
+
 import WalletButton from '@/components/WalletButton'
-import { useTheme } from 'next-themes'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { isMobile } from 'react-device-detect'
-import { useAccount } from 'wagmi'
 import HeaderLink from '../Header/Navigation/HeaderLink'
 import { headerData } from '../Header/Navigation/menuData'
 import MobileHeaderLink from '../Header/Navigation/MobileHeaderLink'
