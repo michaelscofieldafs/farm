@@ -11,7 +11,7 @@ const SavvyFarmEcosystem = () => {
               Ecosystem
             </h2>
             <p className='text-muted/60 text-18'>
-              SavvyYield is a multichain yield farm designed to bring users, communities, and liquidity together across multiple chains. Our goal is to deliver a smarter, safer, and more rewarding DeFi experience, while helping users discover the full potential of multichain innovation. Built for the community, SavvyYield stands on transparency, innovation, and true ownership.
+              Our platform is a multichain ecosystem designed to bring users, communities, and liquidity together across multiple chains. Its goal is to deliver a smarter, safer, and more rewarding Web3 experience, while helping users discover the full potential of multichain innovation. Built for the community, it stands on transparency, innovation, and true ownership.
             </p>
           </div>
           <div className='lg:col-span-4 col-span-12'>

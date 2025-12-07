@@ -22,7 +22,6 @@ import { useAccount } from "wagmi";
 import Web3 from "web3";
 import { ActionButtonSeparator, ActionButtonWalletContainer, ActionContainer, FeeContainer, FeeValueContainer, HeaderContainer, HeaderDetailsContainer, ImageToken, PoolContainer, PoolSectionContainer, PoolSectionValueContainer, PoolSectionValueDescriptionContainer, Separator, TokenContainer, WalletContainer, WalletTitleContainer, WalletValueContainer, WalletValueDescriptionContainer, cardStyle } from "./styles";
 import useSound from 'use-sound';
-import { getMasterchefABIByChainId } from "../../../../../utils/masterChefABIProvider";
 import { getMastChefAddressByChainId } from "@/utils/masterchefAddressProvider";
 import { openInNewTab } from "@/utils/functions";
 import { getTokenContractABIByChainId } from "@/utils/tokenContractABIProvider";
@@ -30,6 +29,7 @@ import { getRpcProviderByChainId } from "@/utils/rpcProviderUtils";
 import ModalDeposit from "@/components/ModalDeposit";
 import { fetchImageByAddress } from "@/utils/fetchTokenImage";
 import { ElectricBorderShow } from "@/components/ElectricBorder";
+import { getMasterchefABIByChainId } from "@/utils/masterChefABIProvider";
 const transactionSound = '/sounds/transaction.mp3';
 
 enum StatusTransaction {

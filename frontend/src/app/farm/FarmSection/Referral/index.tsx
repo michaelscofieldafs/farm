@@ -6,7 +6,6 @@ import { useAppKitNetwork } from '@reown/appkit/react'
 import { Web3Button } from '@web3modal/react'
 import { motion, useInView } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { toast } from "react-toastify"
 import { useAccount } from 'wagmi'
 import Web3 from 'web3'
@@ -33,24 +32,16 @@ const SavvyFarmReferral = () => {
 
   const services = [
     {
-      icon: '/images/logo/savvy-games-logo.png',
-      text: 'Games',
-      link: '/games',
+      icon: '/images/icons/icon-consulting.svg',
+      text: 'Build Community',
     },
     {
-      icon: '/images/logo/savvy-farm-logo.png',
-      text: 'Farm',
-      link: '/farm',
+      icon: '/images/icons/icon-blockchain.svg',
+      text: 'Extra Yield',
     },
     {
-      icon: '/images/logo/savvy-shop-logo.png',
-      text: 'Shop',
-      link: '/shop',
-    },
-    {
-      icon: '/images/logo/savvy-dex-logo.png',
-      text: 'DEX',
-      link: '/dex',
+      icon: '/images/icons/icon-Services.svg',
+      text: 'Boost Earnings',
     },
   ]
 
@@ -84,57 +75,62 @@ const SavvyFarmReferral = () => {
   }, [chainId])
 
   return (
-    <section className='relative md:pt-40 md:pb-28 py-20 overflow-hidden z-1' id='work'>
-      <div className="pointer-events-none fixed inset-0 opacity-40">
-        <div className="absolute -top-40 -left-40 size-[520px] rounded-full bg-emerald-500 blur-[140px]" />
-        <div className="absolute top-1/2 -right-40 size-[520px] rounded-full bg-cyan-500 blur-[160px]" />
-      </div>
+    <section className='md:p-10 pt-10' id='work'>
       <div className='container px-4 mx-auto lg:max-w-(--breakpoint-xl) px-4'>
         <div ref={ref} className='grid grid-cols-12 items-center'>
           <motion.div
             {...bottomAnimation}
             className='lg:col-span-7 col-span-12'>
             <p className='sm:text-28 text-18 text-white'>
-              <span className='text-primary'>SavvyGirl</span> Ecosystem
+              <span className='text-primary'>Referral</span> System
             </p>
             <h2 className='sm:text-30 text-30 text-white lg:w-full md:w-70% font-medium'>
-              SavvyGirl.app is a Web3 ecosystem with gaming, yield farming, a marketplace, and a DEX, combining innovation and security. 🚀
+              Share your link and earn rewards whenever someone makes a deposit through it!
+              Invite, contribute, and reap the benefits. 🚀
             </h2>
             <div className='grid md:grid-cols-2 gap-7 mt-11'>
               {services.map((service, index) => (
                 <div key={index} className='flex items-center gap-5'>
-                  <div className='w-18 h-18 bg-light_grey/30 rounded-full flex items-center justify-center'>
+                  <div className='px-5 py-5 bg-light_grey/30 rounded-full'>
                     <img
                       src={service.icon}
                       alt={`${service.text} icon`}
-                      width={60}
-                      height={60}
+                      width={40}
+                      height={40}
                     />
                   </div>
-                  <Link
-                    to={service.link}
-                    className='text-21 text-muted font-bold hover:text-primary transition-colors cursor-pointer'
-                  >
-                    {service.text}
-                  </Link>
+                  <p className='text-24 text-muted'>{service.text}</p>
                 </div>
               ))}
             </div>
           </motion.div>
           <motion.div {...TopAnimation} className='lg:col-span-5 col-span-12'>
             <div className='2xl:-mr-40 mt-9 flex flex-col justify-center items-center relative'>
+              <div className="flex items-center justify-center z-10">
+                <div className="animate-border-gradient aspect-square rounded-full border-4 border-[#99e39e] flex flex-col items-center justify-center text-center p-6">
+                  <img
+                    src="/images/icons/savvy-icon.png"
+                    alt="logo"
+                    width={41}
+                    height={41}
+                    className="absolute opacity-24"
+                  />
+                  <p className="text-[20px] font-bold leading-none text-white">{feeToReferral}%</p>
+                </div>
+              </div>
+
               <p className='text-16 text-muted font-bold mt-4 z-10'>
-                Join our <span className='text-primary'>community</span>, and get updates,
+                During <span className='text-primary'>Halving 1</span>, you&apos;ll receive {feeToReferral}% of
               </p>
               <p className='text-16 text-muted font-bold z-10'>
-                connect with players, traders, and builders.
+                the deposits made through your <span className='text-primary'>referral</span>.
               </p>
 
               {isConnected ? (
                 <button
                   className='bg-primary mt-10 border border-primary rounded-lg text-21 font-medium hover:bg-transparent hover:text-primary text-darkmode py-2 px-7 z-10'
                   onClick={handleLink}>
-                  TELEGRAM GROUP
+                  GET YOUR REFERRAL LINK
                 </button>
               ) : (
                 <div className='mt-10 z-10'>

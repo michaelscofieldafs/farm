@@ -8,7 +8,6 @@ import CardSlider from './slider'
 import { AppContext } from '@/context/appContext'
 import axios from 'axios'
 import { CircleLoader } from 'react-spinners'
-import { useNavigate } from 'react-router-dom'
 
 export interface HeroProps {
   farmTokenPrice: number;
@@ -28,8 +27,6 @@ const SavvyFarmIntro = () => {
   const { farmTokenUSDCPrice, marketCap, tvl, circulatingSupply, isLoading } = appContext;
 
   const [coins, setCoins] = useState([]);
-
-  const navigate = useNavigate();
 
   const handleClickOutside = useCallback(
     (event: MouseEvent) => {
@@ -106,8 +103,14 @@ const SavvyFarmIntro = () => {
         <div className='grid grid-cols-8'>
           <motion.div {...leftAnimation} className='lg:col-span-5 col-span-12'>
             <div className='flex gap-6 items-center lg:justify-start justify-center mb-5 mt-24'>
+              <img
+                src='/images/logo/savvy-logo.png'
+                alt='icon'
+                width={65}
+                height={65}
+              />
               <p className='text-white sm:text-28 text-18 mb-0'>
-                Play, Earn, Trade & Shop – All in One Web3 <span className='text-primary'></span>
+                The best multichain yieldfarm <span className='text-primary'></span>
               </p>
             </div>
             <h1 className='font-medium lg:text-76 md:text-70 text-54 lg:text-start text-center text-white mb-10'>
@@ -123,9 +126,12 @@ const SavvyFarmIntro = () => {
               <button
                 className='bg-transparent border border-primary rounded-lg text-21 font-medium hover:bg-primary hover:text-darkmode text-primary py-2 px-7'
                 onClick={() => {
-                  navigate('/farm');
+                  const element = document.getElementById('pools');
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' }); // scroll suave
+                  }
                 }}>
-                GO TO FARM
+                GO TO POOLS
               </button>
             </div>
             <div className='flex items-center md:justify-start justify-center gap-12 mt-20 w-full'>

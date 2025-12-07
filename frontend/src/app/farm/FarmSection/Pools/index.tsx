@@ -30,21 +30,35 @@ const SavvyFarmPools = () => {
     );
   }
 
+  const leftAnimation = {
+    initial: { x: '-100%', opacity: 0 },
+    animate: { x: 0, opacity: 1 },
+    exit: { x: '-100%', opacity: 0 },
+    transition: { duration: 0.6 },
+  }
+
+  const rightAnimation = {
+    initial: { x: '100%', opacity: 0 },
+    animate: { x: 0, opacity: 1 },
+    exit: { x: '100%', opacity: 0 },
+    transition: { duration: 0.6 },
+  }
+
   return (
-    <section className='md:pt-20 pt-9 bg-gradient-to-b from-[#071019] to-[#0b1418]' id='pools'>
+    <section className='relative md:pt-40 md:pb-28 py-20 overflow-hidden z-1 pt-9 bg-gradient-to-b from-[#071019] to-[#0b1418]' id='pools'>
       <div className="pointer-events-none fixed inset-0 opacity-40">
         <div className="absolute -top-40 -left-40 size-[520px] rounded-full bg-emerald-500 blur-[140px]" />
         <div className="absolute top-1/2 -right-40 size-[520px] rounded-full bg-cyan-500 blur-[160px]" />
       </div>
-      <div className='lg:px-16 px-4'>
+      <div className='lg:px-16 mt-10 px-4'>
         <div className='text-center'>
           <motion.div
-            whileInView={{ y: 0, opacity: 1 }}
-            initial={{ y: '-100%', opacity: 0 }}
-            transition={{ duration: 0.6 }}>
-            <p className='text-muted sm:text-28 text-18 mb-9'>
-              SavvyFarm <span className='text-primary'>pools</span>
-            </p>
+            {...rightAnimation}>
+            <div className="flex flex-col justify-center items-center">
+              <p className='text-muted sm:text-28 text-18 mb-4'>
+                Savvy <span className='text-primary'>Farm</span>
+              </p>
+            </div>
             <div className='container'>
               <h2 className='text-white sm:text-40 text-30 font-medium lg:w-80% mx-auto mb-10'>
                 Take advantage of the amazing APRs in our LP and single-sided token pools.
@@ -78,9 +92,7 @@ const SavvyFarmPools = () => {
           </motion.div>
           {isLoading ? <div className="hidden md:flex flex-wrap justify-center gap-6 w-full pb-20 px-4"> <CircleLoader className='mt-4' color="#fff" loading={isLoading} size={45} /> </div> :
             <motion.div
-              whileInView={{ scale: 1, opacity: 1 }}
-              initial={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.6 }}>
+              {...leftAnimation}>
               <div className="hidden md:flex flex-wrap justify-center gap-6 w-full pb-20 px-4">
                 {isSingleSided ? (
                   poolsTokenFarm.length > 0 ? (

@@ -129,7 +129,7 @@ export const perksData: {
     {
       icon: "/images/perks/icon-academy.svg",
       title: "Community Engagement",
-      text: "Developed by the community, for the community. Your participation shapes the future of SavvyYield.",
+      text: "Developed by the community, for the community. Your participation shapes the future of SavvyFarm.",
       space: "lg:mt-4",
     },
   ];

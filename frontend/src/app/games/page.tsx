@@ -764,22 +764,15 @@ export default function TicTacToeOnChain() {
                 >
                     <motion.div
                         {...leftAnimation}
-                        className='col-span-12 max-w-3xl mx-auto'
+                        className='col-span-12 max-w mx-auto'
                     >
                         <div className="flex flex-col justify-center items-center">
-                            <img
-                                src="/images/logo/savvy-games-logo.png"
-                                alt="Logo"
-                                className="w-[140px] object-contain"
-                            />
-                            {/**
                             <p className="sm:text-28 text-18 text-white text-center">
-                                <span className="text-primary">SavvyGirl</span> Games
+                                <span className="text-primary">Savvy</span> Games
                             </p>
-                             */}
                         </div>
 
-                        <h2 className='sm:text-30 text-30 text-white font-medium mt-3'>
+                        <h2 className='text-white sm:text-40 text-20 font-medium mt-3'>
                             Show your skills in on-chain games, bet tokens against other players, and contribute to the evolution of the ecosystem!
                         </h2>
                     </motion.div>
@@ -804,8 +797,13 @@ export default function TicTacToeOnChain() {
                         animate={{ opacity: 2, y: 0 }}
                         transition={{ duration: 1, ease: "easeOut" }} className="flex flex-col md:flex-row items-center md:items-center justify-between gap-4 mb-6 text-center md:text-left">
                         <div className="flex items-center gap-4">
+                            <img
+                                src="/images/logo/savvy-tic-tac-toe.png"
+                                alt="Logo"
+                                className="w-24 object-contain"
+                            />
                             <div>
-                                <h1 className="text-white text-xl font-semibold">Tic‑Tac‑Toe</h1>
+                                <h1 className="text-white text-xl font-semibold">SavvyGames - Tic‑Tac‑Toe</h1>
                                 <p className="text-slate-300 text-sm">Play and relax wity SavvyGirl ✨</p>
                             </div>
                         </div>
