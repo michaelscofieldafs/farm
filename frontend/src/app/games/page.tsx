@@ -29,6 +29,7 @@ import { GameState } from "@/enums/gameState";
 import WalletButton from "@/components/WalletButton";
 import { PlayerGameStatus } from "@/enums/playerGameStatus";
 import { useSearchParams } from "react-router-dom";
+import ElegantDropdown from "@/components/Dropdown";
 
 const timeoutSeconds = 300;
 
@@ -775,6 +776,14 @@ export default function TicTacToeOnChain() {
                         <h2 className='text-white sm:text-40 text-20 font-medium mt-3'>
                             Show your skills in on-chain games, bet tokens against other players, and contribute to the evolution of the ecosystem!
                         </h2>
+                        <div className="mt-10">
+                            <ElegantDropdown
+                                label="Select Network"
+                                options={[
+                                    { label: "Tic-TacToe", value: 0 },
+                                ]}
+                            />
+                        </div>
                     </motion.div>
                 </div>
             </div>
