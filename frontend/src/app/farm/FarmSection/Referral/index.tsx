@@ -120,7 +120,7 @@ const SavvyFarmReferral = () => {
               </div>
 
               <p className='text-16 text-muted font-bold mt-4 z-10'>
-                During <span className='text-primary'>Halving 1</span>, you&apos;ll receive {feeToReferral}% of
+                Currently <span className='text-primary'></span>, you&apos;ll receive {feeToReferral}% of
               </p>
               <p className='text-16 text-muted font-bold z-10'>
                 the deposits made through your <span className='text-primary'>referral</span>.

@@ -39,7 +39,7 @@ const SavvyFarmReferral = () => {
     },
     {
       icon: '/images/logo/savvy-farm-logo.png',
-      text: 'Farm',
+      text: 'Yield Farm',
       link: '/farm',
     },
     {
