@@ -73,7 +73,7 @@ const WalletButton: React.FC<WalletButtonProps> = () => {
                 className={`transition-all duration-500 ease-out transform ${isShowButton ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
                     }`}
             >
-                <appkit-button size="sm" label='' loadingLabel=''></appkit-button>
+                <appkit-button balance='hide' size="sm" label='' loadingLabel=''></appkit-button>
             </div>
         </div>
     );
