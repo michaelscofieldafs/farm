@@ -3,6 +3,7 @@ import { motion, useInView } from 'framer-motion';
 import Orb from "@/components/Orb";
 import TextType from "@/components/Typeing";
 import Logo from "@/components/Layout/Header/Logo";
+import { Link } from "react-router-dom";
 
 const leftAnimation = {
   initial: { x: '-100%', opacity: 0 },
@@ -15,7 +16,7 @@ const leftAnimation = {
 export default function SavvyPreview() {
   return (
     <section
-      className='relative md:pt-40 md:pb-28 py-20 overflow-hidden z-1'
+      className='relative md:pt-20 md:pb-28 py-20 overflow-hidden z-1'
       id='preview'>
       <div className="pointer-events-none fixed inset-0 opacity-40">
         {/**
@@ -23,7 +24,7 @@ export default function SavvyPreview() {
          */}
         <div className="absolute top-1/2 -right-40 size-[520px] rounded-full bg-cyan-500 blur-[160px]" />
       </div>
-      <div className='container px-4 mt-10 mb-10'>
+      <div className='container px-4 mb-4'>
         <div className='container mx-auto px-4 lg:max-w-(--breakpoint-xl)'>
           <div
             className='grid grid-cols-12 place-items-center text-center'
@@ -34,6 +35,23 @@ export default function SavvyPreview() {
             >
               <Logo />
             </motion.div>
+          </div>
+          <div className="flex justify-center mt-10">
+            <Link to="https://t.me/Savvy_Talks">
+              <img
+                src="/images/logo/telegram.png"
+                alt="logo"
+                width={35}
+              />
+            </Link>
+            <div className="mr-4 ml-4" />
+            <Link to="https://x.com/SavvyGirl2004">
+              <img
+                src="/images/logo/twitter.png"
+                alt="logo"
+                width={35}
+              />
+            </Link>
           </div>
         </div>
       </div>
