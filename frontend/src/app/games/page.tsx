@@ -8,28 +8,27 @@ import {
 
 import { parseUnits } from "viem/utils";
 
+import ElegantDropdown from "@/components/Dropdown";
+import Modal, { ModalProps } from "@/components/Modal";
+import { wagmiAdapter } from "@/components/Web3Provider";
+import savvyTicTacToeABI from "@/contracts/savvyTicTacToeABI.json";
+import { GameState } from "@/enums/gameState";
+import { PlayerGameStatus } from "@/enums/playerGameStatus";
+import { usePlayerGameStatus } from "@/hooks/usePlayerGameStatus";
+import { useTimeUntilCancel } from "@/hooks/useTimeUntilCancel";
+import { Game } from "@/interfaces/game";
+import { GameInfo } from "@/interfaces/gameInfo";
+import { DECIMALS, ZERO_ADDRESS } from "@/utils/constants";
+import { shortenAddress, showToast, weiToEth } from "@/utils/helpers";
+import { getContractAddressByChainId } from "@/utils/tokenGameAddressProvider";
 import { useAppKitNetwork } from "@reown/appkit/react";
 import { readContract, waitForTransactionReceipt, watchBlocks, writeContract } from '@wagmi/core';
 import { motion, useInView } from 'framer-motion';
+import { useSearchParams } from "react-router-dom";
 import useSound from "use-sound";
 import { Address } from "viem";
 import { GameTimerText } from "./components/gameTimerText";
 import { LINES } from "./consts/boardLines";
-import { Game } from "@/interfaces/game";
-import { usePlayerGameStatus } from "@/hooks/usePlayerGameStatus";
-import { useTimeUntilCancel } from "@/hooks/useTimeUntilCancel";
-import { getContractAddressByChainId } from "@/utils/tokenGameAddressProvider";
-import savvyTicTacToeABI from "@/contracts/savvyTicTacToeABI.json";
-import Modal, { ModalProps } from "@/components/Modal";
-import { shortenAddress, showToast, weiToEth } from "@/utils/helpers";
-import { DECIMALS, ZERO_ADDRESS } from "@/utils/constants";
-import { wagmiAdapter } from "@/components/Web3Provider";
-import { GameInfo } from "@/interfaces/gameInfo";
-import { GameState } from "@/enums/gameState";
-import WalletButton from "@/components/WalletButton";
-import { PlayerGameStatus } from "@/enums/playerGameStatus";
-import { useSearchParams } from "react-router-dom";
-import ElegantDropdown from "@/components/Dropdown";
 
 const timeoutSeconds = 300;
 
@@ -798,7 +797,7 @@ export default function TicTacToeOnChain() {
     backdrop-blur-md
     border-[1px] border-[#FCDAAD]/70
     shadow-[0_0_24px_#FCDAAD50]
-    min-h-[770px]
+    min-h-[700px]
 ">
                     <motion.header
                         {...TopAnimation}
@@ -829,7 +828,7 @@ export default function TicTacToeOnChain() {
                                         {statusType === PlayerGameStatus.WaitingForOpponent ? (
                                             <a
                                                 href="#"
-                                                className="underline text-blue-400 hover:text-blue-300 transition"
+                                                className="underline text-green-400 hover:text-green-300 transition"
                                                 onClick={() => {
                                                     handleLink();
                                                 }}

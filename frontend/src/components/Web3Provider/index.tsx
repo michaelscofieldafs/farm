@@ -1,7 +1,7 @@
 
 
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
-import { bsc, bscTestnet, mainnet, sepolia, sonic, sonicBlazeTestnet, plasma, plasmaTestnet, base } from '@reown/appkit/networks'
+import { bsc, bscTestnet, mainnet, sepolia, sonic, sonicBlazeTestnet, plasma, plasmaTestnet, baseSepolia } from '@reown/appkit/networks'
 import { createAppKit } from '@reown/appkit/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactNode } from 'react'
@@ -37,7 +37,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
     createAppKit({
         adapters: [wagmiAdapter],
         allowUnsupportedChain: true,
-        defaultNetwork: sonic,
+        defaultNetwork: sonicTestnet,
         themeVariables: {
             '--w3m-font-family': 'DM Sans, sans-serif',
             '--w3m-font-size-master': '13px',
@@ -49,7 +49,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
             '--w3m-qr-color': '#99E39E',
         },
         enableReconnect: true,
-        networks: [sonicTestnet, sonic, base],
+        networks: [sonicTestnet, baseSepolia],
         chainImages: {
             146: 'https://resources.cryptocompare.com/asset-management/17157/1727687183179.png',
             64_165: 'https://resources.cryptocompare.com/asset-management/17157/1727687183179.png',
@@ -74,6 +74,6 @@ export function Web3Provider({ children }: { children: ReactNode }) {
 }
 
 export const wagmiAdapter = new WagmiAdapter({
-    networks: [sonicTestnet, sonic, base],
+    networks: [sonicTestnet, baseSepolia],
     projectId,
 })

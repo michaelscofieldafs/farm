@@ -11,7 +11,7 @@ const WalletButton: React.FC<WalletButtonProps> = () => {
     const { caipNetwork } = useAppKitNetwork();
 
     const showEmoji = (): boolean => {
-        return chain?.id == 146 || chain?.id == 57054;
+        return false;
     }
 
     useEffect(() => {
@@ -73,7 +73,7 @@ const WalletButton: React.FC<WalletButtonProps> = () => {
                 className={`transition-all duration-500 ease-out transform ${isShowButton ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
                     }`}
             >
-                <appkit-button size="sm" label='' loadingLabel=''></appkit-button>
+                <appkit-button size="sm" label='' balance='hide' loadingLabel=''></appkit-button>
             </div>
         </div>
     );
