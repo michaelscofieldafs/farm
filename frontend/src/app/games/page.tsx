@@ -812,7 +812,15 @@ export default function TicTacToeOnChain() {
                             />
                             <div>
                                 <h1 className="text-white text-xl font-semibold">SavvyGames - Tic‑Tac‑Toe</h1>
-                                <p className="text-slate-300 text-sm">Play and relax wity SavvyGirl ✨</p>
+                                <div className="flex">
+                                    <p className="text-slate-300 text-sm mr-2">Play and relax with SavvyGirl </p>
+                                    <img
+                                        src='/images/hero/rocket.gif'
+                                        alt='Banner'
+                                        width={20}
+                                        height={20}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </motion.header>
