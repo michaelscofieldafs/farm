@@ -23,7 +23,7 @@ contract SavvyGirlOnchainTicTacToe is ReentrancyGuard, Ownable {
     uint256 public feeBP = 300;
     uint256 public constant BP_DIVISOR = 10000;
     uint256 public maxResultsLimit = 10;
-    uint256 public moveTimeout = 5 minutes;
+    uint256 public moveTimeout = 1 minutes;
 
     struct Game {
         address host;
