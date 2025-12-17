@@ -389,11 +389,19 @@ contract SavvyGirlOnchainTicTacToe is ReentrancyGuard, Ownable {
         g.state = GameState.Finished;
         g.winner = msg.sender;
 
+        uint256 totalPool = g.stake * 2;
+        uint256 feeAmount = (totalPool * feeBP) / 10000;
+        uint256 payout = totalPool - feeAmount;
+
         if (g.token == address(0)) {
-            (bool success, ) = msg.sender.call{value: g.stake * 2}("");
-            require(success, "native payout failed");
+            (bool s1, ) = feeReceiver.call{value: feeAmount}("");
+            require(s1, "fee failed");
+            (bool s2, ) = msg.sender.call{value: payout}("");
+            require(s2, "payout failed");
         } else {
-            IERC20(g.token).transfer(msg.sender, g.stake * 2);
+            IERC20 token = IERC20(g.token);
+            token.transfer(feeReceiver, feeAmount);
+            token.transfer(msg.sender, payout);
         }
 
         activeGameOfHost[g.host] = type(uint256).max;
