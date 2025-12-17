@@ -8,14 +8,12 @@ const Footer: FC = () => {
   return (
     <footer className='pt-16 bg-gradient-to-b from-[#071019] to-[#0b1418]'>
       <div className='container px-4'>
-        {/* Flex container principal: esquerda (logo) e direita (links) */}
         <div className='flex flex-col lg:flex-row justify-between items-start lg:items-center gap-12'>
 
-          {/* Coluna esquerda: logo, redes e copyright */}
           <div className='flex flex-col gap-8'>
             <Logo />
             <div className='flex gap-6 items-center'>
-              <Link to='#' className='group'>
+              <Link to='https://t.me/Savvy_Talks' className='group'>
                 <Icon
                   icon='fa6-brands:telegram'
                   width='24'
@@ -33,7 +31,7 @@ const Footer: FC = () => {
               </Link>
             </div>
             <div className='flex-col sm:flex-row sm:gap-4 mt-4 mb-10'>
-              <h3 className='text-white text-24 font-medium'>
+              <h3 className="text-white text-sm md:text-2xl font-medium">
                 2025 Copyright
               </h3>
               <Link className='text-white text-24 font-medium hover:text-primary' to="/">
@@ -42,13 +40,13 @@ const Footer: FC = () => {
             </div>
           </div>
 
-          {/* Coluna direita: lista de links horizontal */}
-          <div className='flex flex-wrap gap-6'>
+          <div className="flex flex-wrap gap-6 mb-4 md:mb-0">
             {headerData.map((item, index) => (
               <Link
                 key={index}
                 to={item.href}
-                className='text-white hover:text-primary text-17'>
+                className="text-white hover:text-primary text-sm md:text-17"
+              >
                 {item.label}
               </Link>
             ))}

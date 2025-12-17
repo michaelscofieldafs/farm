@@ -4,7 +4,7 @@ import React, { forwardRef } from "react";
 import PropTypes from "prop-types";
 import MDTypographyRoot from "components/MDTypography/MDTypographyRoot";
 
-// NovaFarm contexts
+// contexts
 import { useMaterialUIController } from "context";
 
 const MDTypography = forwardRef(

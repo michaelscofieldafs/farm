@@ -30,8 +30,6 @@ import { Address } from "viem";
 import { GameTimerText } from "./components/gameTimerText";
 import { LINES } from "./consts/boardLines";
 
-const timeoutSeconds = 300;
-
 export default function TicTacToeOnChain() {
     // STATES
     const [board, setBoard] = useState<(string | null)[]>(Array(9).fill(null));
@@ -42,6 +40,7 @@ export default function TicTacToeOnChain() {
     const [isLoadingCancelGame, setIsLoadingCancelGame] = useState(false);
     const [isLoadingCreateGame, setIsLoadingCreateGame] = useState(false);
     const [fee, setFee] = useState(0);
+    const [timeoutSeconds, setTimeoutSeconds] = useState(300);
 
     // HOOKS
     const { address, isConnected } = useAccount();
@@ -58,6 +57,8 @@ export default function TicTacToeOnChain() {
     const [showModal, setShowModal] = useState<ModalProps | null>(null);
 
     const { chainId } = useAppKitNetwork();
+
+    const { chain } = useAccount();
 
     const currentChainRef = useRef(chainId);
 
@@ -153,7 +154,7 @@ export default function TicTacToeOnChain() {
 
         const showModalInfo: ModalProps = {
             title: 'Create new game',
-            description: `Do you want to create a new game with a stake of ${stakeHuman} Sonic`,
+            description: `Do you want to create a new game with a stake of ${stakeHuman} ${fetchNativeTokenName()}`,
             handleOpen: () => {
                 setShowModal(null);
             },
@@ -191,6 +192,10 @@ export default function TicTacToeOnChain() {
         setShowModal(showModalInfo);
     };
 
+    const fetchNativeTokenName = () => {
+        return chain ? chain.nativeCurrency.name : "token(s)";
+    }
+
     const fetchGameById = async (gameId: number): Promise<bigint | undefined> => {
         try {
             isFetchingGame.current = true;
@@ -221,9 +226,9 @@ export default function TicTacToeOnChain() {
                 if (mappedGame.winner === currentAddressRef.current!) {
                     const feeBP = BigInt(Number(currentFeeRef.current));
                     const total = mappedGame.stake * BigInt(2);
-                    const tax = (total * feeBP) / BigInt(10000);
+                    const tax = (total * feeBP) / BigInt(100);
                     const finalAmount = total - tax;
-                    textShow = `You won!!! You receive ${weiToEth(finalAmount, "Sonic")} in your wallet!`
+                    textShow = `You won!!! You receive ${weiToEth(finalAmount, fetchNativeTokenName())} in your wallet!`
                     playWin();
                 }
                 else {
@@ -275,6 +280,21 @@ export default function TicTacToeOnChain() {
             console.error(err);
             setCurrentGame(null);
             isFetchingGame.current = false;
+        } finally {
+        }
+    };
+
+    const fetchTimeout = async (): Promise<void> => {
+        try {
+            const result: any = await readContract(wagmiAdapter.wagmiConfig, {
+                abi: savvyTicTacToeABI,
+                address: getContractAddressByChainId(Number(currentChainRef.current)) as Address,
+                functionName: "moveTimeout",
+            });
+
+            setTimeoutSeconds(Number(result));
+        } catch (err: any) {
+            setTimeoutSeconds(300);
         } finally {
         }
     };
@@ -443,7 +463,7 @@ export default function TicTacToeOnChain() {
 
             const showModalInfo: ModalProps = {
                 title: 'Join game',
-                description: `Would you like to join the selected match with the stake of ${weiToEth(gameInfo.stake!.toString?.(), "Sonic")}?`,
+                description: `Would you like to join the selected match with the stake of ${weiToEth(gameInfo.stake!.toString?.(), fetchNativeTokenName())}?`,
                 handleOpen: () => {
                     setShowModal(null);
                 },
@@ -495,7 +515,7 @@ export default function TicTacToeOnChain() {
         if (gameInfo) {
             const showModalInfo: ModalProps = {
                 title: 'Join game',
-                description: `Would you like to join the selected match with the stake of ${weiToEth(gameInfo.stake!.toString?.(), "Sonic")}?`,
+                description: `Would you like to join the selected match with the stake of ${weiToEth(gameInfo.stake!.toString?.(), fetchNativeTokenName())}?`,
                 handleOpen: () => {
                     setShowModal(null);
                 },
@@ -535,7 +555,7 @@ export default function TicTacToeOnChain() {
     const handleJoinGame = async (gameId: number, stake: any): Promise<void> => {
         const showModalInfo: ModalProps = {
             title: 'Join game',
-            description: `Would you like to join the selected match with the stake of ${weiToEth(stake.toString?.(), "Sonic")}?`,
+            description: `Would you like to join the selected match with the stake of ${weiToEth(stake.toString?.(), fetchNativeTokenName())}?`,
             handleOpen: () => {
                 setShowModal(null);
             },
@@ -692,6 +712,7 @@ export default function TicTacToeOnChain() {
      * WATCH BLOCKS → auto refresh
      ---------------------------------------- */
     useEffect(() => {
+        fetchTimeout();
         refetchGames();
         refetch(currentAddressRef.current!);
         fetchFeeInfo();
@@ -756,7 +777,7 @@ export default function TicTacToeOnChain() {
             <div className="absolute -top-40 -left-40 size-[520px] rounded-full bg-emerald-500 blur-[140px]" />
             <div className="absolute top-1/2 -right-40 size-[520px] rounded-full bg-cyan-500 blur-[160px]" />
         </div>
-        <div className='container px-4 mt-10'>
+        <div className='min-h-screen container px-4 mt-10'>
             <div className='container mx-auto px-4 lg:max-w-(--breakpoint-xl)'>
                 <div
                     ref={ref}
@@ -788,7 +809,7 @@ export default function TicTacToeOnChain() {
             </div>
             {showModal && <Modal callback={showModal.callback} description={showModal.description} handleOpen={showModal.handleOpen} open={showModal.open}
                 title={showModal.title} />}
-            <motion.div {...rightAnimation} className="min-h-screen flex flex-col items-center justify-center p-4 md:p-6 mt-10">
+            <motion.div {...rightAnimation} className="flex flex-col items-center justify-center p-4 md:p-6 mt-4">
                 <div className="
     w-full max-w-4xl 
     bg-[rgba(255,255,255,0.03)] 
@@ -810,15 +831,16 @@ export default function TicTacToeOnChain() {
                                 alt="Logo"
                                 className="w-24 object-contain"
                             />
-                            <div>
-                                <h1 className="text-white text-xl font-semibold">SavvyGames - Tic‑Tac‑Toe</h1>
-                                <div className="flex">
-                                    <p className="text-slate-300 text-sm mr-2">Play and relax with SavvyGirl </p>
+                            <div className="flex flex-col items-start text-left">
+                                <h1 className="text-white text-xl font-semibold">Tic‑Tac‑Toe</h1>
+                                <div className="flex items-start">
+                                    <p className="text-slate-300 text-sm mr-2">
+                                        Play and relax with SavvyGirl
+                                    </p>
                                     <img
-                                        src='/images/hero/rocket.gif'
-                                        alt='Banner'
+                                        src="/images/hero/rocket.gif"
+                                        alt="Banner"
                                         width={20}
-                                        height={20}
                                     />
                                 </div>
                             </div>
@@ -1011,7 +1033,7 @@ export default function TicTacToeOnChain() {
                                                             <p>Host: {shortenAddress(g.host)}</p>
                                                             <p>
                                                                 <span className="font-medium">Stake:</span>{" "}
-                                                                {weiToEth(g.stake?.toString?.(), "Sonic")}
+                                                                {weiToEth(g.stake?.toString?.(), fetchNativeTokenName())}
                                                             </p>
                                                         </div>
                                                         <button

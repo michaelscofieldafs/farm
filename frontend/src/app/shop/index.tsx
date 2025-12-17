@@ -1,5 +1,7 @@
 import React from "react";
 import { motion, useInView } from 'framer-motion';
+import Orb from "@/components/Orb";
+import TextType from "@/components/Typeing";
 
 const ShirtMock = ({ color = '#0f0f10', image = '/images/shop/shirt.png' }) => (
   <svg viewBox="0 0 400 420" className="w-full h-auto drop-shadow-2xl">
@@ -55,7 +57,7 @@ const rightAnimation = {
 export default function SavvyFarmShop() {
   return (
     <section
-      className='relative md:pt-40 md:pb-28 py-20 overflow-hidden z-1'
+      className='min-h-screen relative md:pt-40 md:pb-28 py-20 overflow-hidden z-1'
       id='shop'>
       <div className="pointer-events-none fixed inset-0 opacity-40">
         <div className="absolute -top-40 -left-40 size-[520px] rounded-full bg-emerald-500 blur-[140px]" />
@@ -89,6 +91,7 @@ export default function SavvyFarmShop() {
         {...rightAnimation} className='container px-4 mx-auto lg:max-w-(--breakpoint-xl)'>
         <div className="w-full text-white">
 
+          {/**
           <section className="relative z-10 pb-8" style={{ background: 'transparent' }}>
             <div className="mx-auto max-w-7xl px-6 grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="rounded-2xl bg-white/5 border-[1px] border-[#FCDAAD]/70
@@ -109,12 +112,30 @@ export default function SavvyFarmShop() {
     shadow-[0_0_15px_#FCDAAD50] p-6 flex items-start gap-4">
                 <div>
                   <h3 className="font-semibold text-lg">Shop with crypto</h3>
-                  <p className="text-white/60 text-sm">Pay your way using the Sonic chain</p>
+                  <p className="text-white/60 text-sm">Pay your way across multiple chains</p>
                 </div>
               </div>
             </div>
           </section>
-
+           */}
+          <div style={{ width: '100%', height: '600px', position: 'relative' }}>
+            <Orb
+              hoverIntensity={0.5}
+              rotateOnHover={true}
+              hue={0}
+              forceHoverState={false}
+            />
+            <TextType
+              text={["Coming soon..."]}
+              typingSpeed={145}
+              pauseDuration={4500}
+              showCursor={true}
+              cursorCharacter="|"
+              className="text-white sm:text-30 text-20 font-medium absolute 
+    top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center"
+            />
+          </div>
+          {/**
           <section id="shop" className="relative z-10" style={{ background: 'transparent' }}>
             <div className="mx-auto max-w-7xl px-6">
               <h2 className="text-3lg md:text-2xl font-small text-center mb-10">Check out our <span className='text-primary'>products</span></h2>
@@ -125,6 +146,7 @@ export default function SavvyFarmShop() {
               </div>
             </div>
           </section>
+           */}
         </div>
       </motion.div>
       <div className='absolute w-50 h-50 bg-linear-to-bl from-tealGreen from-50% to-charcoalGray to-60% blur-400 rounded-full -top-64 -right-14 -z-1'></div>

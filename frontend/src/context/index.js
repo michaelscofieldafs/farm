@@ -56,7 +56,7 @@ const AuthContextProvider = ({ children }) => {
 // Setting custom name for the context which is visible on react dev tools
 MaterialUI.displayName = "MaterialUIContext";
 
-// NovaFarm reducer
+// reducer
 function reducer(state, action) {
   switch (action.type) {
     case "MINI_SIDENAV": {
@@ -95,7 +95,7 @@ function reducer(state, action) {
   }
 }
 
-// NovaFarm context provider
+// context provider
 function MaterialUIControllerProvider({ children }) {
   const initialState = {
     miniSidenav: false,
@@ -117,7 +117,7 @@ function MaterialUIControllerProvider({ children }) {
   return <MaterialUI.Provider value={value}>{children}</MaterialUI.Provider>;
 }
 
-// NovaFarm custom hook for using context
+// custom hook for using context
 function useMaterialUIController() {
   const context = useContext(MaterialUI);
 

@@ -36,7 +36,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
 
     createAppKit({
         adapters: [wagmiAdapter],
-        allowUnsupportedChain: true,
+        allowUnsupportedChain: false,
         defaultNetwork: sonicTestnet,
         themeVariables: {
             '--w3m-font-family': 'DM Sans, sans-serif',
