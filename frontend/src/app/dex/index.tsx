@@ -16,7 +16,7 @@ export default function SavvyFarmDex() {
     <section
       className='min-h-screen relative md:pt-40 md:pb-28 py-20 overflow-hidden z-1'
       id='dex'>
-      <div className="pointer-events-none fixed inset-0 opacity-40">
+      <div className="pointer-events-none fixed inset-0 opacity-40 hidden md:block">
         <div className="absolute -top-40 -left-40 size-[520px] rounded-full bg-emerald-500 blur-[140px]" />
         <div className="absolute top-1/2 -right-40 size-[520px] rounded-full bg-cyan-500 blur-[160px]" />
       </div>

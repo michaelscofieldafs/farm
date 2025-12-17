@@ -773,7 +773,7 @@ export default function TicTacToeOnChain() {
     return <section
         className='relative md:pt-40 md:pb-28 py-20 overflow-hidden z-1'
         id='games'>
-        <div className="pointer-events-none fixed inset-0 opacity-40">
+        <div className="pointer-events-none fixed inset-0 opacity-40 hidden md:block">
             <div className="absolute -top-40 -left-40 size-[520px] rounded-full bg-emerald-500 blur-[140px]" />
             <div className="absolute top-1/2 -right-40 size-[520px] rounded-full bg-cyan-500 blur-[160px]" />
         </div>
@@ -986,7 +986,7 @@ export default function TicTacToeOnChain() {
 
                                 {statusType === PlayerGameStatus.InProgress && (currentGame?.state === GameState.InProgress || currentGame?.state === GameState.WaitingForPlayer) &&
                                     <div className="mt-6 p-4 rounded-2xl border border-slate-700 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent)]">
-                                        <GameTimerText expired={expired} minutes={minutes} seconds={seconds} />
+                                        <GameTimerText expired={expired} minutes={minutes} seconds={seconds} isMyTurn={isMyTurn()} />
                                         <div className="flex">
                                             <button
                                                 disabled={isLoadingCancelGame}
@@ -1030,9 +1030,9 @@ export default function TicTacToeOnChain() {
                                                         className="border border-slate-300 rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition cursor-pointer"
                                                     >
                                                         <div>
-                                                            <p>Host: {shortenAddress(g.host)}</p>
+                                                            <p><span className="font-bold">Host:</span> {shortenAddress(g.host)}</p>
                                                             <p>
-                                                                <span className="font-medium">Stake:</span>{" "}
+                                                                <span className="font-bold">Stake:</span>{" "}
                                                                 {weiToEth(g.stake?.toString?.(), fetchNativeTokenName())}
                                                             </p>
                                                         </div>
