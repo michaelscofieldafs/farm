@@ -14,5 +14,5 @@ export const headerData: HeaderItem[] = [
   { label: "Farm", href: "/farm" },
   { label: "Shop", href: "/shop" },
   { label: "Dex", href: "/dex" },
-  { label: "Docs & Contracts", href: "#" },
+  { label: "Docs & Contracts", href: "https://savvygirl-app.gitbook.io/docs", isUrl: true },
 ];
