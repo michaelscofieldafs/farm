@@ -19,7 +19,7 @@ const HeaderLink: React.FC<{ item: HeaderItem }> = ({ item }) => {
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     if (item.isUrl) {
       e.preventDefault();
-      window.open('https://my.soniclabs.com/bridge', '_blank');
+      window.open('https://savvygirl-app.gitbook.io/docs', '_blank');
       return;
     }
 
