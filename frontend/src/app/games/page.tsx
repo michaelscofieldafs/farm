@@ -1107,12 +1107,13 @@ export default function TicTacToeOnChain() {
                 <button
                     onClick={toggleFullscreen}
                     className="
+    hidden lg:flex
     fixed bottom-6 right-6 z-50
     bg-primary text-darkmode
     px-4 py-3 rounded-full
     shadow-lg
     hover:scale-105 transition
-    flex items-center gap-2
+    items-center gap-2
   "
                 >
                     {isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
