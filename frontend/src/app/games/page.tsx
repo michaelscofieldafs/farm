@@ -1038,7 +1038,7 @@ export default function TicTacToeOnChain() {
                         <aside className="space-y-4 w-full md:max-w-none max-w-[500px] mx-auto">
                             {statusType === PlayerGameStatus.None && <>
                                 <div className="p-4 rounded-2xl border border-slate-700 bg-[linear-gradient(180deg,rgba(255,255,255,0.02),transparent)]">
-                                    <h3 className="text-sm text-slate-300">Games Available</h3>
+                                    <h3 className="text-sm text-slate-300">Latest Available Games</h3>
 
                                     {games?.length ? (
                                         <div className="mt-3 max-h-[300px] overflow-y-auto pr-2">
