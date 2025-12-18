@@ -21,7 +21,7 @@ const Footer: FC = () => {
                   className='text-white group-hover:text-primary'
                 />
               </Link>
-              <Link to='#' className='group'>
+              <Link to='https://x.com/SavvyGirl2004' className='group'>
                 <Icon
                   icon='fa6-brands:x-twitter'
                   width='24'
