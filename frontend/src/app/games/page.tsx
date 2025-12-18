@@ -41,6 +41,7 @@ export default function TicTacToeOnChain() {
     const [isLoadingCreateGame, setIsLoadingCreateGame] = useState(false);
     const [fee, setFee] = useState(0);
     const [timeoutSeconds, setTimeoutSeconds] = useState(300);
+    const [isFullscreen, setIsFullscreen] = useState(false);
 
     // HOOKS
     const { address, isConnected } = useAccount();
@@ -50,6 +51,8 @@ export default function TicTacToeOnChain() {
     const currentGameIdRef = useRef(currentGameId);
     const currentAddressRef = useRef(address);
     const currentFeeRef = useRef(0);
+
+    const containerRef = useRef<HTMLDivElement>(null);
 
     const [searchParams] = useSearchParams();
     const urlGameId = searchParams.get("gameId");
@@ -686,6 +689,22 @@ export default function TicTacToeOnChain() {
         },
     ]
 
+    const toggleFullscreen = async () => {
+        if (!document.fullscreenElement) {
+            await containerRef.current?.requestFullscreen();
+        } else {
+            await document.exitFullscreen();
+        }
+    };
+
+    useEffect(() => {
+        const onChange = () => {
+            setIsFullscreen(!!document.fullscreenElement);
+        };
+
+        document.addEventListener('fullscreenchange', onChange);
+        return () => document.removeEventListener('fullscreenchange', onChange);
+    }, []);
 
     const isMyTurn = (): boolean => {
         if (!currentGame) return false;
@@ -770,8 +789,8 @@ export default function TicTacToeOnChain() {
     /* ----------------------------------------
      * UI
      ---------------------------------------- */
-    return <section
-        className='relative md:pt-40 md:pb-28 py-20 overflow-hidden z-1'
+    return <section ref={containerRef}
+        className={`relative md:pt-40 md:pb-28 py-20  ${isFullscreen ? 'overflow-y-auto max-h-screen' : 'overflow-hidden z-1'}`}
         id='games'>
         <div className="pointer-events-none fixed inset-0 opacity-40 hidden md:block">
             <div className="absolute -top-40 -left-40 size-[520px] rounded-full bg-emerald-500 blur-[140px]" />
@@ -1085,7 +1104,19 @@ export default function TicTacToeOnChain() {
                     }
                          */}
                 </div>
-
+                <button
+                    onClick={toggleFullscreen}
+                    className="
+    fixed bottom-6 right-6 z-50
+    bg-primary text-darkmode
+    px-4 py-3 rounded-full
+    shadow-lg
+    hover:scale-105 transition
+    flex items-center gap-2
+  "
+                >
+                    {isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+                </button>
                 <p className="mt-7 mx-auto w-[400px] sm:w-[900px] text-slate-300 text-center bg-[rgba(255,255,255,0.03)] border border-slate-700 rounded-3xl shadow-xl p-4 md:p-6 backdrop-blur-md text-sm leading-relaxed">
                     Every action — creating a game, joining one, and making moves — is on-chain and requires <br /> a wallet-approved transaction. Play safely and transparently!</p>
             </motion.div>
