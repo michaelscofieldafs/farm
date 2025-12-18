@@ -22,6 +22,7 @@ const WalletButton: React.FC<WalletButtonProps> = () => {
     }, [])
 
     useEffect(() => {
+        /**
         if (wasConnected.current && !isConnected) {
             setTimeout(async () => {
                 try {
@@ -52,6 +53,7 @@ const WalletButton: React.FC<WalletButtonProps> = () => {
                 }
             }, 500);
         }
+ */
         wasConnected.current = isConnected;
     }, [isConnected]);
 
