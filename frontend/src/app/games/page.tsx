@@ -228,7 +228,7 @@ export default function TicTacToeOnChain() {
                     const total = mappedGame.stake * BigInt(2);
                     const tax = (total * feeBP) / BigInt(100);
                     const finalAmount = total - tax;
-                    textShow = `You won!!! You receive ${weiToEth(finalAmount, fetchNativeTokenName())} in your wallet!`
+                    textShow = `You won!!! You received ${weiToEth(finalAmount, fetchNativeTokenName())} in your wallet!`
                     playWin();
                 }
                 else {
