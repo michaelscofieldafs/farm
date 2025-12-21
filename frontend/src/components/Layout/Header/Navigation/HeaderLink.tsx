@@ -19,21 +19,19 @@ const HeaderLink: React.FC<{ item: HeaderItem }> = ({ item }) => {
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     if (item.isUrl) {
       e.preventDefault();
-      window.open('https://savvygirl-app.gitbook.io/docs', '_blank');
+      window.open(item.href, '_blank');
       return;
     }
 
-    // Se for um link interno com âncora
     if (item.href.startsWith('/#')) {
       const id = item.href.split('#')[1];
       const target = document.getElementById(id);
       if (target) {
-        e.preventDefault(); // impede o pulo brusco padrão
+        e.preventDefault();
 
-        // Atualiza a URL manualmente, mantendo o histórico
         window.history.pushState(null, '', `#${id}`);
 
-        const offset = 100; // altura do header
+        const offset = 100;
         const top =
           target.getBoundingClientRect().top + window.scrollY - offset;
         window.scrollTo({ top, behavior: 'smooth' });
