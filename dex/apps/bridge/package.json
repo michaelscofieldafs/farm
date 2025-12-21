@@ -1,0 +1,57 @@
+{
+  "name": "bridge",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "browserslist": {
+    "production": [
+      "chrome >= 67",
+      "edge >= 79",
+      "firefox >= 68",
+      "opera >= 54",
+      "safari >= 14"
+    ],
+    "development": [
+      ">0.2%",
+      "not ie <= 99",
+      "not android <= 4.4.4",
+      "not dead",
+      "not op_mini all"
+    ]
+  },
+  "dependencies": {
+    "@pancakeswap/chains": "workspace:^",
+    "@pancakeswap/hooks": "workspace:*",
+    "@pancakeswap/localization": "workspace:^",
+    "@pancakeswap/uikit": "workspace:*",
+    "@pancakeswap/utils": "workspace:*",
+    "@vanilla-extract/next-plugin": "^2.3.0",
+    "@wagmi/core": "catalog:",
+    "ethers": "^5.0.0",
+    "jotai": "catalog:",
+    "lodash": "^4.17.21",
+    "next": "catalog:",
+    "next-themes": "^0.2.1",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "styled-components": "6.0.7",
+    "styled-jsx": "5.1.1",
+    "viem": "catalog:",
+    "wagmi": "catalog:"
+  },
+  "devDependencies": {
+    "@next/eslint-plugin-next": "14.2.3",
+    "@pancakeswap/next-config": "workspace:*",
+    "@pancakeswap/tsconfig": "workspace:*",
+    "@types/node": "18.0.4",
+    "@types/react": "catalog:",
+    "@types/react-dom": "^18.0.6",
+    "eslint": "^8.32.0",
+    "webpack-retry-chunk-load-plugin": "3.1.1"
+  }
+}
