@@ -8,7 +8,7 @@ import SavvyFarmRewardEmission from "./FarmSection/RewardEmission";
 import Orb from "@/components/Orb";
 import { motion, useInView } from 'framer-motion';
 
-const isShowFarm = false;
+const isShowFarm = true;
 
 const leftAnimation = {
     initial: { x: '-100%', opacity: 0 },

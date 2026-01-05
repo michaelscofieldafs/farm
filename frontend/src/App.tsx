@@ -13,25 +13,19 @@ import ScrollToTop from "./components/ScrollToTop";
 function App() {
   return <BrowserRouter>
     <Web3Provider>
-      {/**
       <AppContextProvider>
-       */}
-      <ScrollToTop />
-      <Routes>
-        <Route element={<Layout />}>
-          {/**
-          <Route path="/" element={<Home />} />
-           */}
-          <Route path="/" element={<TicTacToeOnChain />} />
-          <Route path="/farm" element={<Farm />} />
-          <Route path="/shop" element={<SavvyFarmShop />} />
-          <Route path="/dex" element={<SavvyFarmDex />} />
-        </Route>
-      </Routes>
-      <ToastContainer />
-      {/**
+        <ScrollToTop />
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/games" element={<TicTacToeOnChain />} />
+            <Route path="/farm" element={<Farm />} />
+            <Route path="/shop" element={<SavvyFarmShop />} />
+            <Route path="/dex" element={<SavvyFarmDex />} />
+          </Route>
+        </Routes>
+        <ToastContainer />
       </AppContextProvider>
-       */}
     </Web3Provider>
   </BrowserRouter>
 }

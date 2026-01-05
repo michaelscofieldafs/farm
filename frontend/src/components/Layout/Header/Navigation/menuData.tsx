@@ -9,8 +9,8 @@ export const headerData: HeaderItem[] = [
   { label: "Bridge", href: "https://my.soniclabs.com/bridge", isUrl: true },
   { label: "Docs & Contracts", href: "/documentation#version" },
    */
-  { label: "Home", href: "#" },
-  { label: "Games", href: "/" },
+  { label: "Home", href: "/" },
+  { label: "Games", href: "/games" },
   { label: "Farm", href: "/farm" },
   { label: "Shop", href: "/shop" },
   { label: "Dex", href: "https://dex.savvygirl.app", isUrl: true },

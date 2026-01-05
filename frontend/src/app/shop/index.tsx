@@ -91,7 +91,6 @@ export default function SavvyFarmShop() {
         {...rightAnimation} className='container px-4 mx-auto lg:max-w-(--breakpoint-xl)'>
         <div className="w-full text-white">
 
-          {/**
           <section className="relative z-10 pb-8" style={{ background: 'transparent' }}>
             <div className="mx-auto max-w-7xl px-6 grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="rounded-2xl bg-white/5 border-[1px] border-[#FCDAAD]/70
@@ -117,7 +116,7 @@ export default function SavvyFarmShop() {
               </div>
             </div>
           </section>
-           */}
+          {/**
           <div style={{ width: '100%', height: '600px', position: 'relative' }}>
             <Orb
               hoverIntensity={0.5}
@@ -135,7 +134,7 @@ export default function SavvyFarmShop() {
     top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center"
             />
           </div>
-          {/**
+           */}
           <section id="shop" className="relative z-10" style={{ background: 'transparent' }}>
             <div className="mx-auto max-w-7xl px-6">
               <h2 className="text-3lg md:text-2xl font-small text-center mb-10">Check out our <span className='text-primary'>products</span></h2>
@@ -146,7 +145,6 @@ export default function SavvyFarmShop() {
               </div>
             </div>
           </section>
-           */}
         </div>
       </motion.div>
       <div className='absolute w-50 h-50 bg-linear-to-bl from-tealGreen from-50% to-charcoalGray to-60% blur-400 rounded-full -top-64 -right-14 -z-1'></div>
