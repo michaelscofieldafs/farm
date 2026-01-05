@@ -1,3 +1,4 @@
+import { isEvm, isSolana } from '@pancakeswap/chains'
 import { Protocol } from '@pancakeswap/farms'
 import { useTheme } from '@pancakeswap/hooks'
 import { useTranslation } from '@pancakeswap/localization'
@@ -7,6 +8,7 @@ import { formatNumber as formatBalance } from '@pancakeswap/utils/formatBalance'
 import { formatNumber } from '@pancakeswap/utils/formatNumber'
 import { DoubleCurrencyLogo, FiatNumberDisplay } from '@pancakeswap/widgets-internal'
 import { InfinityFeeTierBreakdown } from 'components/FeeTierBreakdown'
+import { IncentraTag } from 'components/Incentra/IncentraTag'
 import { MerklTag } from 'components/Merkl/MerklTag'
 import { RangeTag } from 'components/RangeTag'
 import dayjs from 'dayjs'
@@ -16,11 +18,9 @@ import React, { memo, useEffect, useMemo } from 'react'
 import {
   InfinityBinPositionDetail,
   InfinityCLPositionDetail,
-  PositionDetail,
-  SolanaV3PositionDetail,
   StableLPDetail,
   UnifiedPositionDetail,
-  V2LPDetail,
+  V2LPDetail
 } from 'state/farmsV4/state/accountPositions/type'
 import {
   InfinityBinPoolInfo,
@@ -34,19 +34,14 @@ import { Address } from 'viem'
 import { useV2CakeEarning, useV3CakeEarning } from 'views/universalFarms/hooks/useCakeEarning'
 import { usePositionEarningAmount } from 'views/universalFarms/hooks/usePositionEarningAmount'
 import { useAccount } from 'wagmi'
-import { IncentraTag } from 'components/Incentra/IncentraTag'
-import { isEvm, isSolana, NonEVMChainId } from '@pancakeswap/chains'
-import { PositionDebugView } from '../PositionDebugView'
 import {
   InfinityBinPoolPositionAprButton,
   InfinityCLPoolPositionAprButton,
   PoolGlobalAprButton,
-  SolanaV3PoolPositionAprButton,
   V2PoolPositionAprButton,
-  V3PoolPositionAprButton,
 } from '../../PoolAprButton'
-import { DetailInfoTitle, DetailInfoDesc, DetailInfoLabel, TagCell } from './styled'
-import { SolanaV3Earnings } from './SolanaV3Earnings'
+import { PositionDebugView } from '../PositionDebugView'
+import { DetailInfoDesc, DetailInfoLabel, DetailInfoTitle, TagCell } from './styled'
 
 export const formatPositionAmount = (amount?: UnifiedCurrencyAmount<UnifiedCurrency>) => {
   const minimumFractionDigits = Math.min(amount?.currency.decimals ?? 0, 6)
@@ -220,18 +215,7 @@ export const PositionInfo = memo((props: PositionInfoProps) => {
     }
     if (!userPosition) {
       return <PoolGlobalAprButton pool={pool as PoolInfo} detailMode={detailMode} />
-    }
-    if (pool.protocol === Protocol.V3) {
-      if (chainId === NonEVMChainId.SOLANA) {
-        return (
-          <SolanaV3PoolPositionAprButton
-            pool={pool as SolanaV3PoolInfo}
-            userPosition={userPosition as SolanaV3PositionDetail}
-          />
-        )
-      }
-      return <V3PoolPositionAprButton pool={pool as PoolInfo} userPosition={userPosition as PositionDetail} />
-    }
+    }    
     if (pool.protocol === Protocol.InfinityCLAMM) {
       return (
         <InfinityCLPoolPositionAprButton
@@ -290,9 +274,6 @@ export const PositionInfo = memo((props: PositionInfoProps) => {
           <InfinityCLEarnings tokenId={tokenId} chainId={chainId} poolId={poolId} />
         ) : Protocol.InfinityBIN === protocol ? (
           <InfinityBinEarnings chainId={chainId} poolId={poolId} />
-        ) : null}
-        {Protocol.V3 === protocol && chainId && isSolana(chainId) ? (
-          <SolanaV3Earnings pool={pool as SolanaV3PoolInfo} position={userPosition as SolanaV3PositionDetail} />
         ) : null}
       </DetailInfoDesc>
     </>

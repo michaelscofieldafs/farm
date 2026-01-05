@@ -93,63 +93,102 @@ export const darkColors = {
   ...baseColors,
   ...additionalColors,
   ...darkColorsV2,
-  blue10: "#0B3557",
-  blue20: "#0E4572",
-  blue60: "#72B8F1",
-  secondary: "#A881FC",
-  secondary10: "#322B48",
-  secondary20: "#4B3B5F",
-  secondary60: "#756595",
-  secondary80: "#A881FC80",
-  background: "#08060B",
-  backgroundDisabled: "#3c3742",
-  backgroundAlt: "#27262c",
-  backgroundAlt2: "rgba(39, 38, 44, 0.7)",
-  backgroundAlt3: "rgba(0, 0, 0, 0.2)",
-  backgroundHover: "rgba(0, 0, 0, 0.04)",
-  backgroundTapped: "rgba(0, 0, 0, 0.08)",
-  backgroundOverlay: "rgba(68, 62, 88, 0.60)",
-  backgroundBubblegum: "#160F1E",
-  backgroundPage: "#160F1E",
-  card: "#27262C",
-  cardSecondary: "#18171A",
-  cardBorder: "#383241",
+
+  /* Blues / Teal */
+  blue10: "#062A2C",
+  blue20: "#08393C",
+  blue60: "#5FD6DA",
+
+  /* Primary / Secondary */
+  primaryDark: "#0FB9B1",
+  primary10: "#0A2F31",
+  primary20: "#0E4A4D",
+  primary60: "#38E1D9",
+
+  secondary: "#99E39E",
+  secondary10: "#0C2F30",
+  secondary20: "#134445",
+  secondary60: "#99E39E",
+  secondary80: "#99E39E80",
+
+  /* Backgrounds */
+  background: "#031B1C",
+  backgroundPage: "#031B1C",
+  backgroundAlt: "#071F21",
+  backgroundAlt2: "rgba(7, 31, 33, 0.7)",
+  backgroundAlt3: "rgba(0, 0, 0, 0.25)",
+  backgroundHover: "rgba(255, 255, 255, 0.04)",
+  backgroundTapped: "rgba(255, 255, 255, 0.08)",
+  backgroundOverlay: "rgba(6, 40, 42, 0.65)",
+  backgroundDisabled: "#1E3A3C",
+  backgroundBubblegum: "#041F21",
+
+  /* Cards */
+  card: "#071F21",
+  cardSecondary: "#041718",
+  cardBorder: "#0F3E40",
+
+  /* Dropdowns / Inputs */
+  dropdown: "#071F21",
+  dropdownDeep: "#031516",
+  input: "#0B2F31",
+  inputSecondary: "#072526",
+
+  /* Text */
   contrast: "#FFFFFF",
-  dropdown: "#1E1D20",
-  dropdownDeep: "#100C18",
-  invertedContrast: "#191326",
-  input: "#372F47",
-  inputSecondary: "#262130",
-  primaryDark: "#0098A1",
-  tertiary: "#353547",
-  tertiary20: "#44445B",
-  tertiaryPale20: "#44445B",
-  text: "#F4EEFF",
-  text99: "#F4EEFF99",
-  textDisabled: "#666171",
-  textSubtle: "#B8ADD2",
-  disabled: "#524B63",
-  primary10: "#13393C",
-  primary20: "#094D53",
-  primary60: "#48D0DB",
+  invertedContrast: "#0B1F20",
+  text: "#E6FAFA",
+  text99: "#E6FAFA99",
+  textSubtle: "#9FD6D4",
+  textDisabled: "#5C8F8E",
+
+  /* UI States */
+  disabled: "#355E5F",
+  tertiary: "#123C3E",
+  tertiary20: "#1A4D4F",
+  tertiaryPale20: "#1A4D4F",
+
+  /* Status */
   positive10: "#0C3A32",
-  positive20: "#035345",
-  positive60: "#3DDBB5",
-  destructive10: "#551146",
-  destructive20: "#7B194D",
-  destructive60: "#FB7EC1",
-  destructive: "#ED4B9E",
-  warning10: "#452E14",
-  warning20: "#754300",
-  warning60: "#D67E0A",
-  bubblegum: "#160F1E",
-  gradientPrimary: "linear-gradient(228.54deg, #1FC7D4 -13.69%, #9A6AFF 91.33%)",
-  gradientBubblegum: "linear-gradient(139.73deg, #313D5C 0%, #3D2A54 100%)",
-  gradientInverseBubblegum: "linear-gradient(139.73deg, #3D2A54 0%, #313D5C 100%)",
-  gradientCardHeader: "linear-gradient(166.77deg, #3B4155 0%, #3A3045 100%)",
-  gradientBlue: "linear-gradient(180deg, #00707F 0%, #19778C 100%)",
-  gradientViolet: "linear-gradient(180deg, #6C4999 0%, #6D4DB2 100%)",
-  gradientVioletAlt: "linear-gradient(180deg, #434575 0%, #66578D 100%)",
-  gradientGold: "linear-gradient(180deg, #FFD800 0%, #FDAB32 100%)",
-  gradientBold: "linear-gradient(#53DEE9, #9A6AFF)",
-};
+  positive20: "#0F5E52",
+  positive60: "#3DE3C6",
+
+  destructive: "#E05A7A",
+  destructive10: "#3A1020",
+  destructive20: "#5A1A2F",
+  destructive60: "#F08AA3",
+
+  warning10: "#3A2A10",
+  warning20: "#6A4A12",
+  warning60: "#F2B84B",
+
+  /* Gradients */
+  gradientBubblegum:
+  "linear-gradient(140deg, #0A2F31 0%, #071F21 100%)",
+
+  gradientInverseBubblegum:
+  "linear-gradient(140deg, #071F21 0%, #0A2F31 100%)",
+
+  gradientPrimary:
+    "linear-gradient(135deg, #0FB9B1 0%, #38E1D9 100%)",
+
+  gradientBlue:
+    "linear-gradient(180deg, #0A3F42 0%, #0FB9B1 100%)",
+
+  gradientViolet:
+    "linear-gradient(180deg, #0FB9B1 0%, #38E1D9 100%)",
+
+  gradientVioletAlt:
+    "linear-gradient(180deg, #0A2F31 0%, #0E4A4D 100%)",
+
+  gradientGold:
+    "linear-gradient(180deg, #FFD36A 0%, #F5A623 100%)",
+
+  gradientBold:
+    "linear-gradient(135deg, #38E1D9, #0FB9B1)",
+
+  gradientCardHeader:
+    "linear-gradient(160deg, #0A2F31 0%, #071F21 100%)",
+
+  bubblegum: "#041F21",
+}

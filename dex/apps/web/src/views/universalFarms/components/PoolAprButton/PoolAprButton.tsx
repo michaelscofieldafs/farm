@@ -1,4 +1,3 @@
-import { Protocol } from '@pancakeswap/farms'
 import { TextProps, useModalV2, useTooltip } from '@pancakeswap/uikit'
 import { useMemo } from 'react'
 import { CakeApr } from 'state/farmsV4/atom'
@@ -6,18 +5,13 @@ import {
   InfinityBinPositionDetail,
   InfinityCLPositionDetail,
   PositionDetail,
-  SolanaV3PositionDetail,
 } from 'state/farmsV4/state/accountPositions/type'
 import { ChainIdAddressKey, PoolInfo, SolanaV3PoolInfo } from 'state/farmsV4/state/type'
 import { getMerklLink } from 'utils/getMerklLink'
-import { isInfinityProtocol } from 'utils/protocols'
 
 import { getIncentraLink } from 'utils/getIncentraLink'
-import { isEvm } from '@pancakeswap/chains'
 import { sumApr } from '../../utils/sumApr'
-import { InfinityPoolAprModal } from '../Modals/InfinityPoolAprModal'
 import { V2PoolAprModal } from '../Modals/V2PoolAprModal'
-import { V3PoolAprModal } from '../Modals/V3PoolAprModal'
 import { StopPropagation } from '../StopPropagation'
 import { AprButton } from './AprButton'
 import { AprTooltipContent, BCakeWrapperFarmAprTipContent } from './AprTooltipContent'
@@ -29,7 +23,7 @@ type PoolGlobalAprButtonProps = {
   solanaRewardsApr?: number
   merklApr?: number
   incentraApr?: number
-  userPosition?: PositionDetail | InfinityBinPositionDetail | InfinityCLPositionDetail | SolanaV3PositionDetail
+  userPosition?: PositionDetail | InfinityBinPositionDetail | InfinityCLPositionDetail
   onAPRTextClick?: () => void
   showApyButton?: boolean
   loading?: boolean
@@ -96,25 +90,9 @@ export const PoolAprButton: React.FC<PoolGlobalAprButtonProps> = ({
       {tooltipVisible && tooltip}
       {modal.isOpen && (
         <>
-          {hasBCake ? (
+          {hasBCake ? 
             <V2PoolAprModal modal={modal} poolInfo={pool} combinedApr={baseApr} lpApr={Number(lpApr ?? 0)} />
-          ) : pool.protocol === Protocol.V3 ? (
-            isEvm(pool.chainId) ? (
-              <V3PoolAprModal
-                modal={modal}
-                poolInfo={pool as PoolInfo}
-                cakeApr={cakeApr}
-                positionDetail={userPosition as PositionDetail}
-              />
-            ) : null
-          ) : isInfinityProtocol(pool.protocol) ? (
-            <InfinityPoolAprModal
-              modal={modal}
-              poolInfo={pool}
-              cakeApr={cakeApr}
-              positionDetail={userPosition as InfinityCLPositionDetail}
-            />
-          ) : null}
+           : null}
         </>
       )}
     </StopPropagation>

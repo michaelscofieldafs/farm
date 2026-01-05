@@ -100,6 +100,7 @@ export async function getCurrencyListUsdPrice(
     throw new Error(`Invalid request for currency prices, request url: ${requestUrl}`)
   }
 
+  /**
   try {
     const res = await fetch(requestUrl, options)
     const data = await res.json()
@@ -109,6 +110,9 @@ export async function getCurrencyListUsdPrice(
     console.error('Failed to get currency list usd price:', error)
     return {}
   }
+     */
+
+  return {}
 }
 
 export async function getTokenPrices(

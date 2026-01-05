@@ -3,10 +3,6 @@ import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, us
 import useAccountActiveChain from 'hooks/useAccountActiveChain'
 import { useActiveChainId } from 'hooks/useActiveChainId'
 import { useUnifiedNativeCurrency } from 'hooks/useNativeCurrency'
-import { useSolanaTokenList } from 'hooks/solana/useSolanaTokenList'
-import { useSolanaTokenInfo } from 'hooks/solana/useSolanaTokenInfo'
-import { useSolanaTokenBalances } from 'state/token/solanaTokenBalances'
-import { useSolanaTokenPrices } from 'hooks/solana/useSolanaTokenPrice'
 import { FixedSizeList } from 'react-window'
 import { sanitizeTokenInfos, useAllLists, useInactiveListUrls } from 'state/lists/hooks'
 import { UpdaterByChainId } from 'state/lists/updater'
@@ -153,31 +149,15 @@ function CurrencySearch({
   // Use Solana token list if Solana is selected
   const isSolana = selectedChainId === NonEVMChainId.SOLANA
   const allTokens = useAllTokens(selectedChainId)
-  const { tokenList: solanaTokens } = useSolanaTokenList()
   const native = useUnifiedNativeCurrency(selectedChainId)
 
-  const { solanaAccount } = useAccountActiveChain() // useAccount is already imported and works for all chains
-  const tokenAddresses = useMemo(() => solanaTokens.map((t) => t.address), [solanaTokens])
-  // Solana balances integration
-  const solanaBalances = useSolanaTokenBalances(solanaAccount, tokenAddresses)
-  const tokenAddressesWithBalance = useMemo(
-    () => tokenAddresses.filter((addr) => solanaBalances.balances.get(addr)?.gt(0)),
-    [tokenAddresses, solanaBalances.balances],
-  )
-  const { data: solanaPrices } = useSolanaTokenPrices({
-    mints: tokenAddressesWithBalance,
-    enabled: isSolana && tokenAddressesWithBalance.length > 0,
-  })
-
-  const solanaSearchToken = useSolanaTokenInfo(isSolana && !tokensToShow ? debouncedQuery : undefined)
   const evmSearchToken = useToken(!tokensToShow ? debouncedQuery : undefined, selectedChainId)
-  const searchToken = isSolana ? solanaSearchToken : evmSearchToken
+  const searchToken = evmSearchToken
 
   // if they input an address, use it
   const evmSearchTokenIsAdded = useIsUserAddedToken(evmSearchToken, selectedChainId)
-  const searchTokenIsAdded = isSolana
-    ? !!solanaTokens.find((t) => t.address === (searchToken as SPLToken | undefined)?.address)
-    : evmSearchTokenIsAdded
+  const searchTokenIsAdded = 
+     evmSearchTokenIsAdded
 
   // if no results on main list, show option to expand into inactive (only when tokensToShow is not set)
   const filteredInactiveTokens = useSearchInactiveTokenLists(!tokensToShow ? debouncedQuery : undefined)
@@ -190,55 +170,19 @@ function CurrencySearch({
   }, [debouncedQuery, native, tokensToShow, showNativeProp])
 
   const filteredTokens = useMemo(() => {
-    if (isSolana) {
-      // Simple search for Solana tokens
-      const s = debouncedQuery.toLowerCase().trim()
-      const otherIsSol = isSolWSolToken(otherSelectedCurrency)
-      return solanaTokens.filter(
-        (token) =>
-          (token.symbol.toLowerCase().includes(s) ||
-            token.name?.toLowerCase().includes(s) ||
-            token.address.toLowerCase() === s) &&
-          !(otherIsSol && isSolWSolToken(token)),
-      )
-    }
     const filterToken = createFilterToken(debouncedQuery, (address) => isAddress(address))
     // Only EVM tokens here
     return Object.values(tokensToShow || allTokens).filter(filterToken) as Token[]
-  }, [tokensToShow, allTokens, debouncedQuery, isSolana, solanaTokens, otherSelectedCurrency])
+  }, [tokensToShow, allTokens, debouncedQuery, isSolana, otherSelectedCurrency])
 
   const queryTokens = useSortedTokensByQuery(filteredTokens as Token[], debouncedQuery)
 
   const { balances } = useAllTokenBalances(selectedChainId)
 
   const filteredSortedTokens: UnifiedCurrency[] = useMemo(() => {
-    if (isSolana) {
-      return [...filteredTokens].sort((a, b) => {
-        const balA = solanaBalances.balances.get(a.address)?.dividedBy(10 ** (a.decimals || 1)) ?? BIG_ZERO
-        const balB = solanaBalances.balances.get(b.address)?.dividedBy(10 ** (b.decimals || 1)) ?? BIG_ZERO
-        const priceA = solanaPrices?.[a.address.toLowerCase()] ?? 0
-        const priceB = solanaPrices?.[b.address.toLowerCase()] ?? 0
-        const usdA = balA.multipliedBy(priceA)
-        const usdB = balB.multipliedBy(priceB)
-        if (!usdA.eq(usdB)) {
-          return usdB.comparedTo(usdA)
-        }
-        const hasBalA = balA.gt(0)
-        const hasBalB = balB.gt(0)
-        if (hasBalA && hasBalB) {
-          if (!balA.eq(balB)) {
-            return balB.comparedTo(balA)
-          }
-        }
-        if (hasBalA !== hasBalB) {
-          return hasBalB ? 1 : -1
-        }
-        return 0
-      })
-    }
     const tokenComparator = getTokenComparator(balances ?? {})
     return [...(queryTokens as Token[])].sort(tokenComparator)
-  }, [filteredTokens, queryTokens, balances, isSolana, solanaBalances.balances, solanaPrices])
+  }, [filteredTokens, queryTokens, balances, isSolana])
 
   const handleCurrencySelect = useCallback(
     (currency: UnifiedCurrency) => {

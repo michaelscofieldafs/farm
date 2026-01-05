@@ -12,7 +12,6 @@ const PUBLIC_NODES: Record<string, string[]> = {
     'https://bsc-dataseed1.defibit.io',
     'https://bsc-dataseed1.bnbchain.org',
   ],
-  [ChainId.ARBITRUM_ONE]: ['https://arbitrum-one.publicnode.com', 'https://arbitrum.llamarpc.com'],
   [ChainId.ETHEREUM]: ['https://ethereum.publicnode.com', 'https://eth.llamarpc.com'],
 }
 

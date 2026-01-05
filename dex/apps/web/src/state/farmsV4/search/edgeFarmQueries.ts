@@ -1,5 +1,6 @@
 import { ChainId, chainNamesInKebabCase } from '@pancakeswap/chains'
 import {
+  ALL_PROTOCOLS,
   FarmV4SupportedChainId,
   fetchAllUniversalFarms,
   Protocol,
@@ -135,7 +136,7 @@ async function fetchFarms(query: FarmQuery, extend: boolean) {
   }
 
   if (symbols && symbols.length > 0) {
-    return fetchAllExplorerPoolsBySymbols(Array.from(chainIds), symbols, protocols, sortBy)
+    return fetchAllExplorerPoolsBySymbols(Array.from(chainIds), symbols, ALL_PROTOCOLS, sortBy)
   }
   return fetchAllExplorerPools(query)
 }
@@ -207,7 +208,7 @@ async function fetchAllExplorerPools(query: FarmQuery) {
   const chainIds = chains.length > 0 ? chains : supportedChainIdV4
   const poolQuery = {
     baseUrl: `${process.env.NEXT_PUBLIC_EXPLORE_API_ENDPOINT}/cached/pools/list`,
-    protocols: protocols.length > 0 ? protocols : DEFAULT_PROTOCOLS,
+    protocols: ALL_PROTOCOLS,
     chains: chainIds.map((chain) => getEdgeChainName(chain as ChainId)),
     maxPages: 2,
     orderBy: getOrder(sortBy),
@@ -219,7 +220,7 @@ async function fetchAllExplorerPools(query: FarmQuery) {
 async function fetchAllExplorerPoolsByAddress(query: FarmQuery, isPool: boolean = false) {
   const { protocols, chains, tokens, sortBy } = query
   const chainIds = chains.length > 0 ? chains : supportedChainIdV4
-  const protocolList = protocols.length > 0 ? protocols : DEFAULT_PROTOCOLS
+  const protocolList = ALL_PROTOCOLS
 
   if (!protocolList.length) return []
   const baseUrl = `${process.env.NEXT_PUBLIC_EXPLORE_API_ENDPOINT}/cached/pools/list`

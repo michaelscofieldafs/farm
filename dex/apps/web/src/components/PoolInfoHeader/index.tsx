@@ -1,4 +1,3 @@
-import Decimal from 'decimal.js'
 import { Protocol } from '@pancakeswap/farms'
 import { HookData } from '@pancakeswap/infinity-sdk'
 import { useTranslation } from '@pancakeswap/localization'
@@ -23,13 +22,12 @@ import { formatNumber } from '@pancakeswap/utils/formatNumber'
 import { CurrencyLogo, DoubleCurrencyLogo, FeeTierTooltip, Liquidity } from '@pancakeswap/widgets-internal'
 import { InfinityFeeTierBreakdown } from 'components/FeeTierBreakdown'
 import { LinkType, MiniUniversalFarmsOverlay } from 'components/MiniUniversalFarms/MiniUniversalFarmsOverlay'
-import { getFarmAprInfo } from 'state/farmsV4/search/farm.util'
-import { PoolInfo, UnifiedPoolInfo } from 'state/farmsV4/state/type'
+import { Tooltips } from 'components/Tooltips'
+import Decimal from 'decimal.js'
+import { UnifiedPoolInfo } from 'state/farmsV4/state/type'
 import { getBlockExploreLink } from 'utils'
 import { isInfinityProtocol } from 'utils/protocols'
-import { Tooltips } from 'components/Tooltips'
 import { PoolFeaturesModal } from 'views/PoolDetail/components/PoolFeaturesModal'
-import { PoolGlobalAprButtonV3 } from 'views/universalFarms/components/PoolAprButtonV3'
 
 interface PoolInfoHeaderProps {
   poolId?: string
@@ -325,25 +323,7 @@ export const PoolInfoHeader = ({
                     <Text fontSize={12} bold color="textSubtle" textTransform="uppercase" width="max-content">
                       {t('Est. APR')}
                     </Text>
-                    {overrideAprDisplay?.roiCalculator || (
-                      <PoolGlobalAprButtonV3
-                        pool={poolInfo as unknown as PoolInfo}
-                        showApyText={false}
-                        color="text"
-                        {...getFarmAprInfo(poolInfo.farm)}
-                        fontSize={isMobile ? '20px' : '24px'}
-                      />
-                    )}
                   </FlexGap>
-                  {overrideAprDisplay?.aprDisplay || (
-                    <PoolGlobalAprButtonV3
-                      pool={poolInfo as unknown as PoolInfo}
-                      showApyButton={false}
-                      color="text"
-                      {...getFarmAprInfo(poolInfo.farm)}
-                      fontSize={isMobile ? '20px' : '24px'}
-                    />
-                  )}
                 </AutoColumn>
               </Box>
             </FlexGap>

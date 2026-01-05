@@ -103,15 +103,6 @@ export const MevModal: React.FC<{ isOpen: boolean; onSuccess?: () => void } & In
       <ModalContainer>
         <ModalHeader style={{ border: 'none', position: 'relative' }}>
           <ModalTitle />
-          <Text
-            style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}
-            width="100%"
-            bold
-            fontSize="20px"
-            textAlign="center"
-          >
-            {t('Enable MEV Protect')}
-          </Text>
           <ModalCloseButton onDismiss={onDismiss} />
         </ModalHeader>
         {walletType === WalletType.mevOnlyManualConfig ? (

@@ -21,7 +21,6 @@ import {
   convertAprDataToNumbers,
   formatPoolDetailFiatNumber,
 } from 'views/PoolDetail/utils'
-import { AprTooltipContent } from 'views/universalFarms/components/PoolAprButtonV3/AprTooltipContent'
 import { useCheckShouldSwitchNetwork } from 'views/universalFarms/hooks'
 import { useV2CakeEarning } from 'views/universalFarms/hooks/useCakeEarning'
 import { useV2PositionApr } from 'views/universalFarms/hooks/usePositionAPR'
@@ -138,12 +137,7 @@ const V2PositionWithApr: React.FC<{
       <Flex flexDirection="column" alignItems="flex-start" style={{ cursor: 'default' }}>
         <Tooltips
           content={
-            <AprTooltipContent
-              combinedApr={totalApr}
-              lpFeeApr={Number(aprData.lpApr)}
-              cakeApr={aprData.cakeApr ? { value: Number(aprData.cakeApr.value) } : undefined}
-              merklApr={Number(aprData.merklApr)}
-            />
+            <div />
           }
         >
           <Text bold fontSize="16px" color={totalApr > 0 ? 'success' : 'text'}>

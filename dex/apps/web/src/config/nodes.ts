@@ -1,6 +1,7 @@
 import { ChainId } from '@pancakeswap/chains'
 import { getNodeRealUrl } from 'utils/node/nodeReal'
 import { getGroveUrl } from 'utils/node/pokt'
+import { defineChain } from 'viem/utils'
 import {
   arbitrum,
   arbitrumGoerli,
@@ -18,6 +19,27 @@ import {
   zksyncSepoliaTestnet,
 } from 'wagmi/chains'
 
+export const sonicTestnet = /*#__PURE__*/ defineChain({
+  id: 14601,
+  name: 'Sonic Testnet',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Sonic',
+    symbol: 'S',
+  },
+  rpcUrls: {
+    default: { http: ['https://rpc.testnet.soniclabs.com'] },
+  },
+  blockExplorers: {
+    default: {
+      name: 'Sonic Testnet Explorer',
+      url: 'https://testnet.soniclabs.com/',
+    },
+  },
+  testnet: true,
+})
+
+
 const MONAD_RPC_URLS = [
   process.env.NEXT_PUBLIC_MONAD_RPC,
   process.env.NEXT_PUBLIC_MONAD_BACKUP_RPC,
@@ -26,12 +48,6 @@ const MONAD_RPC_URLS = [
   'https://rpc1.monad.xyz',
   'https://rpc3.monad.xyz',
 ].filter(Boolean) as [string, ...string[]]
-
-const ARBITRUM_NODES = [
-  ...arbitrum.rpcUrls.default.http,
-  'https://arbitrum-one.publicnode.com',
-  'https://arbitrum.llamarpc.com',
-].filter(Boolean)
 
 export const SERVER_NODES = {
   [ChainId.BSC]: [
@@ -59,7 +75,6 @@ export const SERVER_NODES = {
     getNodeRealUrl(ChainId.GOERLI, process.env.SERVER_NODE_REAL_API_GOERLI) || '',
     'https://eth-goerli.public.blastapi.io',
   ].filter(Boolean),
-  [ChainId.ARBITRUM_ONE]: ARBITRUM_NODES,
   [ChainId.ARBITRUM_GOERLI]: arbitrumGoerli.rpcUrls.default.http,
   [ChainId.ZKSYNC]: [
     ...zksync.rpcUrls.default.http,
@@ -82,6 +97,7 @@ export const SERVER_NODES = {
     // process.env.NEXT_PUBLIC_NODE_REAL_BASE_PRODUCTION,
     ...base.rpcUrls.default.http,
   ],
+  [ChainId.SONIC_TESTNET]: sonicTestnet.rpcUrls.default.http,
   [ChainId.BASE_TESTNET]: baseGoerli.rpcUrls.default.http,
   [ChainId.SCROLL_SEPOLIA]: scrollSepolia.rpcUrls.default.http,
   [ChainId.SEPOLIA]: sepolia.rpcUrls.default.http,
@@ -125,12 +141,6 @@ export const PUBLIC_NODES: Partial<Record<ChainId, readonly string[]>> = {
     getNodeRealUrl(ChainId.GOERLI, process.env.NEXT_PUBLIC_NODE_REAL_API_GOERLI) || '',
     'https://eth-goerli.public.blastapi.io',
   ].filter(Boolean) as readonly string[],
-  [ChainId.ARBITRUM_ONE]: [
-    ...ARBITRUM_NODES,
-    process.env.NEXT_PUBLIC_NODIES_ARB || '',
-    getNodeRealUrl(ChainId.ARBITRUM_ONE, process.env.NEXT_PUBLIC_NODE_REAL_API_ETH) || '',
-    // getGroveUrl(ChainId.ARBITRUM_ONE, process.env.NEXT_PUBLIC_GROVE_API_KEY) || '',
-  ].filter(Boolean) as readonly string[],
   [ChainId.ARBITRUM_GOERLI]: arbitrumGoerli.rpcUrls.default.http,
   [ChainId.ZKSYNC]: [
     ...zksync.rpcUrls.default.http,
@@ -159,6 +169,7 @@ export const PUBLIC_NODES: Partial<Record<ChainId, readonly string[]>> = {
     ...base.rpcUrls.default.http,
   ].filter(Boolean) as readonly string[],
   [ChainId.BASE_TESTNET]: baseGoerli.rpcUrls.default.http,
+  [ChainId.SONIC_TESTNET]: sonicTestnet.rpcUrls.default.http,
   [ChainId.SCROLL_SEPOLIA]: scrollSepolia.rpcUrls.default.http,
   [ChainId.SEPOLIA]: sepolia.rpcUrls.default.http,
   [ChainId.ARBITRUM_SEPOLIA]: arbitrumSepolia.rpcUrls.default.http,

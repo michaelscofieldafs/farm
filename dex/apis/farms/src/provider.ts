@@ -1,6 +1,6 @@
 import { ChainId } from '@pancakeswap/chains'
 import { Chain, createPublicClient, http, PublicClient } from 'viem'
-import { arbitrum, bsc, bscTestnet, goerli, mainnet, opBNB, opBNBTestnet, zkSync, zkSyncTestnet } from 'viem/chains'
+import { arbitrum, bsc, bscTestnet, goerli, mainnet, opBNB, opBNBTestnet, zkSync } from 'viem/chains'
 
 const requireCheck = [
   ETH_NODE,
@@ -8,7 +8,6 @@ const requireCheck = [
   BSC_NODE,
   BSC_TESTNET_NODE,
   ZKSYNC_NODE,
-  ARBITRUM_ONE_NODE,
   LINEA_NODE,
   BASE_NODE,
   OPBNB_NODE,
@@ -154,45 +153,9 @@ const goerliClient = createPublicClient({
   pollingInterval: 6_000,
 })
 
-const zksyncTestnetClient = createPublicClient({
-  chain: zkSyncTestnet as Chain,
-  transport: http(),
-  batch: {
-    multicall: {
-      batchSize: 1024 * 200,
-      wait: 16,
-    },
-  },
-  pollingInterval: 6_000,
-})
-
 const zksyncClient = createPublicClient({
   chain: zkSync as Chain,
   transport: http(ZKSYNC_NODE),
-  batch: {
-    multicall: {
-      batchSize: 1024 * 200,
-      wait: 16,
-    },
-  },
-  pollingInterval: 6_000,
-})
-
-const arbitrumOneClient = createPublicClient({
-  chain: arbitrum,
-  transport: http(ARBITRUM_ONE_NODE),
-  batch: {
-    multicall: {
-      batchSize: 1024 * 200,
-      wait: 16,
-    },
-  },
-  pollingInterval: 6_000,
-})
-
-const lineaClient = createPublicClient({
-  chain: linea,
-  transport: http(LINEA_NODE),
   batch: {
     multicall: {
       batchSize: 1024 * 200,
@@ -246,14 +209,8 @@ export const viemProviders = ({ chainId }: { chainId?: ChainId }): PublicClient 
       return bscTestnetClient
     case ChainId.GOERLI:
       return goerliClient
-    case ChainId.ZKSYNC_TESTNET:
-      return zksyncTestnetClient
     case ChainId.ZKSYNC:
       return zksyncClient
-    case ChainId.ARBITRUM_ONE:
-      return arbitrumOneClient
-    case ChainId.LINEA:
-      return lineaClient
     case ChainId.BASE:
       return baseClient
     case ChainId.OPBNB:

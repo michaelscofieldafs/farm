@@ -31,7 +31,6 @@ import { useRouter } from 'next/router'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useFarms, usePollFarmsAvgInfo, usePollFarmsWithUserData } from 'state/farms/hooks'
 import { V2FarmWithoutStakedValue, V3FarmWithoutStakedValue, type V3Farm } from 'state/farms/types'
-import { useFarmsV3WithPositionsAndBooster } from 'state/farmsV3/hooks'
 import { ViewMode } from 'state/user/actions'
 import { useUserFarmStakedOnly, useUserFarmsViewMode } from 'state/user/hooks'
 import { styled } from 'styled-components'
@@ -157,17 +156,10 @@ const Farms: React.FC<React.PropsWithChildren> = ({ children }) => {
   const { t } = useTranslation()
   const { chainId } = useActiveChainId()
   const { data: farmsV2, userDataLoaded: v2UserDataLoaded, poolLength: v2PoolLength, regularCakePerBlock } = useFarms()
-  const {
-    farmsWithPositions: farmsV3,
-    poolLength: v3PoolLength,
-    isLoading,
-    userDataLoaded: v3UserDataLoaded,
-  } = useFarmsV3WithPositionsAndBooster({ mockApr })
 
   // FIXME: temporary sort sable v2 farm in front of v3 farms
   const farmsLP: V2AndV3Farms = useMemo(() => {
     const farms: V2AndV3Farms = [
-      ...farmsV3.map((f) => ({ ...f, version: 3 } as V3FarmWithoutStakedValue)),
       ...farmsV2.map((f) => ({ ...f, version: 2 } as V2FarmWithoutStakedValue)),
     ]
     if (chainId !== ChainId.BSC) {
@@ -186,7 +178,7 @@ const Farms: React.FC<React.PropsWithChildren> = ({ children }) => {
       ...farms.slice(targetIndex + 1, sableFarmIndex),
       ...farms.slice(sableFarmIndex + 1),
     ]
-  }, [farmsV2, farmsV3, chainId])
+  }, [farmsV2, [], chainId])
 
   const cakePrice = useCakePrice()
 
@@ -211,8 +203,7 @@ const Farms: React.FC<React.PropsWithChildren> = ({ children }) => {
   const userDataReady =
     !account ||
     (!!account &&
-      (chainId && supportedChainIdV2.includes(chainId) ? v2UserDataLoaded : true) &&
-      (chainId && supportedChainIdV3.includes(chainId) ? v3UserDataLoaded : true))
+      (chainId && supportedChainIdV2.includes(chainId) ? v2UserDataLoaded : true))
 
   const [stakedOnly, , toggleStakedOnly] = useUserFarmStakedOnly(isActive)
   const [v3FarmOnly, setV3FarmOnly] = useState(false)
@@ -227,10 +218,9 @@ const Farms: React.FC<React.PropsWithChildren> = ({ children }) => {
         (farm) =>
           farm.pid !== 0 &&
           (farm.multiplier !== '0X' ||
-            Boolean(farm.version === 2 && farm?.bCakeWrapperAddress && farm?.bCakePublicData?.isRewardInRange)) &&
-          (farm.version === 3 ? !v3PoolLength || v3PoolLength >= farm.pid : !v2PoolLength || v2PoolLength > farm.pid),
+            Boolean(farm.version === 2 && farm?.bCakeWrapperAddress && farm?.bCakePublicData?.isRewardInRange)),
       ),
-    [farmsLP, v2PoolLength, v3PoolLength],
+    [farmsLP, v2PoolLength, 0],
   )
 
   const farmsAvgInfo = usePollFarmsAvgInfo(activeFarms)
@@ -509,13 +499,13 @@ const Farms: React.FC<React.PropsWithChildren> = ({ children }) => {
           </Box>
         )}
 
-        {!isLoading && // FarmV3 initial data will be slower, wait for it loads for now to prevent showing the v2 farm from config and then v3 pop up later
+        {!true && // FarmV3 initial data will be slower, wait for it loads for now to prevent showing the v2 farm from config and then v3 pop up later
           (viewMode === ViewMode.TABLE ? (
             <Table farms={chosenFarmsMemoized} cakePrice={cakePrice} userDataReady={userDataReady} />
           ) : (
             <FlexLayout>{children}</FlexLayout>
           ))}
-        {account && !v2UserDataLoaded && !v3UserDataLoaded && stakedOnly && (
+        {account && !v2UserDataLoaded && stakedOnly && (
           <Flex justifyContent="center">
             <Loading />
           </Flex>

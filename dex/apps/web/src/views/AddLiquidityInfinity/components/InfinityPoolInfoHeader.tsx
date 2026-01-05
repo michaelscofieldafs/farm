@@ -8,10 +8,6 @@ import { useMemo } from 'react'
 import { usePoolInfo } from 'state/farmsV4/hooks'
 import { useInverted } from 'state/infinity/shared'
 import { getTokenSymbolAlias } from 'utils/getTokenAlias'
-import {
-  InfinityBinPoolDerivedAprButton,
-  InfinityCLPoolDerivedAprButton,
-} from 'views/universalFarms/components/PoolAprButtonV3/PoolPositionAprButtonV3'
 
 export const InfinityPoolInfoHeader = () => {
   const { chainId, poolId } = useInfinityPoolIdRouteParams()
@@ -47,9 +43,9 @@ export const InfinityPoolInfoHeader = () => {
       overrideAprDisplay={{
         aprDisplay: poolInfo ? (
           poolInfo.protocol === Protocol.InfinityCLAMM ? (
-            <InfinityCLPoolDerivedAprButton pool={poolInfo} fontSize={isMobile ? '20px' : '24px'} />
+            <div />
           ) : poolInfo.protocol === Protocol.InfinityBIN ? (
-            <InfinityBinPoolDerivedAprButton pool={poolInfo} fontSize={isMobile ? '20px' : '24px'} />
+            <div />
           ) : (
             '-'
           )

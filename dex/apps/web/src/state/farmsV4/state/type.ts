@@ -2,7 +2,6 @@ import { Protocol } from '@pancakeswap/farms'
 import { HookData } from '@pancakeswap/infinity-sdk'
 import { Currency, UnifiedCurrency } from '@pancakeswap/swap-sdk-core'
 import { Address } from 'viem'
-import { SolanaV3Pool } from 'state/pools/solana'
 import { PublicKey } from '@solana/web3.js'
 import { FarmInfo } from '../search/farm.util'
 
@@ -49,7 +48,7 @@ export type SolanaV3PoolInfo = Omit<BasePoolInfo, 'lpAddress' | 'poolId'> & {
   protocol: Protocol.V3
   lpAddress: string
   nftMint: PublicKey
-  rawPool: SolanaV3Pool
+  rawPool: any
   poolId: string
 }
 

@@ -44,7 +44,6 @@ import { getTokenSymbolAlias } from 'utils/getTokenAlias'
 import { isInfinityProtocol } from 'utils/protocols'
 import { Tooltips } from 'components/Tooltips'
 import { getRewardProvider, getRewardMultiplier } from 'views/universalFarms/components/FarmStatusDisplay/hooks'
-import { PoolGlobalAprButtonV3 } from 'views/universalFarms/components/PoolAprButtonV3'
 import { RewardInfoCard } from 'views/universalFarms/components/RewardInfoCard'
 import LiquiditySunsetWarning from 'components/Liquidity/LiquiditySunsetWarning'
 import { isSolana } from '@pancakeswap/chains'
@@ -360,15 +359,10 @@ export const PoolInfo = () => {
                     <Text fontSize={12} bold color="textSubtle" textTransform="uppercase" minWidth="max-content">
                       {t('Est. APR')}
                     </Text>
-                    {isSolanaChain ? null : <PoolGlobalAprButtonV3 pool={poolInfo} showApyText={false} />}
+                    {isSolanaChain ? null : <div />}
                   </FlexGap>
                   {poolInfo ? (
-                    <PoolGlobalAprButtonV3
-                      clickable={!isSolanaChain}
-                      aprInfo={aprInfo}
-                      pool={poolInfo}
-                      showApyButton={false}
-                    />
+                    <div />
                   ) : null}
                 </AutoColumn>
               </LightGreyCard>

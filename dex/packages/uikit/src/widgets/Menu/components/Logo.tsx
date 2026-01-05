@@ -3,6 +3,8 @@ import { keyframes, styled } from "styled-components";
 import Flex from "../../../components/Box/Flex";
 import { LogoIcon, LogoWithTextIcon } from "../../../components/Svg";
 import { MenuContext } from "../context";
+import { Image } from "../../../components";
+import SavvyDexLogo from '../../../assets/images/logo/savvy-dex-logo.png';
 
 interface Props {
   href: string;
@@ -46,19 +48,18 @@ const Logo: React.FC<React.PropsWithChildren<Props>> = ({ href }) => {
   const isAbsoluteUrl = href.startsWith("http");
   const innerLogo = (
     <>
-      <LogoIcon className="mobile-icon" />
-      <LogoWithTextIcon className="desktop-icon" />
+      <img width={50} height={50} src={new URL('../../../assets/images/logo/savvy-dex-logo.png', import.meta.url).href}  />
     </>
   );
 
   return (
     <Flex alignItems="center">
       {isAbsoluteUrl ? (
-        <StyledLink as="a" href={href} aria-label="PancakeSwap home page">
+        <StyledLink as="a" href={href} aria-label="SavyyDex home page">
           {innerLogo}
         </StyledLink>
       ) : (
-        <StyledLink href={href} as={linkComponent} aria-label="PancakeSwap home page">
+        <StyledLink href={href} as={linkComponent} aria-label="SavyyDex home page">
           {innerLogo}
         </StyledLink>
       )}

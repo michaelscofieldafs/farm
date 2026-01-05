@@ -18,7 +18,6 @@ import {
 } from 'state/predictions/hooks'
 import { styled } from 'styled-components'
 import History from './History'
-import Positions from './Positions'
 import LoadingSection from './components/LoadingSection'
 import Menu from './components/Menu'
 import { ErrorNotification, PauseNotification } from './components/Notification'
@@ -221,7 +220,6 @@ const Desktop: React.FC<React.PropsWithChildren> = () => {
           {[PredictionStatus.INITIAL, PredictionStatus.LIVE].includes(status) && (
             <Box>
               <Menu />
-              {status === PredictionStatus.LIVE ? <Positions /> : <LoadingSection />}
             </Box>
           )}
         </PositionPane>

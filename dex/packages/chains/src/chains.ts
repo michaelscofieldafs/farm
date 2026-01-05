@@ -10,6 +10,8 @@ export interface Chain {
 }
 
 export const Chains: Chain[] = [
+  
+  /**
   { id: ChainId.BSC, name: chainNames[ChainId.BSC], fullName: chainFullNames[ChainId.BSC], isEVM: true },
   { id: ChainId.ETHEREUM, name: chainNames[ChainId.ETHEREUM], fullName: chainFullNames[ChainId.ETHEREUM], isEVM: true },
   {
@@ -25,6 +27,7 @@ export const Chains: Chain[] = [
     isEVM: false,
   },
   { id: ChainId.BASE, name: chainNames[ChainId.BASE], fullName: chainFullNames[ChainId.BASE], isEVM: true },
+  /**
   {
     id: ChainId.MONAD_MAINNET,
     name: chainNames[ChainId.MONAD_MAINNET],
@@ -40,6 +43,7 @@ export const Chains: Chain[] = [
   { id: ChainId.ZKSYNC, name: chainNames[ChainId.ZKSYNC], fullName: chainFullNames[ChainId.ZKSYNC], isEVM: true },
   { id: ChainId.LINEA, name: chainNames[ChainId.LINEA], fullName: chainFullNames[ChainId.LINEA], isEVM: true },
   { id: ChainId.OPBNB, name: chainNames[ChainId.OPBNB], fullName: chainFullNames[ChainId.OPBNB], isEVM: true },
+    */
   {
     id: ChainId.BSC_TESTNET,
     name: chainNames[ChainId.BSC_TESTNET],
@@ -47,6 +51,7 @@ export const Chains: Chain[] = [
     isEVM: true,
     testnet: true,
   },
+  /**
   { id: ChainId.GOERLI, name: chainNames[ChainId.GOERLI], fullName: chainFullNames[ChainId.GOERLI], isEVM: true },
   { id: ChainId.SEPOLIA, name: chainNames[ChainId.SEPOLIA], fullName: chainFullNames[ChainId.SEPOLIA], isEVM: true },
   {
@@ -68,13 +73,22 @@ export const Chains: Chain[] = [
     isEVM: true,
     testnet: true,
   },
+   */
   {
+    id: ChainId.SONIC_TESTNET,
+    name: chainNames[ChainId.SONIC_TESTNET],
+    fullName: chainFullNames[ChainId.SONIC_TESTNET],
+    isEVM: true,
+    testnet: true,
+  },
+    {
     id: ChainId.BASE_TESTNET,
     name: chainNames[ChainId.BASE_TESTNET],
     fullName: chainFullNames[ChainId.BASE_TESTNET],
     isEVM: true,
     testnet: true,
   },
+  /**
   {
     id: ChainId.BASE_SEPOLIA,
     name: chainNames[ChainId.BASE_SEPOLIA],
@@ -101,4 +115,5 @@ export const Chains: Chain[] = [
     isEVM: true,
     testnet: true,
   },
+   */
 ]

@@ -2,7 +2,6 @@ import { useTranslation } from '@pancakeswap/localization'
 import { Price, UnifiedCurrency } from '@pancakeswap/swap-sdk-core'
 import { Flex, FlexGap, IconButton, SwapHorizIcon, useMatchBreakpoints } from '@pancakeswap/uikit'
 import { Bound } from '@pancakeswap/widgets-internal'
-import { formatTickPrice } from 'hooks/v3/utils/formatTickPrice'
 import { memo, useCallback, useMemo, useState } from 'react'
 
 type PriceRangeProps = {
@@ -50,11 +49,11 @@ export const PriceRange = memo(({ base, quote, priceLower, priceUpper, tickAtLim
       alignItems={isMobile ? 'flex-start' : 'center'}
     >
       {t('Min %minAmount%', {
-        minAmount: formatTickPrice(priceMin, tickAtLimit, Bound.LOWER, locale),
+        minAmount: 1,
       })}{' '}
       /{' '}
       {t('Max %maxAmount%', {
-        maxAmount: formatTickPrice(priceMax, tickAtLimit, Bound.UPPER, locale),
+        maxAmount: 1,
       })}{' '}
       {isMobile ? <br /> : <>&nbsp;</>}
       <Flex alignItems="center">

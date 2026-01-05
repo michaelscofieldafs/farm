@@ -285,24 +285,26 @@ export function FormMain({ inputAmount, outputAmount, tradeLoading, isUserInsuff
           title={
             <FlexGap gap="8px" alignItems="center">
               <Text color="textSubtle" fontSize={12} bold>
-                {t('From')}:
+                Your wallet:
               </Text>
               {fromAccount && (
                 <FlexGap gap="4px" alignItems="center">
+                  {/**
                   {walletIconFrom && (
                     <Box width={24} height={24}>
                       <WalletIcon src={walletIconFrom} width={24} height={24} alt="Wallet Icon" />
                     </Box>
                   )}
+                     */}
                   <Text fontSize="12px" color="textSubtle" fontWeight="600">
-                    {truncateHash(fromAccount, 6, 4)}
+                    {truncateHash(fromAccount, 6, 10)}
                   </Text>
                 </FlexGap>
               )}
             </FlexGap>
           }
           isUserInsufficientBalance={isUserInsufficientBalance}
-          modalTitle={t('From')}
+          modalTitle={'Your wallet'}
           showSearchHeader
         />
       </Suspense>
@@ -328,17 +330,19 @@ export function FormMain({ inputAmount, outputAmount, tradeLoading, isUserInsuff
           title={
             <FlexGap gap="8px" alignItems="center">
               <Text color="textSubtle" fontSize={12} bold>
-                {t('To')}:
+                Your wallet:
               </Text>
               {(toAccount || recipient) && (
                 <FlexGap gap="4px" alignItems="center">
+                  {/**
                   {walletIconTo && !recipient && (
                     <Box width={24} height={24}>
                       <WalletIcon src={walletIconTo} width={24} height={24} alt="Wallet Icon" />
                     </Box>
                   )}
+                     */}
                   <Text fontSize="12px" color="textSubtle" fontWeight="600">
-                    {recipient ? truncateHash(recipient, 6, 4) : truncateHash(toAccount ?? '', 6, 4)}
+                    {recipient ? truncateHash(recipient, 6, 10) : truncateHash(toAccount ?? '', 6, 10)}
                   </Text>
                 </FlexGap>
               )}

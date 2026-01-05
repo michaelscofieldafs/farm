@@ -7,28 +7,23 @@ import {
   InfinityBinPoolInfo,
   InfinityCLPoolInfo,
   PoolInfo,
-  SolanaV3PoolInfo,
   StablePoolInfo,
-  V2PoolInfo,
+  V2PoolInfo
 } from 'state/farmsV4/state/type'
 import { useChainIdByQuery } from 'state/info/hooks'
 import { getRewardProvider } from 'views/universalFarms/components/FarmStatusDisplay/hooks'
 import { useCheckShouldSwitchNetwork } from 'views/universalFarms/hooks'
 
+import { isSolana } from '@pancakeswap/chains'
 import { useAtom } from 'jotai'
 import { positionEarningAmountAtom } from 'views/universalFarms/hooks/usePositionEarningAmount'
-import { isSolana, NonEVMChainId } from '@pancakeswap/chains'
 
-import { useAccount } from 'wagmi'
 import useAccountActiveChain from 'hooks/useAccountActiveChain'
 import { MyPositionsProvider } from './MyPositionsContext'
 import {
   InfinityBinPositionsTable,
-  InfinityCLPositionsTable,
   V2OrSSPositionsTable,
-  V3PositionsTable,
 } from './ProtocolPositionsTables'
-import { SolanaV3PositionsTable } from './ProtocolPositionsTables/SolanaV3PositionsTable'
 
 export const MyPositions: React.FC<{ poolInfo: PoolInfo }> = ({ poolInfo }) => {
   return (
@@ -94,14 +89,10 @@ const MyPositionsInner: React.FC<{ poolInfo: PoolInfo }> = ({ poolInfo }) => {
   return (
     <AutoColumn gap="lg">
       {isSolanaChain ? (
-        <SolanaV3PositionsTable poolInfo={poolInfo as SolanaV3PoolInfo} />
+        <div>{t('Unsupported protocol: %protocol%', { protocol: poolInfo.protocol })}</div>
       ) : (
         (() => {
           switch (poolInfo.protocol) {
-            case 'v3':
-              return <V3PositionsTable poolInfo={poolInfo} />
-            case Protocol.InfinityCLAMM:
-              return <InfinityCLPositionsTable poolInfo={poolInfo as InfinityCLPoolInfo} />
             case Protocol.InfinityBIN:
               return <InfinityBinPositionsTable poolInfo={poolInfo as InfinityBinPoolInfo} />
             case 'v2':

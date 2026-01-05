@@ -14,7 +14,6 @@ import { ChartFee } from './ChartFee'
 import { ChartLiquidity } from './ChartLiquidity'
 import { ChartTVL } from './ChartTVL'
 import { ChartVolume } from './ChartVolume'
-import { SolanaChartLiquidity } from './ChartLiquidity/SolanaChartLiquidity'
 
 enum PoolChart {
   Volume = 0,
@@ -115,7 +114,7 @@ export const PoolCharts: React.FC<PoolChartsProps> = ({ poolInfo, ...props }) =>
           isV2OrStable ? (
             <ChartTVL address={id} poolInfo={poolInfo} timeFilter={timeFilter} />
           ) : isSolana(poolInfo?.chainId) ? (
-            <SolanaChartLiquidity address={id} />
+            <ChartLiquidity address={id} poolInfo={poolInfo} />
           ) : (
             <ChartLiquidity address={id} poolInfo={poolInfo} />
           )

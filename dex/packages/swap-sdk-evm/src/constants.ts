@@ -119,6 +119,14 @@ export const WETH9 = {
     'Wrapped Ether',
     'https://weth.io',
   ),
+    [ChainId.SONIC_TESTNET]: new ERC20Token(
+    ChainId.SONIC_TESTNET,
+    '0x4200000000000000000000000000000000000006',
+    18,
+    'WETH',
+    'Wrapped Ether',
+    'https://weth.io',
+  ),
   [ChainId.SCROLL_SEPOLIA]: new ERC20Token(
     ChainId.SCROLL_SEPOLIA,
     '0x5300000000000000000000000000000000000004',
@@ -227,6 +235,7 @@ export const WNATIVE = {
   [ChainId.OPBNB]: WBNB[ChainId.OPBNB],
   [ChainId.BASE]: WETH9[ChainId.BASE],
   [ChainId.BASE_TESTNET]: WETH9[ChainId.BASE_TESTNET],
+  [ChainId.SONIC_TESTNET]: WETH9[ChainId.SONIC_TESTNET],
   [ChainId.SCROLL_SEPOLIA]: WETH9[ChainId.SCROLL_SEPOLIA],
   [ChainId.SEPOLIA]: WETH9[ChainId.SEPOLIA],
   [ChainId.ARBITRUM_SEPOLIA]: WETH9[ChainId.ARBITRUM_SEPOLIA],
@@ -270,6 +279,7 @@ export const NATIVE = {
   },
   [ChainId.BASE]: ETHER,
   [ChainId.BASE_TESTNET]: ETHER,
+  [ChainId.SONIC_TESTNET]: ETHER,
   [ChainId.SCROLL_SEPOLIA]: ETHER,
   [ChainId.SEPOLIA]: {
     name: 'Sepolia Ether',

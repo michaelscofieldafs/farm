@@ -13,7 +13,6 @@ import { CreateLiquidityV2Form } from 'views/CreateLiquidityPool/V2/CreateLiquid
 import styled from 'styled-components'
 import { isSolana } from '@pancakeswap/chains'
 import { useActiveChainId } from 'hooks/useAccountActiveChain'
-import { CreateSolanaLiquidityV3Form } from 'views/CreateLiquidityPool/Solana/CreateSolanaLiquidityV3Form'
 import { useCurrencies } from 'views/CreateLiquidityPool/hooks/useCurrencies'
 
 const StyledBox = styled(Box)`
@@ -41,7 +40,7 @@ const CreateLiquidityPage = () => {
             <CreateLiquidityInfinityForm />
           ) : protocolName === 'v3' ? (
             isSolana(chainId) || isSolana(baseCurrency?.chainId) ? (
-              <CreateSolanaLiquidityV3Form />
+              <CreateLiquidityV3Form />
             ) : (
               <CreateLiquidityV3Form />
             )

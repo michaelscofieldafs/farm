@@ -2,7 +2,6 @@ import { Currency } from '@pancakeswap/sdk'
 import { FeeAmount, Pool, TICK_SPACINGS, nearestUsableTick, tickToPrice } from '@pancakeswap/v3-sdk'
 import { NonEVMChainId } from '@pancakeswap/chains'
 import { useActiveChainId } from 'hooks/useAccountActiveChain'
-import { useClmmAmmConfigs } from 'hooks/solana/useClmmAmmConfigs'
 import { useCallback, useMemo } from 'react'
 import { setFullRange } from 'views/AddLiquidityV3/formViews/V3FormView/form/actions'
 import { useV3FormDispatch } from '../reducer'
@@ -17,20 +16,14 @@ export function useRangeHopCallbacks(
 ) {
   const dispatch = useV3FormDispatch()
   const { chainId } = useActiveChainId()
-  const ammConfigs = useClmmAmmConfigs()
 
   const baseToken = useMemo(() => baseCurrency?.wrapped, [baseCurrency])
   const quoteToken = useMemo(() => quoteCurrency?.wrapped, [quoteCurrency])
 
-  const solanaTickSpacing = useMemo(() => {
-    if (chainId !== NonEVMChainId.SOLANA || !feeAmount) return undefined
-    return Object.values(ammConfigs).find((c) => c.tradeFeeRate === Number(feeAmount))?.tickSpacing ?? undefined
-  }, [ammConfigs, chainId, feeAmount])
 
   const effectiveTickSpacing = useMemo(() => {
-    if (chainId === NonEVMChainId.SOLANA) return solanaTickSpacing
     return feeAmount ? TICK_SPACINGS[feeAmount] : undefined
-  }, [chainId, solanaTickSpacing, feeAmount])
+  }, [chainId, feeAmount])
 
   const getDecrementLower = useCallback(() => {
     if (baseToken && quoteToken && typeof tickLower === 'number' && effectiveTickSpacing !== undefined) {

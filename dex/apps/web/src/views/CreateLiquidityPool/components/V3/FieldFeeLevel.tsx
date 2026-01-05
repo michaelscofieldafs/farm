@@ -22,8 +22,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useFeeLevelQueryState } from 'state/infinity/create'
 import { useActiveChainId } from 'hooks/useAccountActiveChain'
 import { isSolana, NonEVMChainId } from '@pancakeswap/chains'
-import { useSolanaClmmFeeTiers } from 'hooks/solana/useSolanaClmmFeeTiers'
-import { useSolanaExistingFeeTiers } from 'hooks/solana/useSolanaExistingFeeTiers'
 import { UnifiedCurrency } from '@pancakeswap/swap-sdk-core'
 
 import { PRESET_FEE_LEVELS_V3 } from '../../constants'
@@ -62,23 +60,12 @@ export const FieldFeeLevel: React.FC<FieldFeeLevelProps> = ({
   const [inputValue, setInputValue] = useState<string | null>(null)
   const { chainId } = useActiveChainId()
   const isSolanaChain = isSolana(chainId)
-  const solanaFeeTiers = useSolanaClmmFeeTiers()
   const router = useRouter()
-
-  // Fetch existing Solana pools for the selected pair to disable used fee tiers
-  const existingSolanaFeeTiers = useSolanaExistingFeeTiers(
-    baseCurrency?.wrapped.address,
-    quoteCurrency?.wrapped.address,
-    isSolanaChain,
-  )
 
   // Build dynamic options depending on chain
   const options = useMemo(() => {
-    if (isSolanaChain) {
-      return solanaFeeTiers
-    }
     return PRESET_FEE_LEVELS_V3
-  }, [isSolanaChain, solanaFeeTiers])
+  }, [isSolanaChain])
 
   const handleQuickSelect = useCallback(
     (presetFeeLevel: number) => {
@@ -107,11 +94,6 @@ export const FieldFeeLevel: React.FC<FieldFeeLevelProps> = ({
             <Text bold fontSize="16px" color="textSubtle">
               {parseFeeAsReadable(o)}
             </Text>
-            {!existingSolanaFeeTiers.has(o) && (
-              <Text fontSize="12px" color="textSubtle">
-                {t('Not Created')}
-              </Text>
-            )}
           </FlexGap>
         ),
         value: o,
@@ -120,7 +102,7 @@ export const FieldFeeLevel: React.FC<FieldFeeLevelProps> = ({
           handleMenuItemClick(idx)
         },
       })),
-    [existingSolanaFeeTiers, t, options, handleMenuItemClick],
+    [t, options, handleMenuItemClick],
   )
 
   const activeIndex = useMemo(() => {
@@ -168,14 +150,8 @@ export const FieldFeeLevel: React.FC<FieldFeeLevelProps> = ({
   }, [router.events, feeAmount, router.isReady, updateFee, isSolanaChain, feeLevel, options.length])
 
   useEffect(() => {
-    if (!isSolanaChain || !feeLevel || !solanaFeeTiers.length) return
-    if (solanaFeeTiers.find((f) => f === feeLevel)) return
-    if (solanaFeeTiers.find((f) => f === feeLevel * 1e4)) {
-      setFeeLevel(feeLevel * 1e4)
-    } else {
       updateFee()
-    }
-  }, [feeLevel, isSolanaChain, setFeeLevel, solanaFeeTiers, updateFee])
+  }, [feeLevel, isSolanaChain, setFeeLevel,, updateFee])
 
   useEffect(() => {
     if (feeAmount && feeAmount !== feeLevel) {

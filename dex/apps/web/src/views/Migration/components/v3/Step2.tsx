@@ -12,7 +12,6 @@ import Image from 'next/image'
 import { useEffect, useMemo, useState } from 'react'
 import { Field } from 'state/burn/actions'
 import { useBurnActionHandlers } from 'state/burn/hooks'
-import { useFarmsV3Public } from 'state/farmsV3/hooks'
 import { toV2LiquidityToken, useTrackedTokenPairs } from 'state/user/hooks'
 import { useTokenBalancesWithLoadingIndicator } from 'state/wallet/hooks'
 import atomWithStorage from 'utils/atomWithStorageWithErrorCatch'
@@ -33,7 +32,6 @@ export const STABLE_LP_TO_MIGRATE = [
 export function Step2() {
   const { address: account } = useAccount()
   const { t } = useTranslation()
-  const { data: { farmsWithPrice } = { farmsWithPrice: [] } } = useFarmsV3Public()
 
   // fetch the user's balances of all tracked V2 LP tokens
   const trackedTokenPairs = useTrackedTokenPairs()
@@ -64,7 +62,7 @@ export function Step2() {
     [tokenPairsWithLiquidityTokens, v2PairsBalances],
   )
 
-  const activeV3Farms = farmsWithPrice.filter((farm) => farm.multiplier !== '0X')
+  const activeV3Farms: any = []
 
   const v2Pairs = useV2Pairs(
     useMemo(() => liquidityTokensWithBalances.map(({ tokens }) => tokens), [liquidityTokensWithBalances]),

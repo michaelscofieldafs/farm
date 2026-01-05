@@ -16,7 +16,6 @@ import { getIncentraLink, INCENTRA_USER_LINK } from 'utils/getIncentraLink'
 import { useActiveChainId } from 'hooks/useAccountActiveChain'
 import { isAddressEqual } from 'utils'
 import { Protocol } from '@pancakeswap/farms'
-import { FarmV3ApyButton, FarmV3ApyButtonProps } from '../FarmCard/V3/FarmV3ApyButton'
 import { ActionPanelV2, ActionPanelV3 } from './Actions/ActionPanel'
 import Apr, { AprProps } from './Apr'
 import { FarmCell } from './Farm'
@@ -204,31 +203,7 @@ const Row: React.FunctionComponent<React.PropsWithChildren<RowPropsWithLoading>>
                 )
 
               case 'apr':
-                if (props.type === 'v3') {
-                  return (
-                    <td key={key}>
-                      <CellInner>
-                        <CellLayout label={t('APR')}>
-                          <FarmV3ApyButton
-                            farm={props.details}
-                            additionAprInfo={
-                              [
-                                merklApr && farm.merklLink
-                                  ? { aprTitle: t('Merkl APR'), aprValue: merklApr, aprLink: farm.merklLink }
-                                  : undefined,
-                                incentraApr && incentraLink
-                                  ? { aprTitle: `Incentra ${t('APR')}`, aprValue: incentraApr, aprLink: incentraLink }
-                                  : undefined,
-                              ].filter(Boolean) as NonNullable<FarmV3ApyButtonProps['additionAprInfo']>
-                            }
-                          />
-                        </CellLayout>
-                      </CellInner>
-                    </td>
-                  )
-                }
-
-                return (
+                if (props.type === 'v2') {    (
                   <td key={key}>
                     <CellInner>
                       <CellLayout label={t('APR')}>
@@ -248,6 +223,8 @@ const Row: React.FunctionComponent<React.PropsWithChildren<RowPropsWithLoading>>
                     </CellInner>
                   </td>
                 )
+                }            
+                return <div />
               case 'rewardPerDay':
                 if (props.type === 'v2') {
                   return (
@@ -353,19 +330,7 @@ const Row: React.FunctionComponent<React.PropsWithChildren<RowPropsWithLoading>>
               <AprMobileCell>
                 <CellLayout label={t('APR')}>
                   {props.type === 'v3' ? (
-                    <FarmV3ApyButton
-                      farm={props.details}
-                      additionAprInfo={
-                        [
-                          merklApr && farm.merklLink
-                            ? { aprTitle: t('Merkl APR'), aprValue: merklApr, aprLink: farm.merklLink }
-                            : undefined,
-                          incentraApr && incentraLink
-                            ? { aprTitle: `Incentra ${t('APR')}`, aprValue: incentraApr, aprLink: incentraLink }
-                            : undefined,
-                        ].filter(Boolean) as NonNullable<FarmV3ApyButtonProps['additionAprInfo']>
-                      }
-                    />
+                    <div />
                   ) : (
                     <>
                       <Apr

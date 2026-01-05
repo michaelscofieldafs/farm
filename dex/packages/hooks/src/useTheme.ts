@@ -23,7 +23,7 @@ const useTheme = () => {
   )
 
   return useMemo(
-    () => ({ isDark: resolvedTheme === 'dark', theme, setTheme: handleSwitchTheme }),
+    () => ({ isDark: true, theme, setTheme: handleSwitchTheme }),
     [theme, resolvedTheme, handleSwitchTheme],
   )
 }

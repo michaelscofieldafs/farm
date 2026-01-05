@@ -44,6 +44,7 @@ export const useAllChainsOpts = ({ includeSolana = true }: { includeSolana?: boo
     label: chain.name,
   }))
 
+  /**
   if (includeSolana) {
     // non-evm chains
     evmChains.unshift({
@@ -52,6 +53,7 @@ export const useAllChainsOpts = ({ includeSolana = true }: { includeSolana?: boo
       label: 'Solana',
     })
   }
+     */
 
   return evmChains
 }

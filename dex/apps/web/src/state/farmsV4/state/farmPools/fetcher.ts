@@ -1,5 +1,6 @@
 import { getMainnetChainNameInKebabCase } from '@pancakeswap/chains'
 import {
+  ALL_PROTOCOLS,
   FarmV4SupportedChainId,
   Protocol,
   UniversalFarmConfigV4,
@@ -24,7 +25,7 @@ import { parseFarmPools } from '../utils'
 
 dayjs.extend(utc)
 
-export const DEFAULT_PROTOCOLS: Protocol[] = Object.values(Protocol)
+export const DEFAULT_PROTOCOLS: Protocol[] = Object.values(ALL_PROTOCOLS)
 export const DEFAULT_CHAINS: FarmV4SupportedChainId[] = Object.values(supportedChainIdV4)
 
 export const fetchExplorerFarmPools = async (

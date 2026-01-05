@@ -97,12 +97,21 @@ export const getTrackedV2LpTokens = memoize(
     // from preset tokens and base tokens
     const baseTokens: Token[] = BASES_TO_TRACK_LIQUIDITY_FOR[chainId]
     Object.entries(presetTokens).forEach(([address, token]) => {
+      try {
+        
       baseTokens.forEach((baseToken) => {
+        console.log(`afssssssssss: ${chainId} ${baseToken.address}`)
         const baseAddress = safeGetAddress(baseToken.address)
+        console.log(`afs: ${chainId} ${baseToken.address}`)
         if (baseAddress && safeGetAddress(address) !== baseAddress && token.chainId === chainId) {
+          console.log(`afs: ${chainId} afsssss`)
           pairTokens.push(baseToken.sortsBefore(token) ? [baseToken, token] : [token, baseToken])
         }
       })
+    }
+    catch(err) {
+      console.log(`Error fetching position from chainId: ${chainId}`)
+    }
     })
     // from user saved pairs
     if (userSavedPairs[chainId]) {

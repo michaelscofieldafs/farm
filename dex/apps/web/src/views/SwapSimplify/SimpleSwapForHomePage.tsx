@@ -31,10 +31,7 @@ export default function SimpleSwapForHomePage() {
           <Wrapper height="100%">
             <Suspense
               fallback={<StyledSkeleton animation="waves" width="80%" height="50vh" variant="round" borderRadius="0" />}
-            >
-              <QuoteProvider>
-                <V4SwapFormForHomePage />
-              </QuoteProvider>
+            > 
             </Suspense>
           </Wrapper>
         </StyledSwapContainer>

@@ -6,11 +6,7 @@ export const supportedChainIdV4 = [
   ChainId.BSC_TESTNET,
   ChainId.ETHEREUM,
   ChainId.BASE,
-  ChainId.OPBNB,
-  ChainId.ZKSYNC,
-  ChainId.LINEA,
-  ChainId.ARBITRUM_ONE,
-  ChainId.MONAD_MAINNET,
+  ChainId.BASE_TESTNET,
   NonEVMChainId.SOLANA,
 ] as const satisfies readonly (ChainId | NonEVMChainId)[]
 

@@ -15,7 +15,6 @@ import {
   useMatchBreakpoints,
 } from '@pancakeswap/uikit'
 import { VerticalDivider } from '@pancakeswap/widgets-internal'
-import { PickAdSlides } from 'components/AdPanel/PickAdSlides'
 import LiquiditySunsetWarning from 'components/Liquidity/LiquiditySunsetWarning'
 import { Suspense, useCallback } from 'react'
 import { useUserPancakePicks } from 'state/user/hooks/useUserPancakePicks'
@@ -49,7 +48,6 @@ export const PoolsBanner = ({ additionLink }: { additionLink?: React.ReactNode }
       {isPancakePicks && isMobile && (
         <FlexGap width="100%" justifyContent="center" alignItems="center" mb="12px">
           <Suspense>
-            <PickAdSlides isDismissible={false} />
           </Suspense>
         </FlexGap>
       )}
@@ -105,8 +103,9 @@ export const PoolsBanner = ({ additionLink }: { additionLink?: React.ReactNode }
             {!isMobile && (
               <>
                 <FarmH2 scale="lg" color="text">
-                  {t('Liquidity Pools & Farms')}
+                  {t('Liquidity Pools')}
                 </FarmH2>
+                {/**
                 <Row flexWrap="wrap" gap="16px">
                   <LinkExternal
                     href="https://docs.pancakeswap.finance/products/yield-farming/how-to-use-farms"
@@ -125,13 +124,13 @@ export const PoolsBanner = ({ additionLink }: { additionLink?: React.ReactNode }
                     </>
                   )}
                 </Row>
+                 */}
               </>
             )}
           </Box>
           <Box>
             {!isMobile && (
               <Suspense>
-                <PickAdSlides isDismissible={false} />
               </Suspense>
             )}
           </Box>

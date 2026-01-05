@@ -8,7 +8,6 @@ import { useMasterchefV3 } from 'hooks/useContract'
 import { useTransactionDeadline } from 'hooks/useTransactionDeadline'
 import { useV3TokenIdsByAccount } from 'hooks/v3/useV3Positions'
 import { useMemo, useState } from 'react'
-import { useFarmsV3Public } from 'state/farmsV3/hooks'
 import { Hex, encodeFunctionData } from 'viem'
 import { useAccount, useReadContracts, useSendTransaction } from 'wagmi'
 
@@ -62,7 +61,6 @@ export function UpdatePositionsReminder() {
 
 export function UpdatePositionsReminder_() {
   const { t } = useTranslation()
-  const { data: farmsV3 } = useFarmsV3Public()
   const { address: account } = useAccount()
   const { chainId } = useActiveChainId()
 
@@ -98,7 +96,7 @@ export function UpdatePositionsReminder_() {
     }))
     ?.filter((userInfo) => {
       if (!userInfo?.pid) return false
-      const farm = farmsV3?.farmsWithPrice.find((f) => f.pid === Number(userInfo.pid))
+      const farm = null;
       if (!farm) return false
       if (
         userInfo.rewardGrowthInside >
@@ -115,7 +113,7 @@ export function UpdatePositionsReminder_() {
   // getting it on client side to final confirm
   const { data: rewardGrowthGlobalX128s, isLoading } = useReadContracts({
     contracts: isOverRewardGrowthGlobalUserInfos?.map((userInfo) => {
-      const farm = farmsV3?.farmsWithPrice.find((f) => f.pid === Number(userInfo.pid))
+      const farm: any = null
       return {
         abi: lmPoolABI,
         address: farm?.lmPool as `0x${string}`,

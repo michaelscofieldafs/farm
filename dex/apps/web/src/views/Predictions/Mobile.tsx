@@ -1,13 +1,10 @@
 import { PredictionStatus } from '@pancakeswap/prediction'
 import { Box, Flex, Link } from '@pancakeswap/uikit'
-import { MobileCard } from 'components/AdPanel/MobileCard'
 import { memo } from 'react'
 import { useGetPredictionsStatus, useIsChartPaneOpen, useIsHistoryPaneOpen } from 'state/predictions/hooks'
 import { styled } from 'styled-components'
 import History from './History'
 import MobileChart from './MobileChart'
-import Positions from './Positions'
-import LoadingSection from './components/LoadingSection'
 import Menu from './components/Menu'
 import MobileMenu from './components/MobileMenu'
 import { ErrorNotification, PauseNotification } from './components/Notification'
@@ -59,7 +56,6 @@ const Mobile: React.FC<React.PropsWithChildren> = () => {
             {[PredictionStatus.INITIAL, PredictionStatus.LIVE].includes(status) && (
               <Box width="100%">
                 <Menu />
-                {status === PredictionStatus.LIVE ? <Positions view={view} /> : <LoadingSection />}
                 {config?.chainlinkOracleAddress && (
                   <Flex justifyContent="right">
                     <PowerLinkStyle href="https://chain.link/" external>
@@ -90,7 +86,6 @@ const Mobile: React.FC<React.PropsWithChildren> = () => {
         {view === PageView.HISTORY && <History />}
       </Box>
       <Flex my="24px" justifyContent="center">
-        <MobileCard />
       </Flex>
       <MobileMenu />
     </StyledMobile>

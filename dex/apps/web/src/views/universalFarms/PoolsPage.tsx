@@ -75,7 +75,7 @@ export const PoolsPage = memo(() => {
     <FarmSearchContextProvider>
       <Card>
         <CardHeader p={isMobile ? '16px' : undefined}>
-          <PoolsFilterPanel onChange={handleFilterChange} value={poolsFilter} includeSolana>
+          <PoolsFilterPanel onChange={handleFilterChange} value={poolsFilter}>
             {(isMobile || isMd) && (
               <>
                 <CreatePoolButton scale="sm" width="100%" height="40px" />

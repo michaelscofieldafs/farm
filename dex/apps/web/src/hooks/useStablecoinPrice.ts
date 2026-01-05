@@ -13,7 +13,6 @@ import { useMemo } from 'react'
 import { DeepKeyMap, isEqual } from 'utils/hash'
 import { multiplyPriceByAmount } from 'utils/prices'
 import { getViemClients } from 'utils/viem'
-import { useSolanaTokenPrice } from './solana/useSolanaTokenPrice'
 
 type UseStablecoinPriceConfig = {
   enabled?: boolean
@@ -119,23 +118,16 @@ export const useUnifiedUSDPriceAmount = (
     currency instanceof Token || currency instanceof Native ? currency : undefined,
     { enabled: Boolean(currency && amount && !isSolana(currency.chainId)), ...config },
   )
-  const { data: solanaPrice } = useSolanaTokenPrice({
-    mint: currency?.wrapped.address,
-    enabled: Boolean(currency && amount && isSolana(currency.chainId)),
-  })
 
   return useMemo(() => {
     if (!currency) {
       return undefined
     }
     if (amount) {
-      if (isSolana(currency.chainId)) {
-        return new BigNumber(solanaPrice ?? 0).times(amount).toNumber()
-      }
       if (stablePrice) {
         return multiplyPriceByAmount(stablePrice, amount)
       }
     }
     return undefined
-  }, [amount, stablePrice, currency, solanaPrice])
+  }, [amount, stablePrice, currency])
 }

@@ -42,8 +42,6 @@ import useUserAddedTokens, { useUserAddedTokensByChainIds } from '../state/user/
 import { useActiveChainId } from './useActiveChainId'
 import useNativeCurrency, { useUnifiedNativeCurrency } from './useNativeCurrency'
 import { useAccountActiveChain } from './useAccountActiveChain'
-import { useSolanaTokenList } from './solana/useSolanaTokenList'
-import { useSolanaToken } from './solana/useSolanaToken'
 
 export const mapWithoutUrls = (tokenMap?: TokenAddressMap<ChainId>, chainId?: number) => {
   if (!tokenMap || !chainId) return {}
@@ -222,12 +220,10 @@ export function useWarningTokens(chainId?: ChainId): { [address: string]: ERC20T
 
 export function useIsTokenActive(token: UnifiedToken | undefined | null, chainId?: number): boolean {
   const activeEvmTokens = useAllTokens(chainId)
-  const { tokenList: solanaTokens } = useSolanaTokenList()
 
   return useMemo(() => {
     if (
       (chainId && chainId in ChainId && !activeEvmTokens) ||
-      (chainId === NonEVMChainId.SOLANA && !solanaTokens.length) ||
       !token
     ) {
       return false
@@ -235,8 +231,8 @@ export function useIsTokenActive(token: UnifiedToken | undefined | null, chainId
 
     const tokenAddress = safeGetUnifiedAddress(chainId, token.address)
 
-    return Boolean((tokenAddress && !!activeEvmTokens[tokenAddress]) || solanaTokens.find((t) => t.equals(token)))
-  }, [activeEvmTokens, chainId, solanaTokens, token])
+    return Boolean((tokenAddress && !!activeEvmTokens[tokenAddress]))
+  }, [activeEvmTokens, chainId, token])
 }
 
 // Check if currency is included in custom list from user storage
@@ -259,14 +255,7 @@ export function useUnifiedToken(
 ): UnifiedToken | undefined {
   const { chainId: activeChainId } = useAccountActiveChain()
   const chainIdToUse = chainId ?? activeChainId
-  const spl = useSolanaToken(tokenAddress)
   const ercToken = useTokenByChainId(tokenAddress, chainIdToUse)
-  if (chainIdToUse === NonEVMChainId.SOLANA) {
-    if (options?.unwrapWSol && spl && isWSol(spl.address)) {
-      return SOL as unknown as SPLToken
-    }
-    return spl
-  }
   return ercToken ?? undefined
 }
 

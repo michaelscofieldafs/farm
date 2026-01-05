@@ -4,7 +4,6 @@ import { getAddress } from 'viem'
 const CHAIN_TO_QUERY = {
   [ChainId.ETHEREUM]: 'ethereum',
   [ChainId.BSC]: 'bsc',
-  [ChainId.ARBITRUM_ONE]: 'arbitrum',
   [ChainId.ZKSYNC]: 'zksync',
   [ChainId.LINEA]: 'linea',
   [ChainId.BASE]: 'base',

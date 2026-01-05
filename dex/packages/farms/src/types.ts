@@ -323,7 +323,7 @@ export enum Protocol {
   InfinityCLAMM = 'infinityCl',
 }
 
-export const ALL_PROTOCOLS = [Protocol.V2, Protocol.V3, Protocol.STABLE, Protocol.InfinityBIN, Protocol.InfinityCLAMM]
+export const ALL_PROTOCOLS = [Protocol.V2, /** Protocol.V3, Protocol.STABLE, Protocol.InfinityBIN, Protocol.InfinityCLAMM */]
 
 export type FarmBaseConfig = {
   // @deprecated

@@ -246,8 +246,6 @@ const FarmTable: React.FC<React.PropsWithChildren<ITableProps>> = ({ farms, cake
         details: farm,
         multiplier: {
           multiplier: farm.multiplier,
-          farmCakePerSecond: farmV3Multiplier.getFarmCakePerSecond(farm.poolWeight),
-          totalMultipliers: farmV3Multiplier.totalMultipliers,
         },
         stakedLiquidity: {
           inactive: farm.multiplier === '0X',

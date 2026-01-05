@@ -322,9 +322,7 @@ function PoolListPage() {
                 onItemClick={(index) => setSelectedTypeIndex(index)}
                 variant="subtle"
               >
-                <ButtonMenuItem>{t('All')}</ButtonMenuItem>
-                <ButtonMenuItem>V3</ButtonMenuItem>
-                <ButtonMenuItem display={isStableSwapSupported(chainId) ? 'inline-flex' : 'none'}>
+                <ButtonMenuItem display={'none'}>
                   {t('StableSwap')}
                 </ButtonMenuItem>
                 <ButtonMenuItem>V2</ButtonMenuItem>
@@ -334,21 +332,10 @@ function PoolListPage() {
         />
         <Body>
           {mainSection}
-          {selectedTypeIndex === FILTER.V2 ? (
-            <Liquidity.FindOtherLP>
-              {chainId && V3_MIGRATION_SUPPORTED_CHAINS.includes(chainId) && (
-                <NextLinkFromReactRouter style={{ marginTop: '8px' }} to="/migration">
-                  <Button id="migration-link" variant="secondary" scale="sm">
-                    {t('Migrate to V3')}
-                  </Button>
-                </NextLinkFromReactRouter>
-              )}
-            </Liquidity.FindOtherLP>
-          ) : null}
           {showAllPositionButton && (
             <Flex alignItems="center" flexDirection="column">
               <Text color="textSubtle" mb="10px">
-                {t("Don't see a pair you joined?")}
+                {t("Want search your pair?")}
               </Text>
               <Button scale="sm" width="fit-content" variant="secondary" onClick={handleClickShowAllPositions}>
                 {t('Show all positions')}

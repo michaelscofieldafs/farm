@@ -8,8 +8,6 @@ import { styled } from 'styled-components'
 import ManageLists from './ManageLists'
 import ManageTokens from './ManageTokens'
 import { CurrencyModalView } from './types'
-import SolanaManageList from './SolanaManageList'
-import SolanaManageTokens from './SolanaManageTokens'
 
 const StyledButtonMenu = styled(ButtonMenu)`
   width: 100%;
@@ -47,7 +45,12 @@ export default function Manage({
 
       {showLists ? (
         chainId === NonEVMChainId.SOLANA ? (
-          <SolanaManageList />
+          <ManageLists
+            setModalView={setModalView}
+            setImportList={setImportList}
+            setListUrl={setListUrl}
+            chainId={chainId}
+          />
         ) : (
           <ManageLists
             setModalView={setModalView}
@@ -57,7 +60,7 @@ export default function Manage({
           />
         )
       ) : chainId === NonEVMChainId.SOLANA ? (
-        <SolanaManageTokens setModalView={setModalView} setImportToken={setImportToken} />
+        <ManageTokens setModalView={setModalView} setImportToken={setImportToken} chainId={chainId} />
       ) : (
         <ManageTokens setModalView={setModalView} setImportToken={setImportToken} chainId={chainId} />
       )}

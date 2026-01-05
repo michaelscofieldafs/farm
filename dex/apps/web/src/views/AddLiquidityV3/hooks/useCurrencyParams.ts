@@ -1,7 +1,6 @@
 import { ChainId, isEvm, isSolana } from '@pancakeswap/chains'
 import { CAKE, STABLE_COIN, USDC, USDT } from '@pancakeswap/tokens'
 import { FeeAmount } from '@pancakeswap/v3-sdk'
-import { useClmmAmmConfigs } from 'hooks/solana/useClmmAmmConfigs'
 import { useActiveChainId } from 'hooks/useActiveChainId'
 import { useUnifiedNativeCurrency } from 'hooks/useNativeCurrency'
 import { useRouter } from 'next/router'
@@ -51,17 +50,15 @@ export function useCurrencyParams(): {
 export const useFeeAmountFromQuery = () => {
   const { chainId } = useActiveChainId()
   const router = useRouter()
-  const ammConfig = useClmmAmmConfigs()
 
   const feeAmountFromUrl = router.isReady && chainId ? (router.query.currency?.[2] as string) : undefined
 
   return useMemo(
     () =>
       feeAmountFromUrl &&
-      ((isEvm(chainId) && Object.values(FeeAmount).includes(parseFloat(feeAmountFromUrl))) ||
-        (isSolana(chainId) && Object.values(ammConfig).find((c) => c.tradeFeeRate === parseFloat(feeAmountFromUrl))))
+      ((isEvm(chainId) && Object.values(FeeAmount).includes(parseFloat(feeAmountFromUrl))))
         ? parseFloat(feeAmountFromUrl)
         : undefined,
-    [chainId, ammConfig, feeAmountFromUrl],
+    [chainId, feeAmountFromUrl],
   )
 }

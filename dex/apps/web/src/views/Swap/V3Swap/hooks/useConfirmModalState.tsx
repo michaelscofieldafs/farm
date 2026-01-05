@@ -51,11 +51,9 @@ import { getBridgeOrderPriceImpact } from 'views/Swap/Bridge/utils'
 import useAccountActiveChain from 'hooks/useAccountActiveChain'
 import { usePriceBreakdown } from 'views/SwapSimplify/hooks/usePriceBreakdown'
 
-import { useSolanaConnectionWithRpcAtom } from 'hooks/solana/useSolanaConnectionWithRpcAtom'
 import { useWallet } from '@solana/wallet-adapter-react'
 
 import { sendTransactionSafely } from 'components/WalletModalV2/utils/solanaSafeTransaction'
-import { confirmTransaction } from '@pancakeswap/solana-core-sdk'
 import { useAllTypeBestTrade } from 'quoter/hook/useAllTypeBestTrade'
 import { useEVMToSolanaBridgeCalldata } from 'views/Swap/Bridge/hooks/useEVMToSolanaBridgeCalldata'
 import { calculateGasMargin } from 'utils'
@@ -64,7 +62,6 @@ import MultisigToastDescription from 'components/Toast/MultisigToastDescription'
 import { isMultisigWallet } from 'utils/solana/isMultisigWallet'
 import { ConfirmStepContext, ConfirmAction } from './steps/step.type'
 import { useBatchSwapTransaction } from './steps/useBatchSwapTransaction'
-import { useSolSwapStep } from './steps/useSolSwapStep'
 import { useSwapCallback } from './useSwapCallback'
 import { eip5792UserRejectUpgradeError, userRejectedError } from './useSendSwapTransaction'
 
@@ -539,120 +536,6 @@ const useConfirmActions = (
 
   const [allowedSlippage] = useUserSlippage() // custom from users
 
-  const solanaWalletContext = useWallet()
-
-  const solanaConnection = useSolanaConnectionWithRpcAtom()
-
-  const swapBridgeFromSolanaToEVMStep = useMemo(() => {
-    return {
-      step: ConfirmModalState.PENDING_CONFIRMATION,
-      action: async () => {
-        // TODO: show error message???
-        if (!order || !recipient) {
-          return
-        }
-
-        // Build transaction from bridge order data
-        if (!isBridgeOrder(order)) {
-          throw new Error('Not a bridge order')
-        }
-
-        const isOriginSolana = isSolana(order.trade.inputAmount.currency.chainId)
-
-        if (!isOriginSolana) {
-          throw new Error('only support solana to evm bridge')
-        }
-
-        setTxHash(undefined)
-        setConfirmState(ConfirmModalState.PENDING_CONFIRMATION)
-
-        // Swap from Solana to EVM
-        // Move to another swapBridgeFromSolanaToEVMStep
-        if (!solanaAccount) {
-          throw new Error('Solana account not found')
-        }
-
-        // Handle Solana bridge transaction
-        try {
-          const transaction = await getSolanaToEVMBridgeCalldata({
-            order: order as BridgeOrderWithCommands,
-            solanaConnection,
-            solanaWalletContext,
-            allowedSlippage,
-            user: solanaAccount,
-            recipient,
-          })
-
-          if (!transaction) {
-            refreshOrder()
-            resetState()
-
-            return
-            // throw new Error('Quote is not up to date, please try again')
-          }
-
-          // Send transaction safely
-          const signature = await sendTransactionSafely(transaction, solanaConnection, solanaWalletContext)
-
-          const isMultisig = isMultisigWallet(solanaWalletContext?.wallet)
-
-          if (signature) {
-            setTxHash(signature)
-            // Set bridge order metadata for tracking
-            setActiveBridgeOrderMetadata({
-              order,
-              txHash: signature,
-              originChainId: order.trade.inputAmount.currency.chainId,
-              destinationChainId: order.trade.outputAmount.currency.chainId,
-              isMultisig,
-            })
-
-            if (!isMultisig) {
-              setConfirmState(ConfirmModalState.ORDER_SUBMITTED)
-              await confirmTransaction(solanaConnection, signature)
-            } else {
-              setConfirmState(ConfirmModalState.MULTISIG_SUBMITTED)
-              console.warn('Bridge transaction submitted to SquadsX multisig. Pending approvals.')
-            }
-
-            toastSuccess(
-              isMultisig ? t('Multisig transaction submitted') : t('Success!'),
-              isMultisig ? (
-                <MultisigToastDescription />
-              ) : (
-                <ToastDescriptionWithTx txHash={signature} txChainId={order.trade.inputAmount.currency.chainId}>
-                  {t('Bridge transaction submitted')}
-                </ToastDescriptionWithTx>
-              ),
-            )
-          }
-        } catch (error: any) {
-          if (error?.message?.includes('rejected')) {
-            resetState()
-            return
-          }
-
-          console.error('Solana bridge transaction error:', error)
-          showError(t('Failed to process Solana bridge transaction. Please try again.'))
-        }
-      },
-      showIndicator: true,
-    }
-  }, [
-    order,
-    recipient,
-    solanaAccount,
-    solanaConnection,
-    solanaWalletContext,
-    allowedSlippage,
-    refreshOrder,
-    resetState,
-    showError,
-    t,
-    toastSuccess,
-    setActiveBridgeOrderMetadata,
-  ])
-
   const swapBridgeStep = useMemo(() => {
     return {
       step: ConfirmModalState.PENDING_CONFIRMATION,
@@ -931,8 +814,6 @@ const useConfirmActions = (
     }
   }, [t, toastInfo, setConfirmState])
 
-  const solanaSwapStep = useSolSwapStep(confirmStepContext)
-
   const actions = useMemo(() => {
     return {
       [ConfirmModalState.WRAPPING]: wrapStep,
@@ -941,17 +822,16 @@ const useConfirmActions = (
       [ConfirmModalState.APPROVING_TOKEN]: isBridgeOrder(order) ? approvalBridgeStep : approveStep,
       [ConfirmModalState.PENDING_CONFIRMATION]: isBridgeOrder(order)
         ? isSolana(order.trade.inputAmount.currency.chainId)
-          ? swapBridgeFromSolanaToEVMStep
+          ? swapBridgeStep
           : swapBridgeStep
         : isSVMOrder(order)
-        ? solanaSwapStep
+        ? isClassicOrder(order)
         : isClassicOrder(order)
         ? swapStep
         : xSwapStep,
       [ConfirmModalState.ORDER_SUBMITTED]: orderSubmittedStep,
     } as { [k in ConfirmModalState]: ConfirmAction }
   }, [
-    swapBridgeFromSolanaToEVMStep,
     revokeStep,
     permitStep,
     approveStep,
@@ -962,7 +842,6 @@ const useConfirmActions = (
     swapBridgeStep,
     orderSubmittedStep,
     approvalBridgeStep,
-    solanaSwapStep,
   ])
 
   return {

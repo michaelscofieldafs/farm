@@ -1,7 +1,6 @@
 import { ChainId } from '@pancakeswap/chains'
 import { SUPPORTED_CHAIN_IDS } from '@pancakeswap/prediction'
 import { Flex, Text, useMatchBreakpoints } from '@pancakeswap/uikit'
-import { AIPrediction } from 'components/AdPanel/Ads/AIPredictionStripe'
 import { useActiveChainId } from 'hooks/useActiveChainId'
 import { useMemo } from 'react'
 import styled from 'styled-components'
@@ -84,17 +83,10 @@ export const InPageBanner = () => {
   const showInBigDevice = isDesktop || isLg
 
   return (
-    <Container className="warning-banner" $background={AIPrediction.background}>
+    <Container className="warning-banner">
       <Flex justifyContent="center" alignItems="center">
-        {showInBigDevice && (
-          <img width={AIPrediction.stripeImageWidth} alt={AIPrediction.stripeImageAlt} src={AIPrediction.stripeImage} />
-        )}
         <SpeechBubble>
           <InnerContainer>
-            <AIPrediction
-              ctaLink="/prediction?token=ETH&chain=arb&utm_source=PredictionPage&utm_medium=website&utm_campaign=Arbitrum&utm_id=PredictionLaunch"
-              learnMoreLink="https://blog.pancakeswap.finance/articles/pancake-swap-introduces-ai-powered-prediction-market-on-arbitrum-up-to-100-fund-protection-and-launching-60-000-arb-campaign?utm_source=PredictionPage&utm_medium=website&utm_campaign=Arbitrum&utm_id=PredictionLaunch"
-            />
           </InnerContainer>
         </SpeechBubble>
       </Flex>

@@ -5,6 +5,7 @@ import {
   arbitrumTokens,
   arbSepoliaTokens,
   baseSepoliaTokens,
+  sonicTestnetTokens,
   baseTestnetTokens,
   baseTokens,
   bscTestnetTokens,
@@ -52,6 +53,7 @@ export const CHAIN_REFRESH_TIME = {
   [ChainId.OPBNB_TESTNET]: 6_000,
   [ChainId.BASE]: 6_000,
   [ChainId.BASE_TESTNET]: 6_000,
+  [ChainId.SONIC_TESTNET]: 6_000,
   [ChainId.SCROLL_SEPOLIA]: 6_000,
   [ChainId.SEPOLIA]: 12_000,
   [ChainId.BASE_SEPOLIA]: 6_000,
@@ -79,6 +81,7 @@ export const SUGGESTED_BASES: ChainTokenList = {
     opBnbTestnetTokens.usdc,
     opBnbTestnetTokens.weth,
   ],
+  [ChainId.SONIC_TESTNET]: [baseTokens.usdc, baseTokens.weth, baseTokens.cbBTC],
   [ChainId.BASE]: [baseTokens.usdc, baseTokens.weth, baseTokens.cbBTC],
   [ChainId.BASE_TESTNET]: [baseTestnetTokens.usdc, baseTestnetTokens.weth],
   [ChainId.SCROLL_SEPOLIA]: [scrollSepoliaTokens.usdc, scrollSepoliaTokens.weth],
@@ -106,6 +109,7 @@ export const BASES_TO_TRACK_LIQUIDITY_FOR: ChainTokenList = {
   [ChainId.OPBNB_TESTNET]: [opBnbTestnetTokens.wbnb, opBnbTestnetTokens.usdt, opBnbTestnetTokens.usdc],
   [ChainId.OPBNB]: [opBnbTokens.wbnb, opBnbTokens.usdt],
   [ChainId.BASE]: [baseTokens.usdc, baseTokens.weth],
+  [ChainId.SONIC_TESTNET]: [baseTokens.usdc, baseTokens.weth],
   [ChainId.BASE_TESTNET]: [baseTestnetTokens.usdc, baseTestnetTokens.weth],
   [ChainId.SCROLL_SEPOLIA]: [scrollSepoliaTokens.usdc, scrollSepoliaTokens.weth],
   [ChainId.SEPOLIA]: [sepoliaTokens.usdc, sepoliaTokens.weth],
@@ -118,6 +122,7 @@ export const BASES_TO_TRACK_LIQUIDITY_FOR: ChainTokenList = {
 }
 
 export const PINNED_PAIRS: { readonly [chainId in ChainId]?: [Token, Token][] } = {
+  /**
   [ChainId.ETHEREUM]: [
     [WNATIVE[ChainId.ETHEREUM], USDC[ChainId.ETHEREUM]],
     [WBTC_ETH, WNATIVE[ChainId.ETHEREUM]],
@@ -139,11 +144,15 @@ export const PINNED_PAIRS: { readonly [chainId in ChainId]?: [Token, Token][] } 
   [ChainId.LINEA_TESTNET]: [[lineaTestnetTokens.usdc, lineaTestnetTokens.weth]],
   [ChainId.OPBNB]: [[opBnbTokens.usdt, opBnbTokens.wbnb]],
   [ChainId.OPBNB_TESTNET]: [[opBnbTestnetTokens.usdt, opBnbTestnetTokens.wbnb]],
+   */
+  [ChainId.SONIC_TESTNET]: [[sonicTestnetTokens.usdc, sonicTestnetTokens.weth]],
   [ChainId.BASE]: [[baseTokens.usdc, baseTokens.weth]],
   [ChainId.BASE_TESTNET]: [[baseTestnetTokens.usdc, baseTestnetTokens.weth]],
+  /**
   [ChainId.SCROLL_SEPOLIA]: [[scrollSepoliaTokens.usdc, scrollSepoliaTokens.weth]],
   [ChainId.MONAD_MAINNET]: [[monadTokens.wmon, monadTokens.usdc]],
   [ChainId.MONAD_TESTNET]: [[monadTestnetTokens.usdc, monadTestnetTokens.wmon]],
+   */
 }
 
 export const BIG_INT_ZERO = 0n

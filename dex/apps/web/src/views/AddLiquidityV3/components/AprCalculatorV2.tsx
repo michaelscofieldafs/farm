@@ -4,8 +4,7 @@ import React, { useMemo } from 'react'
 import { usePoolApr } from 'state/farmsV4/hooks'
 import { useAccountV3Position } from 'state/farmsV4/state/accountPositions/hooks/useAccountV3Position'
 import { PoolInfo } from 'state/farmsV4/state/type'
-import { PoolGlobalAprButton, V3PoolPositionAprButton } from 'views/universalFarms/components'
-import { V3PoolDerivedAprButton } from 'views/universalFarms/components/PoolAprButtonV3'
+import { PoolGlobalAprButton } from 'views/universalFarms/components'
 
 interface AprCalculatorV2Props {
   pool?: PoolInfo | null
@@ -90,21 +89,11 @@ const DerivedAprCalculator: React.FC<AprCalculatorV2Props> = ({
 
   return showTitle ? (
     <WithTitle pool={pool}>
-      <V3PoolDerivedAprButton
-        pool={pool}
-        inverted={inverted}
-        showApyText={showApyText}
-        showApyButton={showApyButton}
-        fontSize={fontSize}
+      <div
       />
     </WithTitle>
   ) : (
-    <V3PoolDerivedAprButton
-      pool={pool}
-      inverted={inverted}
-      showApyText={showApyText}
-      showApyButton={showApyButton}
-      fontSize={fontSize}
+    <div
     />
   )
 }
@@ -122,9 +111,9 @@ const PositionAprCalculator: React.FC<AprCalculatorV2Props & { tokenId: bigint }
 
   return showTitle ? (
     <WithTitle pool={pool}>
-      <V3PoolPositionAprButton userPosition={userPosition} pool={pool} />
+      <div />
     </WithTitle>
   ) : (
-    <V3PoolPositionAprButton userPosition={userPosition} pool={pool} />
+    <div />
   )
 }

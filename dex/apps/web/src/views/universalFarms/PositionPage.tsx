@@ -42,13 +42,11 @@ import {
 } from './components'
 import { useFilterToQueries } from './hooks/useFilterToQueries'
 import { useInfinityPositions } from './hooks/useInfinityPositions'
-import { useV3Positions } from './hooks/useV3Positions'
 import { useV2Positions } from './hooks/useV2Positions'
 import { useStablePositions } from './hooks/useStablePositions'
 import { positionEarningAmountAtom } from './hooks/usePositionEarningAmount'
 import { getPositionKey } from './components/PositionItem/PositionCard'
 import { matchPositionSearch } from './utils/matchPositionSearch'
-import { useSolanaV3PositionItems } from './hooks/useSolanaV3Positions'
 
 const ToggleWrapper = styled.div`
   display: inline-flex;
@@ -205,18 +203,6 @@ export const PositionPage = () => {
     positionStatus,
     farmsOnly,
   })
-  const { v3Positions, v3Loading, v3PoolsLength } = useV3Positions({
-    selectedNetwork,
-    selectedTokens,
-    positionStatus,
-    farmsOnly,
-  })
-  const { solanaPositions, solanaLoading } = useSolanaV3PositionItems({
-    selectedNetwork,
-    selectedTokens,
-    positionStatus,
-    farmsOnly,
-  })
   const { v2Positions, v2Loading, v2PoolsLength } = useV2Positions({
     selectedNetwork,
     selectedTokens,
@@ -233,8 +219,6 @@ export const PositionPage = () => {
   const allPositionList = useMemo(() => {
     const unifiedList = [
       ...infinityPositions,
-      ...v3Positions,
-      ...solanaPositions,
       ...v2Positions,
       ...stablePositions,
     ] as UnifiedPositionDetail[]
@@ -242,7 +226,7 @@ export const PositionPage = () => {
       const { protocol } = item
       return selectedPoolTypes.includes(protocol) && matchPositionSearch(item, search)
     })
-  }, [infinityPositions, v3Positions, solanaPositions, v2Positions, stablePositions, selectedPoolTypes, search])
+  }, [infinityPositions, v2Positions, stablePositions, selectedPoolTypes, search])
 
   const visibleList = useMemo(() => {
     return allPositionList.slice(0, cursorVisible)
@@ -253,8 +237,8 @@ export const PositionPage = () => {
       return <EmptyListPlaceholder text={t('Please Connect Wallet to view positions.')} />
     }
 
-    const isAnyLoading = infinityLoading || v3Loading || solanaLoading || v2Loading || stableLoading
-    const isAllLoading = infinityLoading && v3Loading && solanaLoading && v2Loading && stableLoading
+    const isAnyLoading = infinityLoading || v2Loading || stableLoading
+    const isAllLoading = infinityLoading && v2Loading && stableLoading
 
     if (isAllLoading) {
       return (
@@ -286,9 +270,7 @@ export const PositionPage = () => {
             key={getPositionKey(pos)}
             data={pos}
             poolLength={
-              pos.protocol === Protocol.V3
-                ? v3PoolsLength[pos.chainId]
-                : pos.protocol === Protocol.V2
+               pos.protocol === Protocol.V2
                 ? v2PoolsLength[pos.pair.chainId]
                 : undefined
             }
@@ -300,16 +282,13 @@ export const PositionPage = () => {
   }, [
     account,
     infinityLoading,
-    v3Loading,
     v2Loading,
     stableLoading,
     visibleList,
     t,
-    v3PoolsLength,
     v2PoolsLength,
     allInfinityPositions,
     solanaAccount,
-    solanaLoading,
   ])
 
   useEffect(() => {
@@ -337,10 +316,12 @@ export const PositionPage = () => {
           {(isMobile || isMd) && <AddLiquidityButton scale="sm" height="40px" width="100%" />}
           {isMobile ? (
             <ControlWrapper>
+              {/**
               <ToggleWrapper>
                 <Text>{t('Farms only')}</Text>
                 <Toggle checked={farmsOnly} onChange={toggleFarmsOnly} scale="sm" />
               </ToggleWrapper>
+               */}
               <ButtonWrapper>
                 <IconButton onClick={onPresentTransactionsModal} variant="text" scale="xs">
                   <HistoryIcon color="textSubtle" width="24px" />
@@ -364,10 +345,12 @@ export const PositionPage = () => {
           </StyledButtonMenu>
           {!isMobile ? (
             <ControlWrapper>
+              {/**
               <ToggleWrapper>
                 <Text>{t('Farms only')}</Text>
                 <Toggle checked={farmsOnly} onChange={toggleFarmsOnly} scale="sm" />
               </ToggleWrapper>
+               */}
               <ButtonWrapper>
                 <IconButton onClick={onPresentTransactionsModal} variant="text" scale="xs">
                   <HistoryIcon color="textSubtle" width="24px" />
@@ -386,8 +369,11 @@ export const PositionPage = () => {
       </CardHeader>
       <CardBody>
         {mainSection}
+        
         {selectedPoolTypes.length === 1 && selectedPoolTypes.includes(Protocol.V2) ? (
           <Liquidity.FindOtherLP>
+            <div />
+            {/**
             {!!intersection(V3_MIGRATION_SUPPORTED_CHAINS, selectedNetwork).length && (
               <NextLink style={{ marginTop: '8px' }} href="/migration">
                 <Button id="migration-link" variant="secondary" scale="sm">
@@ -395,6 +381,7 @@ export const PositionPage = () => {
                 </Button>
               </NextLink>
             )}
+               */}
           </Liquidity.FindOtherLP>
         ) : null}
         {Array.isArray(visibleList) && visibleList.length > 0 && <div ref={observerRef} />}

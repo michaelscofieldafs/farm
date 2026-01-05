@@ -217,6 +217,14 @@ export const CAKE = {
     'https://pancakeswap.finance/',
   ),
   [ChainId.MONAD_MAINNET]: undefined as unknown as ERC20Token,
+  [ChainId.SONIC_TESTNET]: new ERC20Token(
+    ChainId.SONIC_TESTNET,
+    '0x052a99849Ef2e13a5CB28275862991671D4b6fF5',
+    18,
+    'CAKE',
+    'PancakeSwap Token',
+    'https://pancakeswap.finance/',
+  ),
   [ChainId.BASE_TESTNET]: new ERC20Token(
     ChainId.BASE_TESTNET,
     '0x052a99849Ef2e13a5CB28275862991671D4b6fF5',
@@ -300,6 +308,14 @@ export const USDC = {
   [ChainId.LINEA_TESTNET]: new ERC20Token(
     ChainId.LINEA_TESTNET,
     '0xf56dc6695cF1f5c364eDEbC7Dc7077ac9B586068',
+    6,
+    'USDC',
+    'USD Coin',
+    'https://www.centre.io/usdc',
+  ),
+  [ChainId.SONIC_TESTNET]: new ERC20Token(
+    ChainId.SONIC_TESTNET,
+    '0x853154e2A5604E5C74a2546E2871Ad44932eB92C',
     6,
     'USDC',
     'USD Coin',
@@ -556,6 +572,7 @@ export const STABLE_COIN = {
   [ChainId.LINEA_TESTNET]: USDC[ChainId.LINEA_TESTNET],
   [ChainId.OPBNB]: USDT[ChainId.OPBNB],
   [ChainId.OPBNB_TESTNET]: USDT[ChainId.OPBNB_TESTNET],
+  [ChainId.SONIC_TESTNET]: USDC[ChainId.SONIC_TESTNET],
   [ChainId.BASE]: USDC[ChainId.BASE],
   [ChainId.BASE_TESTNET]: USDC[ChainId.BASE_TESTNET],
   [ChainId.SCROLL_SEPOLIA]: USDC[ChainId.SCROLL_SEPOLIA],

@@ -8,11 +8,11 @@ export function FindOtherLP({ children }: { children: React.ReactNode }) {
   return (
     <AtomBox display="flex" flexDirection="column" alignItems="center" mt="24px">
       <Text color="textSubtle" mb="8px">
-        {t("Don't see a pair you joined?")}
+        {t("Want search your pair?")}
       </Text>
       <Link href="/find" passHref>
         <Button id="import-pool-link" variant="secondary" scale="sm">
-          {t("Find other LP tokens")}
+          Find more liquidity pools
         </Button>
       </Link>
       {children}

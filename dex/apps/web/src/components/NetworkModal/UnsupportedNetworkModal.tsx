@@ -36,7 +36,7 @@ export function UnsupportedNetworkModal({ pageSupportedChains }: { pageSupported
     () =>
       Object.values(viemClients)
         .map((client) => client.chain)
-        .filter((chain) => chain && !chain.testnet && pageSupportedChains?.includes(chain.id)),
+        .filter((chain) => chain && pageSupportedChains?.includes(chain.id)),
     [pageSupportedChains],
   )
 

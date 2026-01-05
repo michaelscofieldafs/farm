@@ -9,9 +9,9 @@ import { isBridgeOrder, isClassicOrder, isXOrder } from 'views/Swap/utils'
 import { RouteDisplayEssentials } from 'views/Swap/V3Swap/components/RouteDisplayModal'
 import { useIsWrapping, useSlippageAdjustedAmounts } from '../../Swap/V3Swap/hooks'
 import { useHasDynamicHook } from '../hooks/useHasDynamicHook'
-import { TradeSummary } from './AdvancedSwapDetails'
 import { RoutesBreakdown, XRoutesBreakdown } from './RoutesBreakdown'
 import { usePriceBreakdown } from '../hooks/usePriceBreakdown'
+import { TradeSummary } from './AdvancedSwapDetails'
 
 export const AdvancedDetailsFooter = styled.div.withConfig({
   shouldForwardProp: (prop) => !['show'].includes(prop),

@@ -32,7 +32,6 @@ import CurrencySearch from './CurrencySearch'
 import ImportToken from './ImportToken'
 import Manage from './Manage'
 import { CommonBasesType, CurrencyModalView } from './types'
-import SolanaImportToken from './SolanaImportToken'
 
 const StyledModalContainer = styled(ModalContainer)`
   width: 100%;
@@ -275,7 +274,7 @@ export default function CurrencySearchModal({
           />
         ) : modalView === CurrencyModalView.importToken && importToken ? (
           importToken instanceof SPLToken ? (
-            <SolanaImportToken tokens={[importToken]} handleCurrencySelect={handleCurrencySelect} />
+            <div />
           ) : (
             <ImportToken tokens={[importToken]} handleCurrencySelect={handleCurrencySelect} />
           )

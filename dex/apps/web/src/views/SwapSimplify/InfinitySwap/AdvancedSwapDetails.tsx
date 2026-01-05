@@ -31,7 +31,6 @@ import { useStablecoinPriceAmount } from 'hooks/useStablecoinPrice'
 import { EstimatedTime } from '../../Swap/Bridge/CrossChainConfirmSwapModal/components/EstimatedTime'
 import { SlippageAdjustedAmounts, SVMTradePriceBreakdown, TradePriceBreakdown } from '../../Swap/V3Swap/utils/exchange'
 import FormattedPriceImpact from '../../Swap/components/FormattedPriceImpact'
-import { SVMTradingFee } from './TradingFee'
 
 export const DetailsTitle = styled(Text)`
   text-decoration: underline dotted;
@@ -275,7 +274,7 @@ const TradingFeeDisplay = memo(function TradingFeeDisplay({
         </QuestionHelperV2>
       </RowFixed>
       {isSVMOrder(order) && inputAmount?.currency?.symbol ? (
-        <SVMTradingFee routes={order.trade.routes} inputCurrencySymbol={inputAmount?.currency?.symbol} />
+        <div />
       ) : (
         <SkeletonV2 width="70px" height="16px" borderRadius="8px" minHeight="auto" isDataReady={!loading}>
           {isX ? (

@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import { useSolanaTokenList } from 'hooks/solana/useSolanaTokenList'
 import { NonEVMChainId } from '@pancakeswap/chains'
 
 /**
@@ -7,7 +6,7 @@ import { NonEVMChainId } from '@pancakeswap/chains'
  * Performance-optimized with memoization
  */
 export function useEnhancedTokenLogo() {
-  const { tokenList } = useSolanaTokenList()
+  const tokenList: any = []
 
   // Create a memoized lookup map for O(1) lookups
   const tokenLogoMap = useMemo(() => {

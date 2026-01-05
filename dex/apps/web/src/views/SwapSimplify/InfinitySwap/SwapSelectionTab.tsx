@@ -163,18 +163,11 @@ export const SwapSelection = ({
         fullWidth
       >
         <StyledButtonMenuItem>{t('Swap')}</StyledButtonMenuItem>
-        {isMobile ? (
-          <StyledButtonMenuItemTooltip {...tSwapProps}>{t('TWAP')}</StyledButtonMenuItemTooltip>
-        ) : (
-          <StyledButtonMenuItemTooltip {...tSwapProps}>
-            <TooltipText ref={targetRef}>{t('TWAP')}</TooltipText>
-            {tooltipVisible && tooltip}
-          </StyledButtonMenuItemTooltip>
-        )}
 
-        <StyledButtonMenuItem {...limitProps}>{t('Limit')}</StyledButtonMenuItem>
+        <StyledButtonMenuItem display={'none'} {...limitProps}>{t('Limit')}</StyledButtonMenuItem>
       </ButtonMenu>
 
+{/**
       {withToolkit && !SWAP_CHART_UNSUPPORTED_CHAINS.includes(chainId) && (
         <ColoredIconButton
           onClick={() => {
@@ -193,6 +186,7 @@ export const SwapSelection = ({
           )}
         </ColoredIconButton>
       )}
+         */}
     </SwapSelectionWrapper>
   )
 }

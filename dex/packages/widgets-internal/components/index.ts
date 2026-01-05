@@ -1,4 +1,3 @@
-export * from "./AdPanel";
 export * from "./Banner";
 export * from "./Card";
 export * from "./ClientOnly";

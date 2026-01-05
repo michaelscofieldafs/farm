@@ -17,8 +17,6 @@ import { useCurrencyBalance } from 'state/wallet/hooks'
 import { CommonBasesType } from 'components/SearchModal/types'
 
 import { isEvm, isSolana } from '@pancakeswap/chains'
-import { useSolanaTokenPriceAmount } from 'hooks/solana/useSolanaTokenPrice'
-import { useSolanaTokenBalance } from 'state/token/solanaTokenBalances'
 import useAccountActiveChain from 'hooks/useAccountActiveChain'
 import AddToWalletButton from '../AddToWallet/AddToWalletButton'
 import CurrencySearchModal from '../SearchModal/CurrencySearchModal'
@@ -102,18 +100,15 @@ const CurrencyInputPanel = memo(function CurrencyInputPanel({
     evmAccount ?? undefined,
     isEvm(currency?.chainId) ? currency ?? undefined : undefined,
   )
-  const { balance: selectedSolanaCurrencyBalanceBN } = useSolanaTokenBalance(
-    solanaAccount,
-    isSolana(currency?.chainId) ? currency?.wrapped.address : undefined,
-  )
+ 
   const selectedCurrencyBalance = useMemo(
     () =>
       currency
         ? isEvm(currency.chainId)
           ? selectedEvmCurrencyBalance
-          : UnifiedCurrencyAmount.fromRawAmount(currency, selectedSolanaCurrencyBalanceBN.toString())
+          : selectedEvmCurrencyBalance
         : undefined,
-    [currency, selectedEvmCurrencyBalance, selectedSolanaCurrencyBalanceBN],
+    [currency, selectedEvmCurrencyBalance],
   )
   const accountConnected = useMemo(
     () => (isEvm(currency?.chainId) ? Boolean(evmAccount) : Boolean(solanaAccount)),
@@ -130,13 +125,7 @@ const CurrencyInputPanel = memo(function CurrencyInputPanel({
     isEvm(currency?.chainId) && value !== undefined && Number.isFinite(+value) ? +value : undefined,
   )
 
-  const amountInDollarForSolanaCurrency = useSolanaTokenPriceAmount({
-    mint: currency?.wrapped.address,
-    enabled: showUSDPrice && isSolana(currency?.chainId),
-    amount: value !== undefined && Number.isFinite(+value) ? +value : undefined,
-  })
-
-  const amountInDollar = isEvm(currency?.chainId) ? amountInDollarForEvmCurrency : amountInDollarForSolanaCurrency
+  const amountInDollar = isEvm(currency?.chainId) ? amountInDollarForEvmCurrency : amountInDollarForEvmCurrency
 
   const [onPresentCurrencyModal] = useModal(
     <CurrencySearchModal

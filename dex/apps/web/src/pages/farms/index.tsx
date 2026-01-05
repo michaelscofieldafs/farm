@@ -3,7 +3,6 @@ import { useCakePrice } from 'hooks/useCakePrice'
 import { useContext } from 'react'
 import { FarmsV3Context, FarmsV3PageLayout } from 'views/Farms'
 import FarmCard from 'views/Farms/components/FarmCard/FarmCard'
-import { FarmV3Card } from 'views/Farms/components/FarmCard/V3/FarmV3Card'
 import ProxyFarmContainer, {
   YieldBoosterStateContext,
 } from 'views/Farms/components/YieldBooster/components/ProxyFarmContainer'
@@ -63,13 +62,7 @@ const FarmsPage = () => {
         }
 
         return (
-          <FarmV3Card
-            key={`${farm.pid}-${farm.version}`}
-            farm={farm}
-            cakePrice={cakePrice}
-            account={account}
-            removed={false}
-          />
+          <div />
         )
       })}
     </>

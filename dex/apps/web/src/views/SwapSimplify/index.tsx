@@ -3,9 +3,7 @@ import { useRouter } from 'next/router'
 import { useContext, useEffect, useState } from 'react'
 import { useAtom } from 'jotai'
 
-import { MobileCard } from 'components/AdPanel/MobileCard'
 import { useUnifiedCurrency } from 'hooks/Tokens'
-import { useSolanaTokenList } from 'hooks/solana/useSolanaTokenList'
 import { useActiveChainId } from 'hooks/useActiveChainId'
 import { isSolana } from '@pancakeswap/chains'
 import { AutoSlippageProvider } from 'hooks/useAutoSlippageWithFallback'
@@ -47,9 +45,6 @@ const InfinitySwapInner = () => {
 
   const inputCurrency = useUnifiedCurrency(inputCurrencyId, inputChainId)
   const outputCurrency = useUnifiedCurrency(outputCurrencyId, outputChainId)
-
-  // Prefetch Solana tokens when user switches to Solana
-  useSolanaTokenList(isSolana(chainId) || isSolana(inputChainId) || isSolana(outputChainId))
 
   useEffect(() => {
     if (firstTime && query.showTradingReward) {
@@ -120,7 +115,6 @@ const InfinitySwapInner = () => {
         </Flex>
       </Flex>
 
-      <MobileCard />
     </Page>
   )
 }

@@ -60,6 +60,7 @@ export const farmV3ApiFetch = (chainId: number): Promise<FarmsV3Response> =>
       }
     })
 
+/**
 const fallback: Awaited<ReturnType<typeof farmFetcherV3.fetchFarms>> = {
   chainId: ChainId.BSC,
   farmsWithPrice: [],
@@ -124,6 +125,7 @@ export const useFarmsV3Public = () => {
     data: resp?.data ?? fallback,
   }
 }
+ */
 
 interface UseFarmsOptions {
   // mock apr when tvl is 0
@@ -134,9 +136,11 @@ interface UseFarmsOptions {
 export const useFarmsV3 = ({ mockApr = false, boosterLiquidityX = {} }: UseFarmsOptions = {}) => {
   const { chainId } = useActiveChainId()
 
-  const farmV3 = useFarmsV3Public()
+  //const farmV3 = useFarmsV3Public()
 
   const cakePrice = useCakePrice()
+
+  /**
 
   const { data } = useQuery({
     queryKey: [chainId, 'cake-apr-tvl', boosterLiquidityX],
@@ -243,6 +247,7 @@ export const useFarmsV3 = ({ mockApr = false, boosterLiquidityX = {} }: UseFarms
     isLoading: farmV3.isLoading,
     error: farmV3.error,
   }
+     */
 }
 
 const zkSyncChains = [ChainId.ZKSYNC_TESTNET, ChainId.ZKSYNC]
@@ -404,134 +409,3 @@ const usePositionsByUserFarms = (
   }
 }
 
-export function useFarmsV3WithPositionsAndBooster(options: UseFarmsOptions = {}): {
-  farmsWithPositions: FarmV3DataWithPriceAndUserInfo[]
-  userDataLoaded: boolean
-  cakePerSecond: string
-  poolLength: number
-  isLoading: boolean
-} {
-  const { data: boosterLiquidityX } = useV3BoostedLiquidityX()
-  const { data, isLoading } = useFarmsV3({ ...options, boosterLiquidityX })
-  const { data: boosterWhitelist } = useV3BoostedFarm(data?.farmsWithPrice?.map((f) => f.pid))
-
-  return {
-    ...usePositionsByUserFarms(
-      data.farmsWithPrice?.map((d, index) => ({
-        ...d,
-        boosted: boosterWhitelist?.[index]?.boosted,
-      })),
-    ),
-    poolLength: data.poolLength,
-    cakePerSecond: data.cakePerSecond,
-    isLoading,
-  }
-}
-
-const useV3BoostedFarm = (pids?: number[]) => {
-  const { chainId } = useActiveChainId()
-  const farmBoosterVeCakeContract = useBCakeFarmBoosterVeCakeContract()
-
-  const { data } = useQuery({
-    queryKey: ['v3/boostedFarm', chainId, pids?.join('-')],
-
-    queryFn: () =>
-      getV3FarmBoosterWhiteList({
-        farmBoosterContract: farmBoosterVeCakeContract,
-        chainId: chainId ?? -1,
-        pids: pids ?? [],
-      }),
-
-    enabled: Boolean(chainId && pids && pids.length > 0 && bCakeSupportedChainId.includes(chainId)),
-    retry: 3,
-    retryDelay: 3000,
-  })
-  return { data }
-}
-
-const useV3BoostedLiquidityX = (): { data: Record<number, number> } => {
-  const farmV3 = useFarmsV3Public()
-  const pids = useMemo(() => farmV3?.data?.farmsWithPrice?.map((f) => f.pid), [farmV3?.data?.farmsWithPrice])
-  const { chainId } = useActiveChainId()
-  const masterChefV3Contract = useMasterchefV3()
-
-  const { data } = useQuery({
-    queryKey: ['v3/getV3BoosterAPRLiquidityX', chainId, pids?.join('-')],
-
-    queryFn: () =>
-      getV3BoosterAPRLiquidityX({
-        masterChefV3Contract,
-        chainId: chainId ?? -1,
-        pids: pids ?? [],
-      }),
-
-    enabled: Boolean(chainId && pids && pids.length > 0 && bCakeSupportedChainId.includes(chainId)),
-  })
-
-  return useMemo(() => {
-    const dataMap = data?.reduce((acc, d) => {
-      // eslint-disable-next-line no-param-reassign
-      acc[d.pid] = Number.isNaN(d.boosterliquidityX) ? 1 : d.boosterliquidityX
-      return acc
-    }, {})
-    return {
-      data: dataMap ?? {},
-    }
-  }, [data])
-}
-
-export async function getV3FarmBoosterWhiteList({
-  farmBoosterContract,
-  chainId,
-  pids,
-}: {
-  farmBoosterContract: ReturnType<typeof useBCakeFarmBoosterVeCakeContract>
-  chainId: ChainId
-  pids: number[]
-}): Promise<{ pid: number; boosted: boolean }[]> {
-  const contracts = pids?.map((pid) => {
-    return {
-      address: farmBoosterContract.address,
-      functionName: 'whiteList',
-      abi: bCakeFarmBoosterVeCakeABI,
-      args: [BigInt(pid)],
-    } as const
-  })
-  const whiteList = await publicClient({ chainId }).multicall({
-    contracts,
-  })
-
-  if (!whiteList || whiteList?.length !== pids?.length) return []
-  return pids?.map((d, index) => ({ pid: d, boosted: whiteList[index].result ?? false }))
-}
-
-export async function getV3BoosterAPRLiquidityX({
-  masterChefV3Contract,
-  chainId,
-  pids,
-}: {
-  masterChefV3Contract: ReturnType<typeof useMasterchefV3>
-  chainId: ChainId
-  pids: number[]
-}): Promise<{ pid: number; boosterliquidityX: number }[]> {
-  const contracts = pids?.map((pid) => {
-    return {
-      address: masterChefV3Contract?.address ?? '0x',
-      functionName: 'poolInfo',
-      abi: masterChefV3ABI,
-      args: [BigInt(pid)],
-    } as const
-  })
-  const data = await publicClient({ chainId }).multicall({
-    contracts,
-  })
-
-  if (!data || data?.length !== pids?.length) return []
-
-  return pids?.map((d, index) => ({
-    pid: d,
-    boosterliquidityX:
-      new BN(data?.[index]?.result?.[6]?.toString() ?? 1).div(data?.[index]?.result?.[5]?.toString() ?? 1).toNumber() ??
-      1,
-  }))
-}

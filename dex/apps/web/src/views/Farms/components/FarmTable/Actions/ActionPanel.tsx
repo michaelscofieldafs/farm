@@ -32,8 +32,6 @@ import { useAccount } from 'wagmi'
 import { useIncentraInfo } from 'hooks/useIncentra'
 import { getIncentraLink, INCENTRA_USER_LINK } from 'utils/getIncentraLink'
 import { Protocol } from '@pancakeswap/farms'
-import { FarmV3ApyButton, FarmV3ApyButtonProps } from '../../FarmCard/V3/FarmV3ApyButton'
-import FarmV3CardList from '../../FarmCard/V3/FarmV3CardList'
 import { YieldBoosterStateContext } from '../../YieldBooster/components/ProxyFarmContainer'
 import Apr, { AprProps } from '../Apr'
 import { HarvestAction, HarvestActionContainer, ProxyHarvestActionContainer } from './HarvestAction'
@@ -274,19 +272,6 @@ export const ActionPanelV3: FC<ActionPanelV3Props> = ({
               <>
                 <ValueWrapper>
                   <Text>{t('APR')}</Text>
-                  <FarmV3ApyButton
-                    farm={farm}
-                    additionAprInfo={
-                      [
-                        merklApr && merklLink
-                          ? { aprTitle: t('Merkl APR'), aprValue: merklApr, aprLink: merklLink }
-                          : undefined,
-                        incentraApr && incentraLink
-                          ? { aprTitle: `Incentra ${t('APR')}`, aprValue: incentraApr, aprLink: incentraLink }
-                          : undefined,
-                      ].filter(Boolean) as NonNullable<FarmV3ApyButtonProps['additionAprInfo']>
-                    }
-                  />
                 </ValueWrapper>
                 <ValueWrapper>
                   <Text>{t('Multiplier')}</Text>
@@ -328,7 +313,7 @@ export const ActionPanelV3: FC<ActionPanelV3Props> = ({
         {!userDataReady ? (
           <Skeleton height={200} width="100%" />
         ) : account && !hasNoPosition ? (
-          <FarmV3CardList farm={farm} direction="row" showHarvestAll />
+          <div />
         ) : (
           <NoPosition
             inactive={!isActive}

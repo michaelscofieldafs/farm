@@ -1,5 +1,5 @@
 import { useTranslation } from '@pancakeswap/localization'
-import { Currency, CurrencyAmount, Percent, TradeType, UnifiedCurrencyAmount } from '@pancakeswap/sdk'
+import { Currency, CurrencyAmount, Percent, TradeType } from '@pancakeswap/sdk'
 import { SmartRouter } from '@pancakeswap/smart-router'
 import {
   AutoColumn,
@@ -23,17 +23,16 @@ import { memo, useMemo, useState } from 'react'
 import { Field } from 'state/swap/actions'
 import { styled } from 'styled-components'
 import { warningSeverity } from 'utils/exchange'
-import { SVMTradingFee } from 'views/SwapSimplify/InfinitySwap/TradingFee'
 import { SolanaBridgeTradingFee } from 'views/SwapSimplify/InfinitySwap/SolanaBridgeTradingFee'
 
+import { BridgeOrder } from '@pancakeswap/price-api-sdk'
 import { PancakeSwapXTag } from 'components/PancakeSwapXTag'
 import { paymasterInfo } from 'config/paymaster'
 import { usePaymaster } from 'hooks/usePaymaster'
 import { isAddressEqual } from 'utils'
 import { SlippageButton } from 'views/Swap/components/SlippageButton'
-import { InterfaceOrder, isBridgeOrder, isSolanaBridge, isSVMOrder, isXOrder } from 'views/Swap/utils'
+import { InterfaceOrder, isBridgeOrder, isSVMOrder, isSolanaBridge, isXOrder } from 'views/Swap/utils'
 import { useHasDynamicHook } from 'views/SwapSimplify/hooks/useHasDynamicHook'
-import { BridgeOrder } from '@pancakeswap/price-api-sdk'
 import FormattedPriceImpact from '../../components/FormattedPriceImpact'
 import { StyledBalanceMaxMini, SwapCallbackError } from '../../components/styleds'
 import { SlippageAdjustedAmounts, formatExecutionPrice } from '../utils/exchange'
@@ -243,7 +242,7 @@ export const SwapModalFooterV2 = memo(function SwapModalFooterV2({
           {isSolanaBridge(order) ? (
             <SolanaBridgeTradingFee order={order as BridgeOrder} showUSDFee />
           ) : isSVMOrder(order) && inputAmount?.currency?.symbol ? (
-            <SVMTradingFee routes={order.trade.routes} inputCurrencySymbol={inputAmount.currency.symbol} />
+            <div />
           ) : realizedLPFee || isXOrder(order) ? (
             <Flex alignItems="center">
               {isXOrder(order) ? (

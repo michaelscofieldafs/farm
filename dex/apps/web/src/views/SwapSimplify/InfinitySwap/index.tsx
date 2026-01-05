@@ -92,7 +92,9 @@ export const InfinitySwapForm = memo(() => {
   return (
     <SwapUIV2.SwapFormWrapper>
       <SwapUIV2.SwapTabAndInputPanelWrapper>
+        {/** 
         <SwapSelection swapType={SwapType.MARKET} outputChainId={outputChainId} withToolkit />
+        */}
         <FormMain
           tradeLoading={!tradeLoaded}
           inputAmount={bestOrder?.trade?.inputAmount}
@@ -114,7 +116,7 @@ export const InfinitySwapForm = memo(() => {
       )}
       <ButtonAndDetailsPanel
         tips={<UnwrapTips />}
-        slippage={isWrapping ? null : <SlippageRow order={bestOrder} />}
+        slippage={true ? null : <SlippageRow order={bestOrder} />}
         swapCommitButton={
           <CommitButton order={bestOrder} tradeLoaded={tradeLoaded} tradeError={tradeError} {...commitHooks} />
         }
@@ -155,11 +157,6 @@ export const InfinitySwapForm = memo(() => {
           </Suspense>
         }
         shouldRenderDetails={Boolean(executionPrice) && Boolean(bestOrder) && !isWrapping && !tradeError}
-        mevToggleSlot={
-          <Suspense>
-            <MevToggle />
-          </Suspense>
-        }
         gasTokenSelector={
           isPaymasterAvailable && <GasTokenSelector mt="8px" inputCurrency={inputCurrency || undefined} />
         }

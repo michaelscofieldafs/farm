@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import { useFarmV2PublicAPI } from 'state/farms/hooks'
-import { useFarmsV3Public } from 'state/farmsV3/hooks'
 import { isAddressEqual } from 'utils'
 import { NextPageWithLayout } from 'utils/page.types'
 import { CHAIN_IDS } from 'utils/wagmi'
@@ -19,7 +18,6 @@ const AddLiquidityPage = () => {
 
   // fetching farm api instead of using redux store here to avoid huge amount of actions and hooks needed
   const { data: farmsV2Public } = useFarmV2PublicAPI()
-  const { data: farmV3Public } = useFarmsV3Public()
 
   const { currencyIdA, currencyIdB, feeAmount } = useCurrencyParams()
 
@@ -30,16 +28,12 @@ const AddLiquidityPage = () => {
   const preferFarmType = useMemo(() => {
     if (!currencyA || !currencyB || !router.isReady) return undefined
 
-    const hasV3Farm = farmV3Public?.farmsWithPrice.find(
-      (farm) =>
-        farm.multiplier !== '0X' &&
-        ((farm.token.equals(currencyA.wrapped) && farm.quoteToken.equals(currencyB.wrapped)) ||
-          (farm.quoteToken.equals(currencyA.wrapped) && farm.token.equals(currencyB.wrapped))),
-    )
+    const hasV3Farm = false;
+
     if (hasV3Farm)
       return {
         type: SELECTOR_TYPE.V3,
-        feeAmount: hasV3Farm.feeAmount,
+        feeAmount: 4,
       }
 
     const hasV2Farm = farmsV2Public?.find(
@@ -55,7 +49,7 @@ const AddLiquidityPage = () => {
         ? { type: SELECTOR_TYPE.STABLE }
         : { type: SELECTOR_TYPE.V2 }
       : undefined
-  }, [farmsV2Public, farmV3Public?.farmsWithPrice, currencyA, currencyB, router])
+  }, [farmsV2Public, [], currencyA, currencyB, router])
 
   if (router.isReady && currencyA?.wrapped && currencyB?.wrapped && currencyA.wrapped.equals(currencyB.wrapped)) {
     router.replace('/liquidity/select')

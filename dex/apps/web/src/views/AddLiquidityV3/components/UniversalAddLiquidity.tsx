@@ -19,7 +19,6 @@ import StableFormView from '../formViews/StableFormView'
 import V2FormView from '../formViews/V2FormView'
 import V3FormView from '../formViews/V3FormView'
 import { SELECTOR_TYPE } from '../types'
-import { SolanaFormView } from '../formViews/SolanaFormView/SolanaFormView'
 import { useFeeAmountFromQuery } from '../hooks/useCurrencyParams'
 import { selectTypeAtom } from './AddEVMLiquidityV3Layout'
 
@@ -115,10 +114,10 @@ export function UniversalAddLiquidity({
         >
           {selectorType === SELECTOR_TYPE.V3 &&
             (isSolana(chainId) ? (
-              <SolanaFormView
+              <V3FormView
                 feeAmount={feeAmount}
-                baseCurrency={baseCurrency}
-                quoteCurrency={quoteCurrency}
+                baseCurrency={evmBase}
+                quoteCurrency={evmQuote}
                 currencyIdA={currencyIdA}
                 currencyIdB={currencyIdB}
               />

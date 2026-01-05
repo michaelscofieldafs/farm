@@ -1,6 +1,5 @@
 import { Currency, Price } from '@pancakeswap/sdk'
 import { tickToPrice, tryParseTick } from 'hooks/infinity/utils'
-import { tryParsePrice } from 'hooks/v3/utils'
 import { BigNumber as BN } from 'bignumber.js'
 import { nearestUsableTick } from '@pancakeswap/v3-sdk'
 import { bigNumberToPrice } from './price'
@@ -23,7 +22,7 @@ export function getTickAdjustedPrice(
   // manual check, tick to price failing for tickCurrent = 0 / price = 1
   if (BN(price).eq(1)) return { tick: 0, price: new Price(baseCurrency, quoteCurrency, '1', '1') }
 
-  const price_ = tryParsePrice(baseCurrency, quoteCurrency, price)
+  const price_ = false
   if (!price_) {
     console.error('getTickAdjustedPrice: No price found for given value', {
       price,
@@ -95,7 +94,7 @@ export function getSqrtPriceFromMarketPrice(
   if (!marketPrice) return undefined
 
   // Get limit order tick from price
-  const parsedPrice = tryParsePrice(baseCurrency, quoteCurrency, marketPrice)
+  const parsedPrice = false
   if (!parsedPrice) return undefined
 
   let targetTick = tryParseTick(parsedPrice, tickSpacing)

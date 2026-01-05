@@ -23,7 +23,6 @@ import type { OptionProps } from '@pancakeswap/uikit'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { NonEVMChainId } from '@pancakeswap/chains'
 import { useActiveChainId } from 'hooks/useAccountActiveChain'
-import { useSolanaClmmFeeTiers } from 'hooks/solana/useSolanaClmmFeeTiers'
 import { useFeeLevelQueryState, useFeeTierSettingQueryState } from 'state/infinity/create'
 import { escapeRegExp } from 'utils'
 import { useInfinityCreateFormQueryState } from '../hooks/useInfinityFormState/useInfinityFormQueryState'
@@ -59,15 +58,11 @@ export const FieldFeeLevel: React.FC<FieldFeeLevelProps> = ({ allowCustomFee, ..
   const { poolType } = useInfinityCreateFormQueryState()
   const [inputValue, setInputValue] = useState<string | null>(null)
   const { chainId } = useActiveChainId()
-  const solanaFeeTiers = useSolanaClmmFeeTiers()
 
   // Build dynamic options depending on chain (Solana uses CLMM config)
   const options = useMemo(() => {
-    if (chainId === NonEVMChainId.SOLANA) {
-      return solanaFeeTiers
-    }
     return PRESET_FEE_LEVELS_INFINITY
-  }, [chainId, solanaFeeTiers])
+  }, [chainId])
 
   const tips = useMemo(() => {
     if (!feeLevel || feeTierSetting === 'dynamic') return null

@@ -1,5 +1,6 @@
 import { ChainId, NonEVMChainId, chainNames } from '@pancakeswap/chains'
 import memoize from '@pancakeswap/utils/memoize'
+import { defineChain } from 'viem/utils'
 import {
   Chain,
   arbitrum,
@@ -19,6 +20,7 @@ import {
   opBNBTestnet,
   scrollSepolia,
   sepolia,
+  sonic,
   zksync,
 } from 'wagmi/chains'
 
@@ -102,26 +104,31 @@ export const L2_CHAIN_IDS: ChainId[] = [
   ChainId.MONAD_MAINNET,
 ]
 
+export const sonicTestnet = /*#__PURE__*/ defineChain({
+  id: 14601,
+  name: 'Sonic Testnet',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Sonic',
+    symbol: 'S',
+  },
+  rpcUrls: {
+    default: { http: ['https://rpc.testnet.soniclabs.com'] },
+  },
+  blockExplorers: {
+    default: {
+      name: 'Sonic Testnet Explorer',
+      url: 'https://testnet.soniclabs.com/',
+    },
+  },
+  testnet: true,
+})
+
 export const CHAINS: [Chain, ...Chain[]] = [
   bsc,
   bscTestnet,
-  mainnet,
-  goerli,
-  sepolia,
-  zksync,
-  arbitrum,
-  arbitrumGoerli,
-  arbitrumSepolia,
-  linea,
-  lineaTestnet,
-  base,
   baseGoerli,
-  baseSepolia,
-  opBNB,
-  opBNBTestnet,
-  scrollSepolia,
-  monad,
-  monadTestnet,
+  sonicTestnet,
 ]
 
 // Minimal Solana chain descriptor for explorer and non‑EVM utilities

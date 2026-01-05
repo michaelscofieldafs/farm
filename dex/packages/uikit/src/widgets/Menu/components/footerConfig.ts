@@ -9,6 +9,7 @@ export const footerLinks: (t: ContextApi["t"]) => FooterLinkType[] = (t) => [
         label: t("Trade"),
         href: "https://pancakeswap.finance/swap",
       },
+      /**
       {
         label: t("Earn.verb"),
         href: "https://pancakeswap.finance/liquidity/pools",
@@ -17,8 +18,10 @@ export const footerLinks: (t: ContextApi["t"]) => FooterLinkType[] = (t) => [
         label: t("Play"),
         href: "https://pancakeswap.finance/prediction",
       },
+       */
     ],
   },
+  /**
   {
     label: "Business",
     items: [
@@ -61,6 +64,7 @@ export const footerLinks: (t: ContextApi["t"]) => FooterLinkType[] = (t) => [
       },
     ],
   },
+  */
   {
     label: t("Support"),
     items: [
@@ -68,14 +72,17 @@ export const footerLinks: (t: ContextApi["t"]) => FooterLinkType[] = (t) => [
         label: t("Get Help"),
         href: "https://docs.pancakeswap.finance/welcome-to-pancakeswap/contact-us/faq/help",
       },
+      /**
       {
         label: t("Troubleshooting"),
         href: "https://docs.pancakeswap.finance/readme/help/troubleshooting",
       },
+       */
       {
         label: t("Documentation"),
         href: "https://docs.pancakeswap.finance/",
       },
+      /**
       {
         label: t("Audits"),
         href: "https://docs.pancakeswap.finance/readme/audits",
@@ -84,6 +91,7 @@ export const footerLinks: (t: ContextApi["t"]) => FooterLinkType[] = (t) => [
         label: t("Legacy products"),
         href: "https://docs.pancakeswap.finance/products/legacy-products",
       },
+      */
     ],
   },
   {
@@ -93,6 +101,7 @@ export const footerLinks: (t: ContextApi["t"]) => FooterLinkType[] = (t) => [
         label: t("Tokenomics"),
         href: "https://docs.pancakeswap.finance/governance-and-tokenomics/cake-tokenomics",
       },
+      /**
       {
         label: t("CAKE Emission Projection"),
         href: "https://analytics.pancakeswap.finance/",
@@ -105,6 +114,7 @@ export const footerLinks: (t: ContextApi["t"]) => FooterLinkType[] = (t) => [
         label: t("Careers"),
         href: "https://docs.pancakeswap.finance/team/become-a-chef",
       },
+       */
       {
         label: t("Terms Of Service"),
         href: "https://pancakeswap.finance/terms-of-service",

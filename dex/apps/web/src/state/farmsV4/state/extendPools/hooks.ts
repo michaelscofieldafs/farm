@@ -9,7 +9,6 @@ import isEqual from 'lodash/isEqual'
 import memoize from 'lodash/memoize'
 import { useCallback, useMemo, useState } from 'react'
 import { Address } from 'viem/accounts'
-import { useSolanaPoolInfo } from 'views/PoolDetail/hooks/useSolanaPoolInfo'
 
 import { useLatestTxReceipt } from '../accountPositions/hooks/useLatestTxReceipt'
 import type { PoolInfo } from '../type'
@@ -151,7 +150,6 @@ export const usePoolInfo = <TPoolType extends PoolInfo>({
 }): TPoolType | undefined | null => {
   const [latestTxReceipt] = useLatestTxReceipt()
   const isEvmChain = isEvm(chainId)
-  const { data: solanaPoolInfo } = useSolanaPoolInfo(poolAddress, chainId)
 
   const { data: evmPoolInfo } = useQuery({
     queryKey: ['poolInfo', chainId, poolAddress, latestTxReceipt?.blockHash],
@@ -187,6 +185,6 @@ export const usePoolInfo = <TPoolType extends PoolInfo>({
       evmPoolInfo.token1 = token1
     }
 
-    return (isSolana(chainId) ? solanaPoolInfo : evmPoolInfo) as TPoolType | undefined | null
-  }, [chainId, evmPoolInfo, solanaPoolInfo, token0, token1])
+    return ( evmPoolInfo) as TPoolType | undefined | null
+  }, [chainId, evmPoolInfo, token0, token1])
 }
