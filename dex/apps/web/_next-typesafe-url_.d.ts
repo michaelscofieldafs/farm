@@ -112,7 +112,6 @@ declare module "@@@next-typesafe-url" {
     "/swap": StaticRoute;
     "/swap/limit-v1": StaticRoute;
     "/swap/limit": StaticRoute;
-    "/swap/twap": StaticRoute;
     "/teams": StaticRoute;
     "/teams/[id]": StaticRoute;
     "/terms-of-service": StaticRoute;
