@@ -27,6 +27,7 @@ export const SHORT_SYMBOL = {
   [ChainId.BASE_TESTNET]: 'tBase',
   [ChainId.SCROLL_SEPOLIA]: 'tScroll',
   [ChainId.SEPOLIA]: 'sepolia',
+  [ChainId.SONIC_TESTNET]: 'Sonic Testnet',
   [ChainId.BASE_SEPOLIA]: 'Base Sepolia',
   [ChainId.ARBITRUM_SEPOLIA]: 'Arb Sepolia',
   [ChainId.MONAD_MAINNET]: 'Monad',

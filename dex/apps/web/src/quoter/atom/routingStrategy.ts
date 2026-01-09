@@ -79,6 +79,14 @@ const defaultRoutingConfig: StrategyConfig[] = [
   },
 ]
 
+const defaultRoutingConfigAfs: StrategyConfig[] = [
+  {
+    // Fallback full route
+    key: 'full',
+    priority: 1,
+  },
+]
+
 interface TokenSpecificRoutingStrategy {
   [chainId: number]: {
     [address: string]: StrategyConfig[]
@@ -146,8 +154,7 @@ function getRoutingStrategy(
   if (isRwaTrade) {
     return RWA_ONLY_ROUTING_CONFIG.map((x) => ({ ...Strategies[x.key], ...x })) as StrategyRoute[]
   }
-  const config =
-    tokenSpecificConfig[chainId]?.[addressA] || tokenSpecificConfig[chainId]?.[addressB] || defaultRoutingConfig
+  const config = defaultRoutingConfigAfs
 
   return config.map((x) => {
     const strategy = Strategies[x.key]

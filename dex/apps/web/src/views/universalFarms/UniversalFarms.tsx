@@ -99,7 +99,7 @@ export const UniversalFarms: React.FC<PropsWithChildren> = () => {
             <NextLinkFromReactRouter to={PAGES_LINK.POOLS}>{t('All Pools')}</NextLinkFromReactRouter>
           </StyledTab>
         ),
-        page: () => <PoolsPage />,
+        page: () => <div />,
       },
       1: {
         menu: () => (

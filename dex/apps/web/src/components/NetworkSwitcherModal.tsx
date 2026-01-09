@@ -46,6 +46,7 @@ interface NetworkSelectProps {
 
 function getSortedChains(chainId: UnifiedChainId, showTestnet: boolean): Chain[] {
   return Chains.filter((chain) => {
+    console.log(chain.name);
     if (chain.isEVM) {
       if (chain.id === chainId) return true
       if (isTestnetChainId(chain.id as ChainId)) {

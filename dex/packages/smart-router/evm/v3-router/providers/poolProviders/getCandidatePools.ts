@@ -19,7 +19,7 @@ export type GetCandidatePoolsParams = {
 }
 
 export async function getCandidatePools({
-  protocols = [PoolType.V3, PoolType.V2, PoolType.STABLE],
+  protocols = [PoolType.V2],
   v3SubgraphProvider,
   ...rest
 }: GetCandidatePoolsParams): Promise<Pool[]> {

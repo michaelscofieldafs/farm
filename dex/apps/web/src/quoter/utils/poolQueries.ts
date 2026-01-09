@@ -269,8 +269,10 @@ export const fetchCandidatePoolsLite = async (query: PoolQuery, options: PoolQue
     const poolsArray = await Promise.all([
       options.stableSwap ? queries.getStableSwapPools(query, options) : ([] as Pool[]),
       options.v2Pools ? queries.getV2CandidatePools(query, options) : ([] as Pool[]),
+      /**
       options.v3Pools ? queries.getV3CandidatePoolsWithoutTicks(query, options) : ([] as Pool[]),
       options.infinity ? queries.getInfinityCandidatePoolsLight(query, options) : ([] as Pool[]),
+       */
     ])
     return poolsArray.flat() as Pool[]
   }

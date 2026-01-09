@@ -21,6 +21,7 @@ import { accountActiveChainAtom } from 'wallet/atoms/accountStateAtoms'
 import { atomWithLoadable } from './atomWithLoadable'
 
 export const bestAMMTradeFromQuoterWorkerAtom = atomFamily((option: QuoteQuery) => {
+  console.log('afs 4')
   const { amount, currency, tradeType, maxSplits, gasLimit } = option
   return atomWithLoadable(async (get) => {
     const { account } = get(accountActiveChainAtom)

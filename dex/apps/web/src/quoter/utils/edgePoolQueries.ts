@@ -255,6 +255,7 @@ const querySingleTypeLite = async (
     case 'stable': {
       return fetchSSPool(addressA, addressB, chainId)
     }
+    /**
     case 'v3': {
       return fetchV3PoolsWithoutTicks(addressA, addressB, chainId)
     }
@@ -262,6 +263,7 @@ const querySingleTypeLite = async (
     case 'infinityCl': {
       return fetchInfinityPoolsLight(addressA, addressB, chainId, type)
     }
+       */
     default:
       throw new Error('invalid pool')
   }
@@ -291,7 +293,7 @@ const fetchAllCandidatePoolsLite = async (
 ) => {
   const queries = await Promise.all(
     protocols
-      .filter((x) => x !== 'infinityBin')
+      .filter((x) => x !== 'infinityBin' && x != 'v3')
       .map((protocol) => querySingleTypeLite(chainId, protocol as Protocol, addressA, addressB, 'light')),
   )
   const pools = queries.flat() as (InfinityPoolWithTvl | V2PoolWithTvl | V3Pool | V3PoolWithTvl | StablePoolWithTvl)[]
@@ -314,6 +316,7 @@ function fillTvl(tvlMap: Record<`0x${string}`, string>, pools: Pool[]) {
 
 export const poolTvlMap = async (protocols: Protocol[], chain: APIChain) => {
   try {
+    /**
     const remotePools = await fetchAllPools({
       baseUrl: 'https://explorer.pancakeswap.com/api/cached/pools/tvl-refs',
       protocols,
@@ -328,6 +331,8 @@ export const poolTvlMap = async (protocols: Protocol[], chain: APIChain) => {
       tvlMap[id] = tvlUSD
     }
     return tvlMap
+     */
+    return {}
   } catch (ex) {
     return {}
   }

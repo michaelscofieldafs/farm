@@ -121,23 +121,34 @@ export async function queryTokenPrice(
       return undefined
     }
 
+    console.log("afsssss")
+
     // @ts-ignore
+    /**
     const { priceImpactWithoutFee } = computeTradePriceBreakdown(trade as unknown as SmartRouterTrade<TradeType>)
 
     if (!priceImpactWithoutFee || warningSeverity(priceImpactWithoutFee) > 2) {
       return undefined
     }
+       */
 
     const input = Number(trade.inputAmount.toExact())
     const output = Number(trade.outputAmount.toExact())
+
+    console.log(input);
+    console.log(output)
 
     return {
       price: output / input,
       from: 'quote',
     }
   } catch (ex) {
+    console.log("error quote")
     console.error(ex)
-    return undefined
+        return {
+      price: 0,
+      from: 'quote',
+    }
   }
 }
 

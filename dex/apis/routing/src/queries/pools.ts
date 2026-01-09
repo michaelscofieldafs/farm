@@ -19,6 +19,7 @@ requireCheck.forEach((node) => {
 })
 
 export async function getPoolsTvlFromExplorerAPI({ chainId }: { chainId: ChainId }) {
+  return [];
   const chain = (CHAIN_TO_QUERY as any)[chainId]
   const pageSize = 50
   let hasMorePools = true
