@@ -40,13 +40,15 @@ const usePageInfo = () => {
   const router = useRouter()
   const PAGES_MAP = useMemo(
     () => ({
+      /**
       [PAGES_LINK.POOLS]: {
         tabIdx: 0,
         oldLink: '/farms',
         oldLinkText: t('Legacy Farm Page'),
       },
+       */
       [PAGES_LINK.POSITIONS]: {
-        tabIdx: 1,
+        tabIdx: 0,
         oldLink: '/liquidity',
         oldLinkText: t('Legacy Liquidity Page'),
       },
@@ -93,15 +95,17 @@ export const UniversalFarms: React.FC<PropsWithChildren> = () => {
 
   const tabsConfig = useMemo(() => {
     return {
+      /**
       0: {
         menu: () => (
           <StyledTab key="pools">
             <NextLinkFromReactRouter to={PAGES_LINK.POOLS}>{t('All Pools')}</NextLinkFromReactRouter>
           </StyledTab>
         ),
-        page: () => <div />,
+        page: () => <PoolsPage />,
       },
-      1: {
+       */
+      0: {
         menu: () => (
           <StyledTab key="positions">
             <NextLinkFromReactRouter to={PAGES_LINK.POSITIONS}>{t('My Positions')}</NextLinkFromReactRouter>
