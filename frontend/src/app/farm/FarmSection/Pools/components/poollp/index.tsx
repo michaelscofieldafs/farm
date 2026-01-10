@@ -464,7 +464,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
       if (isConnected) {
         const userInfo = await masterChefContract.methods.userInfo(poolMasterchef, address).call();
-        const userRewards = await masterChefContract.methods.pendingSupernova(poolMasterchef, address).call();
+        const userRewards = await masterChefContract.methods.pendingSavvy(poolMasterchef, address).call();
         const { amount } = userInfo as any;
 
         const amountBN = BigNumber.from(amount);

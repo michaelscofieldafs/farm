@@ -86,7 +86,7 @@ const AppContextProvider = ({ children }: any) => {
 
       const poolLength = Number(await safeCall(masterChefContract.methods.poolLength(), 0));
 
-      const novaPerBlock = Number(await safeCall(masterChefContract.methods.supernovaPerBlock(), 0)) / 10 ** 18;
+      const novaPerBlock = Number(await safeCall(masterChefContract.methods.savvyPerBlock(), 0)) / 10 ** 18;
       const totalAllocPoint = Number(await safeCall(masterChefContract.methods.totalAllocPoint(), 1));
 
       setFarmTokenPerBlock(novaPerBlock);
