@@ -19,7 +19,7 @@ import { useTimeUntilCancel } from "@/hooks/useTimeUntilCancel";
 import { Game } from "@/interfaces/game";
 import { GameInfo } from "@/interfaces/gameInfo";
 import { DECIMALS, ZERO_ADDRESS } from "@/utils/constants";
-import { shortenAddress, showToast, weiToEth } from "@/utils/helpers";
+import { fetchChainBase, isAppChain, shortenAddress, showToast, weiToEth } from "@/utils/helpers";
 import { getContractAddressByChainId } from "@/utils/tokenGameAddressProvider";
 import { useAppKitNetwork } from "@reown/appkit/react";
 import { readContract, waitForTransactionReceipt, watchBlocks, writeContract } from '@wagmi/core';
@@ -59,9 +59,7 @@ export default function TicTacToeOnChain() {
 
     const [showModal, setShowModal] = useState<ModalProps | null>(null);
 
-    const { chainId } = useAppKitNetwork();
-
-    const { chain } = useAccount();
+    const { chain, chainId } = useAccount();
 
     const currentChainRef = useRef(chainId);
 
@@ -109,7 +107,7 @@ export default function TicTacToeOnChain() {
         refetch: refetchGames,
     } = useReadContract({
         address: getContractAddressByChainId(Number(currentChainRef.current)) as Address,
-        chainId: Number(currentChainRef.current),
+        chainId: fetchChainBase(Number(currentChainRef.current)),
         abi: savvyTicTacToeABI,
         functionName: "listAvailableGames",
         args: [currentAddressRef.current!, 10],
@@ -120,7 +118,7 @@ export default function TicTacToeOnChain() {
         refetch: refetchBoard,
     } = useReadContract({
         address: getContractAddressByChainId(Number(currentChainRef.current)) as Address,
-        chainId: Number(currentChainRef.current),
+        chainId: fetchChainBase(Number(currentChainRef.current)),
         abi: savvyTicTacToeABI,
         functionName: "getBoard",
         args: currentGameIdRef.current !== null ? [currentGameIdRef.current] : undefined,
@@ -735,23 +733,30 @@ export default function TicTacToeOnChain() {
         refetchGames();
         refetch(currentAddressRef.current!);
         fetchFeeInfo();
-        const unwatch = watchBlocks(wagmiAdapter.wagmiConfig, {
-            blockTag: 'latest',
-            chainId: Number(currentChainRef.current),
-            pollingInterval: 1000,
-            onBlock({ number }: any) {
-                // Refresh available games list, the player's current status (host/challenger),
-                // the active game if there's one running, and the game board state.
-                if (!isPlayMoveRef.current) {
-                    refetchGames();
-                    refetch(currentAddressRef.current!);
-                    const id = currentGameIdRef.current;
-                    if (id !== null) fetchGameById(id);
+        try {
+            const unwatch = watchBlocks(wagmiAdapter.wagmiConfig, {
+                blockTag: 'latest',
+                chainId: fetchChainBase(Number(currentChainRef.current)),
+                pollingInterval: 1000,
+                onBlock({ number }: any) {
+                    // Refresh available games list, the player's current status (host/challenger),
+                    // the active game if there's one running, and the game board state.
+                    if (!isPlayMoveRef.current) {
+                        refetchGames();
+                        refetch(currentAddressRef.current!);
+                        const id = currentGameIdRef.current;
+                        if (id !== null) fetchGameById(id);
+                    }
+                },
+                onError(error) {
+                    unwatch();
                 }
-            },
-        });
-        return () => unwatch();
-    }, []);
+            });
+            return () => unwatch();
+        }
+        catch (err) {
+        }
+    }, [currentChainRef.current]);
 
     /* ----------------------------------------
      * PROCESS BOARD INTO UI FORMAT
@@ -969,6 +974,7 @@ export default function TicTacToeOnChain() {
                                                     const sanitized = e.target.value.replace(/[^0-9.,]/g, "");
                                                     setStakeInput(sanitized);
                                                 }}
+                                                disabled={!isAppChain(Number(chainId))}
                                             />
                                             <button
                                                 className={`
@@ -981,7 +987,7 @@ export default function TicTacToeOnChain() {
                                                 disabled={isLoadingCreateGame}
                                                 onClick={() => handleCreateGame(stakeInput.replaceAll(",", "."))}
                                             >
-                                                Create Now
+                                                {isAppChain(Number(chainId)) ? 'Create Now' : 'Wrong Chain'}
                                             </button>
                                         </div>
                                     </div>

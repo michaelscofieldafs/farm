@@ -1,6 +1,7 @@
 import { toast, TypeOptions } from "react-toastify";
 import { ZERO_ADDRESS } from "./constants";
 import { ethers } from "ethers";
+import { wagmiAdapter } from "@/components/Web3Provider";
 
 export const showToast = (message: string, type: TypeOptions = 'default'): void => {
     toast.dismiss();
@@ -13,6 +14,10 @@ export const showToast = (message: string, type: TypeOptions = 'default'): void 
         }
     });
 }
+
+export const isAppChain = (chainId: number) => wagmiAdapter.wagmiConfig.chains.some(item => item.id === chainId);
+
+export const fetchChainBase = (chainId: number) => isAppChain(chainId) ? chainId : wagmiAdapter.wagmiConfig.chains[0].id;
 
 export const shortenAddress = (address: string): string => {
     if (address === ZERO_ADDRESS) return 'Waiting player...';

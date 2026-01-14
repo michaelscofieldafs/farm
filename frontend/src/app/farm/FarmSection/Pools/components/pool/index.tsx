@@ -6,7 +6,7 @@
 /* eslint-disable no-unused-vars */
 import { wagmiAdapter } from "@/components/Web3Provider";
 import { AppContext } from "@/context/appContext";
-import { useAppKitNetwork } from "@reown/appkit/react";
+import { useAppKit, useAppKitNetwork } from "@reown/appkit/react";
 import { writeContract, waitForTransactionReceipt, readContract } from '@wagmi/core';
 // @ts-ignore
 import AnimatedNumber from "animated-number-react";
@@ -30,6 +30,7 @@ import ModalDeposit from "@/components/ModalDeposit";
 import { fetchImageByAddress } from "@/utils/fetchTokenImage";
 import { ElectricBorderShow } from "@/components/ElectricBorder";
 import { getMasterchefABIByChainId } from "@/utils/masterChefABIProvider";
+import { isAppChain } from "@/utils/helpers";
 const transactionSound = '/sounds/transaction.mp3';
 
 enum StatusTransaction {
@@ -43,8 +44,7 @@ enum StatusTransaction {
 }
 
 const FarmPoolCard = (props: { pool: any; }) => {
-  const { address, isConnected } = useAccount()
-  const { chainId } = useAppKitNetwork();
+  const { address, isConnected, chainId } = useAccount()
 
   const [isLoading, setIsLoading] = useState(true);
   const [totalTokensDeposited, setTotalTokensDeposited] = useState<BigNumber>(BigNumber.from(0));
@@ -65,6 +65,8 @@ const FarmPoolCard = (props: { pool: any; }) => {
   const { farmTokenUSDCPrice } = useContext(AppContext);
 
   const env = import.meta.env;
+
+  const { open } = useAppKit();
 
   const [play] = useSound(transactionSound);
 
@@ -590,6 +592,11 @@ const FarmPoolCard = (props: { pool: any; }) => {
     return ethers.utils.formatUnits(valueInWei, token.decimais);
   }
 
+  const openNetworkModal = () => {
+    open({ view: 'Networks' });
+  };
+
+
   const showTransactionEffect = (): void => {
     setIsShowTransactionEffect(true);
 
@@ -618,7 +625,9 @@ const FarmPoolCard = (props: { pool: any; }) => {
         balance={`${formatTokenBalanceFromFarm()} / ${(formatTokenBalanceFromFarmUSDC())}`} handleDeposit={handleWithdraw}
         handleShow={handleIsWithdraw} value={depositWithdrawValue} handleValue={handleDeposiWithdrawValue} decimals={token.decimals} buttonTitle={transactionStatusText} balanceValue={fromWeiWithDecimals(totalTokensDeposited)} isLoading={isLoadingDeposit} />
       <HeaderContainer>
-        <ImageToken src={fetchImageByAddress(token.id)} />
+        <ImageToken src={fetchImageByAddress(token.id)} onError={e => {
+          e.currentTarget.src = '/images/icons/icon-token.png';
+        }} />
         <HeaderDetailsContainer style={{ zIndex: 999 }}>
           <div onClick={() => { }} style={{ display: 'flex', alignContent: 'center', justifyContent: 'start' }}>
             <h3 className='text-white sm:text-18 text-18 font-bold' style={{ textShadow: '1px 1px 1px #fff', textAlign: 'start', marginRight: 4 }}>
@@ -864,20 +873,20 @@ const FarmPoolCard = (props: { pool: any; }) => {
       {isConnected ?
         <ActionContainer>
           <div style={{ flex: 1 }}>
-            <button className='clickable-div' onClick={handleIsDeposit} disabled={isLoadingDeposit} type="button" style={{
+            <button className='clickable-div' onClick={isAppChain(Number(chainId)) ? handleIsDeposit : openNetworkModal} disabled={isLoadingDeposit} type="button" style={{
               width: '100%', padding: 10, borderRadius: 10, border: 'none',
               background: 'linear-gradient(to right, #29317D, #019CAD)'
             }}><h3 color={'white'} style={{ color: '#fff' }}>
-                DEPOSIT
+                {isAppChain(Number(chainId)) ? 'DEPOSIT' : 'WRONG CHAIN'}
               </h3></button>
           </div>
           <ActionButtonSeparator />
           <div style={{ flex: 1 }}>
-            <button className='clickable-div' onClick={handleIsWithdraw} disabled={isLoadingDeposit} type="button" style={{
+            <button className='clickable-div' onClick={isAppChain(Number(chainId)) ? handleIsWithdraw : openNetworkModal} disabled={isLoadingDeposit} type="button" style={{
               width: '100%', padding: 10, borderRadius: 10, border: 'none',
               background: 'linear-gradient(to right, #29317D, #FFA62E)'
             }}><h3 color={'white'} style={{ color: '#fff' }}>
-                WITHDRAW
+                {isAppChain(Number(chainId)) ? 'WITHDRAW' : 'WRONG CHAIN'}
               </h3></button>
           </div>
         </ActionContainer> : <ActionButtonWalletContainer>

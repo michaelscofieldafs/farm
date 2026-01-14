@@ -1,6 +1,7 @@
 import { useAppKitNetwork } from '@reown/appkit/react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useAccount } from 'wagmi';
+import { wagmiAdapter } from '../Web3Provider';
 
 interface WalletButtonProps { }
 
@@ -65,7 +66,7 @@ const WalletButton: React.FC<WalletButtonProps> = () => {
             </span>}
             {isConnected &&
                 <span className="inline-block text-sm font-small text-white bg-[#202F34] rounded-full shadow-md px-4 py-1">
-                    {`Network: ${chain?.name ?? ''} ${showEmoji() ? '💜' : ''}`}
+                    {` ${chain?.name ? `Network: ${chain?.name}` : `Wrong Chain (Defaulted to ${wagmiAdapter.wagmiConfig.chains[0].name})`} ${showEmoji() ? '💜' : ''}`}
                 </span>
             }
             <div

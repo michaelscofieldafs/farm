@@ -1,5 +1,5 @@
 import { getTokenContractABIByChainId } from '@/utils/tokenContractABIProvider';
-import { base, bsc, bscTestnet, mainnet, plasma, plasmaTestnet, sepolia, sonic, sonicBlazeTestnet } from '@reown/appkit/networks';
+import { base, baseSepolia, bsc, bscTestnet, mainnet, monadTestnet, plasma, plasmaTestnet, sepolia, sonic, sonicBlazeTestnet } from '@reown/appkit/networks';
 import { useState } from 'react';
 import Web3 from 'web3';
 import { safeCall } from '../utils/functions';
@@ -10,6 +10,7 @@ import { getRouterABIByChainId } from '../utils/routerABIProvider';
 import { getRouterAddressByChainId } from '../utils/routerProvider';
 import { getRpcProviderByChainId } from '../utils/rpcProviderUtils';
 import { getSavvyTokenByChainId, getStableTokenByChainId, getUSDTTokenByChainId } from '../utils/tokenAddressProvider';
+import { sonicTestnet } from '@/components/Web3Provider';
 
 interface ChainAggregateData {
     name: string;
@@ -37,7 +38,7 @@ export const useAggregateChains = () => {
     const fetchAggregateFarmData = async () => {
         setIsLoading(true);
 
-        const chainList = [bsc, mainnet, sonic, base];
+        const chainList = [bscTestnet, sonicTestnet, baseSepolia, monadTestnet];
 
         try {
             let totalTvl = 0;
@@ -84,7 +85,7 @@ export const useAggregateChains = () => {
                             const symbol = (await safeCall(tokenContract.methods.symbol(), '')).toUpperCase();
 
                             // LP Pool
-                            if (symbol === '' || symbol.endsWith('-LP') || symbol.includes('LP') || symbol.includes('UNI-V2')) {
+                            if (symbol.endsWith('-LP') || symbol.includes('LP') || symbol.includes('UNI-V2')) {
                                 const pairContract = new web3.eth.Contract(getPairContractV2ABIByChainId(chain.id), lpToken);
 
                                 const [token0Address, token1Address, reserves, farmBalance, decimals, totalSupply] = await Promise.all([

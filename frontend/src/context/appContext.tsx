@@ -24,6 +24,7 @@ import { getRpcProviderByChainId } from '../utils/rpcProviderUtils';
 import { getSavvyTokenByChainId, getStableTokenByChainId, getUSDTTokenByChainId } from '../utils/tokenAddressProvider';
 import { PoolLP, PoolSingle } from './interfaces';
 import { base, bsc, bscTestnet } from 'viem/chains';
+import { fetchChainBase } from '@/utils/helpers';
 
 interface AppContextType {
   stableTokenUSDCPrice: number;
@@ -71,16 +72,16 @@ const AppContextProvider = ({ children }: any) => {
   const [isLoadingPoolsFarm, setIsLoadingPoolsFarm] = useState(true);
   const { chainId } = useAppKitNetwork();
   const web3Ref = useRef(new Web3(getRpcProviderByChainId(Number(chainId))));
-  const chainIdRef = useRef(chainId);
+  const chainIdRef = useRef(fetchChainBase(Number(chainId)));
 
   const fetchPoolsFromMasterchef = async (savvyTokenPriceUSDC = 0, stableTokenPriceUSDC = 0) => {
     setIsLoadingPoolsFarm(true);
 
     try {
-      const chainId = Number(chainIdRef.current);
-      const masterChefAddress = getMastChefAddressByChainId(chainId);
+      const chainIdBase = fetchChainBase(Number(chainIdRef.current));
+      const masterChefAddress = getMastChefAddressByChainId(chainIdBase);
       const masterChefContract = new web3Ref.current.eth.Contract(
-        getMasterchefABIByChainId(chainId),
+        getMasterchefABIByChainId(chainIdBase),
         masterChefAddress
       );
 
@@ -100,12 +101,14 @@ const AppContextProvider = ({ children }: any) => {
             const { allocPoint = 0, depositFeeBP = 0, lpToken } = poolInfo;
             if (!lpToken) return null;
 
-            const tokenContract = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(chainId), lpToken);
+            const tokenContract = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(chainIdBase), lpToken);
             const symbol = (await safeCall(tokenContract.methods.symbol(), '')).toUpperCase();
 
+            if (symbol === '') return null;
+
             // LP Pool
-            if (symbol === '' || symbol.endsWith('-LP') || symbol.includes('LP') || symbol.includes('UNI-V2')) {
-              const pairContract = new web3Ref.current.eth.Contract(getPairContractV2ABIByChainId(chainId), lpToken);
+            if (symbol.endsWith('-LP') || symbol.includes('LP') || symbol.includes('UNI-V2')) {
+              const pairContract = new web3Ref.current.eth.Contract(getPairContractV2ABIByChainId(chainIdBase), lpToken);
 
               // Fetch base if of pair contract
               const [token0Address, token1Address, reserves, farmBalance, totalSupply, decimals] = await Promise.all([
@@ -120,8 +123,8 @@ const AppContextProvider = ({ children }: any) => {
               // If both token is null break
               if (!token0Address || !token1Address) return null;
 
-              const token0 = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(chainId), token0Address);
-              const token1 = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(chainId), token1Address);
+              const token0 = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(chainIdBase), token0Address);
+              const token1 = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(chainIdBase), token1Address);
 
               // Basic if of tokens
               const [decimals0, symbol0, name0] = await Promise.all([
@@ -151,7 +154,7 @@ const AppContextProvider = ({ children }: any) => {
               console.log(`token ${name0} \ ${name1}\n${price0} \ ${price1} \ Tvl: ${tvlFarm}`)
 
               // Calculate APR of pool
-              const blocksPerYear: number = getBlocksPerYearByChainId(chainId);
+              const blocksPerYear: number = getBlocksPerYearByChainId(chainIdBase);
               const poolTokensPerBlock = novaPerBlock * (Number(allocPoint) / totalAllocPoint);
               const totalRewardPricePerYear = savvyTokenPriceUSDC * poolTokensPerBlock * blocksPerYear;
               const apr = tvlFarm > 0 ? (totalRewardPricePerYear / tvlFarm) * 100 : 0;
@@ -186,7 +189,7 @@ const AppContextProvider = ({ children }: any) => {
             const tvl = (Number(farmBalance) / 10 ** decimals) * price;
 
             //Calculate APR pool
-            const blocksPerYear = getBlocksPerYearByChainId(chainId);
+            const blocksPerYear = getBlocksPerYearByChainId(chainIdBase);
             const poolTokensPerBlock = novaPerBlock * (Number(allocPoint) / totalAllocPoint);
             const totalRewardPricePerYear = savvyTokenPriceUSDC * poolTokensPerBlock * blocksPerYear;
             const apr = tvl > 0 ? (totalRewardPricePerYear / tvl) * 100 : 0;
@@ -208,7 +211,9 @@ const AppContextProvider = ({ children }: any) => {
       );
 
       // Run all the functions in parallel
-      const poolList = await Promise.all(poolPromises);
+      let poolList = await Promise.all(poolPromises);
+
+      poolList = poolList.filter(item => item != null);
 
       const poolsLp: PoolLP[] = poolList.filter(p => p && p.token0) as PoolLP[];
       const poolsSingleSided: PoolSingle[] = poolList.filter(p => p && !p.token0)
@@ -236,8 +241,8 @@ const AppContextProvider = ({ children }: any) => {
   // Fetch token price v2
   const fetchTokenPriceV2 = async (address: string, savvyPriceUSDC = farmTokenUSDCPrice, stableTokenPriceUSDC = stableTokenUSDCPrice) => {
     try {
-      if (getSavvyTokenByChainId(chainId).toLowerCase() == address.toLowerCase()) return savvyPriceUSDC;
-      if (getStableTokenByChainId(chainId).toLowerCase() == address.toLowerCase()) return stableTokenPriceUSDC;
+      if (getSavvyTokenByChainId(Number(chainIdRef.current)).toLowerCase() == address.toLowerCase()) return savvyPriceUSDC;
+      if (getStableTokenByChainId(Number(chainIdRef.current)).toLowerCase() == address.toLowerCase()) return stableTokenPriceUSDC;
 
       const price = await calcTokenPrice(address, stableTokenPriceUSDC);
       return price;
@@ -304,7 +309,7 @@ const AppContextProvider = ({ children }: any) => {
   // Fetch circtulating supply of savvy token
   const fetchCirculatingSupply = async (tokenPrice = farmTokenUSDCPrice) => {
     try {
-      const tokenContract = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(chainId), getSavvyTokenByChainId(Number(chainIdRef.current)));
+      const tokenContract = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(Number(chainIdRef.current)), getSavvyTokenByChainId(Number(chainIdRef.current)));
       let totalSupply: any = await tokenContract.methods.totalSupply().call();
       totalSupply = (Number(totalSupply) / 10 ** 18);
 
@@ -493,12 +498,14 @@ const AppContextProvider = ({ children }: any) => {
 
     // Check if the network manually selected by the wallet is compatible with the farm.
     if (chainId != null) {
+      /**
       if (!supportedChains.includes(Number(chainId))) {
         return;
       }
+      */
 
       console.log(`Change network to ${chainId}`);
-      chainIdRef.current = chainId;
+      chainIdRef.current = Number(fetchChainBase(Number(chainId)));
       web3Ref.current = new Web3(getRpcProviderByChainId(Number(chainId)));
       clearFarmData();
       fetchData();
@@ -506,17 +513,25 @@ const AppContextProvider = ({ children }: any) => {
   }, [chainId]);
 
   useEffect(() => {
-    const unwatch = watchBlocks(wagmiAdapter.wagmiConfig, {
-      chainId: Number(chainIdRef.current),
-      blockTag: 'latest',
-      pollingInterval: 4000,
-      onBlock(block) {
-        console.log(`Block ${block.number} of ${chainIdRef.current}`);
-        fetchDataFarm();
-      },
-      onError(error) { },
-    });
-    return () => unwatch();
+    try {
+      const unwatch = watchBlocks(wagmiAdapter.wagmiConfig, {
+        chainId: Number(fetchChainBase(chainIdRef.current)),
+        blockTag: 'latest',
+        pollingInterval: 4000,
+        onBlock(block) {
+          console.log(`Block ${block.number} of ${chainIdRef.current}`);
+          fetchDataFarm();
+        },
+        onError(error) {
+          clearFarmData();
+          unwatch();
+        },
+      });
+      return () => unwatch();
+    }
+    catch (err) {
+      clearFarmData();
+    }
   }, [chainIdRef.current]);
 
   return (

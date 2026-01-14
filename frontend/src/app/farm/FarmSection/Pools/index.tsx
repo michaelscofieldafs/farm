@@ -18,8 +18,8 @@ const SavvyFarmPools = () => {
 
   const NoPoolsAvailable = () => {
     return (
-      <div className="flex flex-col items-center justify-center text-center py-4 bg-black/20 rounded-2xl shadow-lg ring-1 ring-white/5">
-        <h2 className="text-2xl md:text-3xl font-semibold mb-2">
+      <div className="flex flex-col items-center justify-center text-center p-7 py-4 bg-black/20 rounded-2xl shadow-lg ring-1 ring-white/5">
+        <h2 className="text-2xl md:text-2xl text-slate-400 font-semibold mb-2">
           No pools available on this chain... yet!
         </h2>
         <p className="text-slate-400 max-w-md mb-6">

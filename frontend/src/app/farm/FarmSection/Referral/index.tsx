@@ -14,7 +14,7 @@ const SavvyFarmReferral = () => {
   const ref = useRef(null)
   const inView = useInView(ref)
   const { address, isConnected } = useAccount();
-  const [feeToReferral, setFeeToReferral] = useState(0);
+  const [feeToReferral, setFeeToReferral] = useState(50);
 
   const { chainId } = useAppKitNetwork();
 
@@ -70,8 +70,10 @@ const SavvyFarmReferral = () => {
   }
 
   useEffect(() => {
+    /**
     setFeeToReferral(0);
     fetchFeeToReferral();
+     */
   }, [chainId])
 
   return (

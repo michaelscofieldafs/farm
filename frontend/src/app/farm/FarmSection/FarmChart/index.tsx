@@ -2,15 +2,18 @@
 
 import { useAggregateChains } from '@/hooks/useAggregateChains';
 import {
+    baseSepolia,
     bsc,
     bscTestnet,
     form,
     mainnet,
+    monadTestnet,
     plasma,
     plasmaTestnet,
     sepolia,
     sonic,
-    sonicBlazeTestnet
+    sonicBlazeTestnet,
+    sonicTestnet
 } from '@reown/appkit/networks';
 import { useEffect, useState } from 'react';
 import { CircleLoader } from 'react-spinners';
@@ -57,7 +60,10 @@ export default function SavvyFarmStatisticsDashboard() {
                 sonicBlazeTestnet.name,
                 bscTestnet.name,
                 sepolia.name,
-                plasmaTestnet.name
+                plasmaTestnet.name,
+                monadTestnet,
+                baseSepolia,
+                sonicTestnet,
             ];
 
             const sortedData = Object.values(dataByChain).sort(
