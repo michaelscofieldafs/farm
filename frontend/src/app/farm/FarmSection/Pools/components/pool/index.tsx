@@ -109,7 +109,6 @@ const FarmPoolCard = (props: { pool: any; }) => {
       const amountToDeposit = 0;
 
       setIsLoadingDeposit(true);
-
       toast.dismiss();
       toast("We are processing your reward claim.", {
         type: 'success',
@@ -123,7 +122,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
       const hash = await writeContract(wagmiAdapter.wagmiConfig, {
         abi: getMasterchefABIByChainId(chainId),
         address: getMastChefAddressByChainId(chainId) as Address,
-        functionName: 'deposit',
+        functionName: 'withdraw',
         args: [poolMasterchef, amountToDeposit],
         account: address,
       })
@@ -161,7 +160,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
     try {
       if (depositWithdrawValueWei.lte(BigNumber.from(0))) {
         toast.dismiss();
-        toast("Enter the amount of tokens you want to deposit.", {
+        toast("Enter the amount of tokens you want to withdraw.", {
           type: 'warning',
           position: 'top-center',
           style: { fontSize: 16, fontFamily: 'Trebuchet MS, sans-serif' },
@@ -643,7 +642,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
             <a className="fee">        <FeeContainer>
               <FeeValueContainer style={{ display: 'flex' }}>
                 <h3 className='text-white sm:text-14 text-14 font-normal'>
-                  {fee > 0 ? `${fee}% Fee` : 'No fees!'}
+                  {fee > 0 ? `${fee}% Deposit/Withdraw fee` : 'No fees!'}
                 </h3>
               </FeeValueContainer>
             </FeeContainer></a>
@@ -754,6 +753,11 @@ const FarmPoolCard = (props: { pool: any; }) => {
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <h3 className='text-white sm:text-14 text-14 font-bold'>
                 You staked
+              </h3>
+              <h3 className='logo-2' style={{ color: '#fff' }}>
+                {isLoading ? <SkeletonTheme baseColor="#202020" highlightColor="#444">
+                  <Skeleton count={1} height={5} width={45} />
+                </SkeletonTheme> : `${formatTokenBalanceFromFarm()}`}
               </h3>
               <h3 className='logo-2' style={{ color: '#fff' }}>
                 {isLoading ? <SkeletonTheme baseColor="#202020" highlightColor="#444">

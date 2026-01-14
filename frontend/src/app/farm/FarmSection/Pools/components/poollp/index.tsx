@@ -656,7 +656,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
             <a className="fee">        <FeeContainer>
               <FeeValueContainer style={{ display: 'flex' }}>
                 <h3 className='text-white sm:text-14 text-14 font-normal'>
-                  {fee > 0 ? `${fee}% Fee` : 'No fees!'}
+                  {fee > 0 ? `${fee}% Deposit/Withdraw Fee` : 'No fees!'}
                 </h3>
               </FeeValueContainer>
             </FeeContainer></a>
