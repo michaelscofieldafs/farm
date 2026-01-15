@@ -110,7 +110,6 @@ const FarmPoolCard = (props: { pool: any; }) => {
       const amountToDeposit = 0;
 
       setIsLoadingDeposit(true);
-
       toast.dismiss();
       toast("We are processing your reward claim.", {
         type: 'success',
@@ -121,10 +120,12 @@ const FarmPoolCard = (props: { pool: any; }) => {
         }
       });
 
+
+      console.log("handleRewards5 -> amountToDeposit = ", amountToDeposit);
       const hash = await writeContract(wagmiAdapter.wagmiConfig, {
         abi: getMasterchefABIByChainId(chainId),
         address: getMastChefAddressByChainId(chainId) as Address,
-        functionName: 'deposit',
+        functionName: 'withdraw',
         args: [poolMasterchef, amountToDeposit],
         account: address,
       })
@@ -163,7 +164,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
     try {
       if (depositWithdrawValueWei.lte(BigNumber.from(0))) {
         toast.dismiss();
-        toast("Enter the amount of tokens you want to deposit.", {
+        toast("Enter the amount of tokens you want to withdraw.", {
           type: 'warning',
           position: 'top-center',
           style: { fontSize: 16, fontFamily: 'Trebuchet MS, sans-serif' },
@@ -181,7 +182,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
       }
 
       setIsLoadingDeposit(true);
-
+       console.log("handleRewards2");
       const hash = await writeContract(wagmiAdapter.wagmiConfig, {
         abi: getMasterchefABIByChainId(chainId),
         address: getMastChefAddressByChainId(chainId) as Address,
