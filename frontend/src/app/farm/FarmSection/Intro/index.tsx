@@ -136,7 +136,7 @@ const SavvyFarmIntro = () => {
                 whileInView={{ y: 0, opacity: 1 }}
                 initial={{ y: '100%', opacity: 0 }}
                 transition={{ duration: 0.6 }}
-                className='w-4/5'
+                className='w-full md:w-4/5'
               >
                 <div className='flex items-center justify-between gap-8 w-full'>
                   <p className='flex-1 sm:text-28 text-18 text-muted mb-4'>

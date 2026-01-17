@@ -39,46 +39,48 @@ const CardSlider = ({ data }: CardSliderProps) => {
     ],
   }
   return (
-    <div className='mt-16'>
-      <Slider {...settings}>
-        {data.map((item, index) => (
-          <div key={index} className='pr-6'>
-            <div className='px-5 py-6 bg-dark_grey/80 rounded-xl'>
-              <div className='flex items-center gap-5'>
-                <div
-                  className={`${item.background} ${item.padding} rounded-full`}>
-                  <img
-                    src={item.image}
-                    alt='icon'
-                    width={50}
-                    height={50}
-                  />
-                </div>
-                <p className='text-white text-xs font-normal '>
-                  <span className='text-16 font-bold mr-2'>{item.name}</span>
-                  {item.symbol.toUpperCase()}
-                </p>
-              </div>
-              <div className='flex justify-between mt-7'>
-                <div className=''>
-                  <p className='text-16 font-bold text-white mb-0 leading-none'>
-                    {`${Number(item.current_price).toLocaleString('en-US', {
-                      style: 'currency',
-                      currency: 'USD',
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}`}
+    <div className='mt-16 flex justify-center md:block'>
+      <div className='w-full max-w-4xl md:max-w-none'>
+        <Slider {...settings}>
+          {data.map((item, index) => (
+            <div key={index} className='pr-6 w-full'>
+              <div className='mx-auto w-full max-w-[320px] md:max-w-none md:mx-0 px-5 py-6 bg-dark_grey/80 rounded-xl'>
+                <div className='flex items-center gap-5'>
+                  <div
+                    className={`${item.background} ${item.padding} rounded-full`}>
+                    <img
+                      src={item.image}
+                      alt='icon'
+                      width={50}
+                      height={50}
+                    />
+                  </div>
+                  <p className='text-white text-xs font-normal '>
+                    <span className='text-16 font-bold mr-2'>{item.name}</span>
+                    {item.symbol.toUpperCase()}
                   </p>
                 </div>
-                <div className=''>
-                  <span className={`text-xs ${item.price_change_percentage_24h > 0 ? 'text-success' : 'text-error'
-                    }`}>{`${item.price_change_percentage_24h}%`}</span>
+                <div className='flex justify-between mt-7'>
+                  <div className=''>
+                    <p className='text-16 font-bold text-white mb-0 leading-none'>
+                      {`${Number(item.current_price).toLocaleString('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}`}
+                    </p>
+                  </div>
+                  <div className=''>
+                    <span className={`text-xs ${item.price_change_percentage_24h > 0 ? 'text-success' : 'text-error'
+                      }`}>{`${item.price_change_percentage_24h}%`}</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
-      </Slider>
+          ))}
+        </Slider>
+      </div>
     </div>
   )
 }
