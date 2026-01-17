@@ -540,13 +540,13 @@ const FarmPoolCard = (props: { pool: any; }) => {
     const formatter = new Intl.NumberFormat('en-US', {
       notation: 'compact',
       compactDisplay: 'short',
-      minimumFractionDigits: 0,
+      minimumFractionDigits: readable > 0 ? 2 : 0,
       maximumFractionDigits: 3,
     });
 
     const formattedValue = formatter.format(readable);
 
-    return `${readable < 0.001 ? `~ ${formattedValue}` : formattedValue} $${token.symbol.toUpperCase()}`;
+    return `${readable > 0 && readable < 0.001 ? `~ ${formattedValue}` : formattedValue} $${token.symbol.toUpperCase()}`;
   }
 
   function formatTokenBalanceFromFarmUSDC(
