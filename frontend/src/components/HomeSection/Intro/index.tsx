@@ -60,7 +60,7 @@ const SavvyFarmIntro = () => {
       const combined = Array.isArray(resp1.data) && Array.isArray(resp2.data) ? [...resp1.data, ...resp2.data] : (resp1.data || []);
 
       const data = combined.filter((item: { name: string }) =>
-        ['Bitcoin', 'Ethereum', 'BNB', 'Solana', 'TRON', 'Sui', 'Avalanche', 'Sonic', 'Arbitrum', 'XRP'].includes(item.name)
+        ['Bitcoin', 'Ethereum', 'BNB', 'Solana', 'TRON', 'Sui', 'Avalanche', 'Sonic', 'Arbitrum'].includes(item.name)
       );
 
       setCoins(data);
