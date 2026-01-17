@@ -552,7 +552,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
     const formatter = new Intl.NumberFormat('en-US', {
       notation: 'compact',
       compactDisplay: 'short',
-      minimumFractionDigits: readable > 0 ? 2 : 0,
+      minimumFractionDigits: readable > 0 ? 1 : 0,
       maximumFractionDigits: 3,
     });
 
