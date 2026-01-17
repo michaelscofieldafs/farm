@@ -45,7 +45,7 @@ const SavvyFarmPools = () => {
   }
 
   return (
-    <section className='relative md:pt-40 md:pb-28 py-20 overflow-hidden z-1 pt-9 bg-gradient-to-b from-[#071019] to-[#0b1418]' id='pools'>
+    <section className='relative pt-28 md:pt-40 pb-20 md:pb-28 overflow-hidden z-1 bg-gradient-to-b from-[#071019] to-[#0b1418]' id='pools'>
       <div className="pointer-events-none fixed inset-0 opacity-40">
         <div className="absolute -top-40 -left-40 size-[520px] rounded-full bg-emerald-500 blur-[140px]" />
         <div className="absolute top-1/2 -right-40 size-[520px] rounded-full bg-cyan-500 blur-[160px]" />
@@ -90,14 +90,14 @@ const SavvyFarmPools = () => {
               </div>
             </div>
           </motion.div>
-          {isLoading ? <div className="hidden md:flex flex-wrap justify-center gap-6 w-full pb-20 px-4"> <CircleLoader className='mt-4' color="#fff" loading={isLoading} size={45} /> </div> :
+          {isLoading ? <div className="flex flex-wrap justify-center gap-6 w-full pb-20 px-4"> <CircleLoader className='mt-4' color="#fff" loading={isLoading} size={45} /> </div> :
             <motion.div
               {...leftAnimation}>
-              <div className="hidden md:flex flex-wrap justify-center gap-6 w-full pb-20 px-4">
+              <div className="flex flex-wrap justify-center gap-6 w-full pb-20 px-4">
                 {isSingleSided ? (
                   poolsTokenFarm.length > 0 ? (
                     poolsTokenFarm.map(item => (
-                      <div className="basis-[280px]">
+                      <div className="w-full sm:basis-[280px]">
                         <FarmPoolCard pool={item} />
                       </div>
                     ))
@@ -107,7 +107,7 @@ const SavvyFarmPools = () => {
                 ) : (
                   poolsFarm.length > 0 ? (
                     poolsFarm.map(item => (
-                      <div className="basis-[280px]">
+                      <div className="w-full sm:basis-[280px]">
                         <FarmLpPoolCard pool={item} />
                       </div>
                     ))

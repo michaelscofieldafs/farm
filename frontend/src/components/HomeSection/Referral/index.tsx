@@ -55,14 +55,18 @@ const SavvyFarmReferral = () => {
   ]
 
   const handleLink = () => {
-    const encodedText = btoa(unescape(encodeURIComponent(address as string)));
-    const url = `http://localhost:3000/?refer=${encodedText}`;
+    if (address) {
+      const encodedText = btoa(unescape(encodeURIComponent(address as string)));
+      const url = `${window.location.origin}/?refer=${encodedText}`;
 
-    navigator.clipboard.writeText(url);
-    toast.dismiss();
-    toast('Copied link', {
-      position: 'top-center',
-    })
+      navigator.clipboard.writeText(url);
+      toast.dismiss();
+      toast('Copied link', {
+        position: 'top-center',
+      })
+    } else {
+      window.open('https://t.me/', '_blank');
+    }
   }
 
   const fetchFeeToReferral = async () => {
@@ -100,9 +104,9 @@ const SavvyFarmReferral = () => {
             <h2 className='sm:text-30 text-30 text-white lg:w-full md:w-70% font-medium'>
               SavvyGirl.app is a Web3 ecosystem with gaming, yield farming, a marketplace, and a DEX, combining innovation and security. 🚀
             </h2>
-            <div className='grid md:grid-cols-2 gap-7 mt-11'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-7 mt-11 justify-items-center md:justify-items-stretch'>
               {services.map((service, index) => (
-                <div key={index} className='flex items-center gap-5'>
+                <div key={index} className='flex flex-col items-center md:flex-row md:items-center md:justify-start gap-5 w-full'>
                   <div className='w-18 h-18 bg-light_grey/30 rounded-full flex items-center justify-center'>
                     <img
                       src={service.icon}
@@ -113,7 +117,7 @@ const SavvyFarmReferral = () => {
                   </div>
                   <Link
                     to={service.link}
-                    className='text-21 text-muted font-bold hover:text-primary transition-colors cursor-pointer'
+                    className='text-21 text-muted font-bold hover:text-primary transition-colors cursor-pointer text-center md:text-left'
                   >
                     {service.text}
                   </Link>
@@ -130,14 +134,15 @@ const SavvyFarmReferral = () => {
                 connect with players, traders, and builders.
               </p>
 
-              {isConnected ? (
+              <div className='mt-8 z-10'>
                 <button
-                  className='bg-primary mt-10 border border-primary rounded-lg text-21 font-medium hover:bg-transparent hover:text-primary text-darkmode py-2 px-7 z-10'
+                  className='bg-primary border border-primary rounded-lg text-21 font-medium hover:bg-transparent hover:text-primary text-darkmode py-2 px-7'
                   onClick={handleLink}>
                   TELEGRAM GROUP
                 </button>
-              ) : (
-                <div className='mt-10 z-10'>
+              </div>
+              {!isConnected && (
+                <div className='mt-4 z-10'>
                   <Web3Button balance="show" label='Connect wallet to get your link' />
                 </div>
               )}

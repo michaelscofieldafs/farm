@@ -182,7 +182,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
       }
 
       setIsLoadingDeposit(true);
-       console.log("handleRewards2");
+      console.log("handleRewards2");
       const hash = await writeContract(wagmiAdapter.wagmiConfig, {
         abi: getMasterchefABIByChainId(chainId),
         address: getMastChefAddressByChainId(chainId) as Address,
@@ -768,6 +768,11 @@ const FarmPoolCard = (props: { pool: any; }) => {
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <h3 className='text-white sm:text-14 text-14 font-bold'>
                 You staked
+              </h3>
+              <h3 className='logo-2' style={{ color: '#fff' }}>
+                {isLoading ? <SkeletonTheme baseColor="#202020" highlightColor="#444">
+                  <Skeleton count={1} height={5} width={45} />
+                </SkeletonTheme> : `${formatTokenBalanceFromFarm()}`}
               </h3>
               <h3 className='logo-2' style={{ color: '#fff' }}>
                 {isLoading ? <SkeletonTheme baseColor="#202020" highlightColor="#444">

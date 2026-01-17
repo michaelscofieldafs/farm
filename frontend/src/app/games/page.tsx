@@ -21,7 +21,7 @@ import { GameInfo } from "@/interfaces/gameInfo";
 import { DECIMALS, ZERO_ADDRESS } from "@/utils/constants";
 import { fetchChainBase, isAppChain, shortenAddress, showToast, weiToEth } from "@/utils/helpers";
 import { getContractAddressByChainId } from "@/utils/tokenGameAddressProvider";
-import { useAppKitNetwork } from "@reown/appkit/react";
+import { useAppKit, useAppKitNetwork } from "@reown/appkit/react";
 import { readContract, waitForTransactionReceipt, watchBlocks, writeContract } from '@wagmi/core';
 import { motion, useInView } from 'framer-motion';
 import { useSearchParams } from "react-router-dom";
@@ -69,6 +69,8 @@ export default function TicTacToeOnChain() {
 
     const ref = useRef(null)
     const inView = useInView(ref)
+
+    const { open } = useAppKit();
 
     const TopAnimation = {
         initial: { y: '-100%', opacity: 0 },
@@ -687,6 +689,11 @@ export default function TicTacToeOnChain() {
         },
     ]
 
+    const openNetworkModal = () => {
+        open({ view: 'Networks' });
+    };
+
+
     const toggleFullscreen = async () => {
         if (!document.fullscreenElement) {
             await containerRef.current?.requestFullscreen();
@@ -985,7 +992,7 @@ export default function TicTacToeOnChain() {
                                                     }
     `}
                                                 disabled={isLoadingCreateGame}
-                                                onClick={() => handleCreateGame(stakeInput.replaceAll(",", "."))}
+                                                onClick={() => isAppChain(Number(chainId)) ? handleCreateGame(stakeInput.replaceAll(",", ".")) : openNetworkModal()}
                                             >
                                                 {isAppChain(Number(chainId)) ? 'Create Now' : 'Wrong Chain'}
                                             </button>

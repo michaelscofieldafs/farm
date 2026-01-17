@@ -49,19 +49,16 @@ const SavvyFarmIntro = () => {
 
   const fetchCoins = async () => {
     try {
-      const response = await axios.get(
-        'https://api.coingecko.com/api/v3/coins/markets',
-        {
-          params: {
-            vs_currency: 'usd',
-            order: 'gecko_desc',
-            per_page: 500,
-            page: 1,
-          },
-        }
-      );
+      const [resp1, resp2] = await Promise.all([
+        axios.get('https://api.coingecko.com/api/v3/coins/markets', { params: { vs_currency: 'usd', order: 'gecko_desc', per_page: 250, page: 1 } }),
+        axios.get('https://api.coingecko.com/api/v3/coins/markets', { params: { vs_currency: 'usd', order: 'gecko_desc', per_page: 250, page: 2 } }),
+      ]);
 
-      const data = response.data.filter((item: { name: string }) => item.name == 'Bitcoin' || item.name == 'Ethereum' || item.name == 'BNB' || item.name == 'Solana' || item.name == 'TRON' || item.name == 'Sui' || item.name == 'Avalanche' || item.name == 'Sonic');
+      const combined = Array.isArray(resp1.data) && Array.isArray(resp2.data) ? [...resp1.data, ...resp2.data] : (resp1.data || []);
+
+      const data = combined.filter((item: { name: string }) =>
+        ['Bitcoin', 'Ethereum', 'BNB', 'Solana', 'TRON', 'Sui', 'Avalanche', 'Sonic'].includes(item.name)
+      );
 
       setCoins(data);
     } catch (err) {

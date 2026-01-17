@@ -46,14 +46,18 @@ const SavvyFarmReferral = () => {
   ]
 
   const handleLink = () => {
-    const encodedText = btoa(unescape(encodeURIComponent(address as string)));
-    const url = `http://localhost:3000/?refer=${encodedText}`;
+    if (address) {
+      const encodedText = btoa(unescape(encodeURIComponent(address as string)));
+      const url = `${window.location.origin}/?refer=${encodedText}`;
 
-    navigator.clipboard.writeText(url);
-    toast.dismiss();
-    toast('Copied link', {
-      position: 'top-center',
-    })
+      navigator.clipboard.writeText(url);
+      toast.dismiss();
+      toast('Copied link', {
+        position: 'top-center',
+      })
+    } else {
+      window.open('https://t.me/', '_blank');
+    }
   }
 
   const fetchFeeToReferral = async () => {
@@ -90,9 +94,9 @@ const SavvyFarmReferral = () => {
               Share your link and earn rewards whenever someone makes a deposit through it!
               Invite, contribute, and reap the benefits. 🚀
             </h2>
-            <div className='grid md:grid-cols-2 gap-7 mt-11'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-7 mt-11 justify-items-center md:justify-items-stretch'>
               {services.map((service, index) => (
-                <div key={index} className='flex items-center gap-5'>
+                <div key={index} className='flex flex-col items-center md:flex-row md:items-center md:justify-start gap-5 w-full'>
                   <div className='px-5 py-5 bg-light_grey/30 rounded-full'>
                     <img
                       src={service.icon}
@@ -101,7 +105,7 @@ const SavvyFarmReferral = () => {
                       height={40}
                     />
                   </div>
-                  <p className='text-24 text-muted'>{service.text}</p>
+                  <p className='text-24 text-muted text-center md:text-left'>{service.text}</p>
                 </div>
               ))}
             </div>
@@ -128,14 +132,15 @@ const SavvyFarmReferral = () => {
                 the deposits made through your <span className='text-primary'>referral</span>.
               </p>
 
-              {isConnected ? (
+              <div className='mt-8 z-10'>
                 <button
-                  className='bg-primary mt-10 border border-primary rounded-lg text-21 font-medium hover:bg-transparent hover:text-primary text-darkmode py-2 px-7 z-10'
+                  className='bg-primary border border-primary rounded-lg text-21 font-medium hover:bg-transparent hover:text-primary text-darkmode py-2 px-7'
                   onClick={handleLink}>
-                  GET YOUR REFERRAL LINK
+                  TELEGRAM GROUP
                 </button>
-              ) : (
-                <div className='mt-10 z-10'>
+              </div>
+              {!isConnected && (
+                <div className='mt-4 z-10'>
                   <Web3Button balance="show" label='Connect wallet to get your link' />
                 </div>
               )}

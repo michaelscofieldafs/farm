@@ -23,7 +23,7 @@ import { getRouterAddressByChainId } from '../utils/routerProvider';
 import { getRpcProviderByChainId } from '../utils/rpcProviderUtils';
 import { getSavvyTokenByChainId, getStableTokenByChainId, getUSDTTokenByChainId } from '../utils/tokenAddressProvider';
 import { PoolLP, PoolSingle } from './interfaces';
-import { base, bsc, bscTestnet } from 'viem/chains';
+import { base, baseSepolia, bsc, bscTestnet } from 'viem/chains';
 import { fetchChainBase } from '@/utils/helpers';
 
 interface AppContextType {
@@ -517,7 +517,7 @@ const AppContextProvider = ({ children }: any) => {
       const unwatch = watchBlocks(wagmiAdapter.wagmiConfig, {
         chainId: Number(fetchChainBase(chainIdRef.current)),
         blockTag: 'latest',
-        pollingInterval: 4000,
+        pollingInterval: chainIdRef.current !== baseSepolia.id ? 4000 : 10000,
         onBlock(block) {
           console.log(`Block ${block.number} of ${chainIdRef.current}`);
           fetchDataFarm();
