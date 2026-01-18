@@ -558,7 +558,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
     const formattedValue = formatter.format(readable);
 
-    return `${readable < 0.001 ? `~ ${formattedValue}` : formattedValue} LP`;
+    return `${readable > 0 && readable < 0.001 ? `~ ${formattedValue}` : formattedValue} LP`;
   }
 
   function formatTokenBalanceFromFarmUSDC(
