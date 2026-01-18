@@ -541,7 +541,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
       notation: 'compact',
       compactDisplay: 'short',
       minimumFractionDigits: readable > 0 ? 1 : 0,
-      maximumFractionDigits: 3,
+      maximumFractionDigits: readable < 1 ? 3 : 1,
     });
 
     const formattedValue = formatter.format(readable);
