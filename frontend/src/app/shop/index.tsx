@@ -27,10 +27,25 @@ const ShirtMock = ({ color = '#0f0f10', image = '/images/shop/shirt.png' }) => (
   </svg>
 )
 
-const ProductCard = ({ title, price, imgColor }: any) => (
+const ProductCard = ({ title, price, imgColor, image }: any) => (
   <div className="rounded-2xl bg-white/5 border border-white/10 p-6 flex flex-col gap-1">
-    <ShirtMock color={imgColor} />
+    <ShirtMock color={imgColor} image={image} />
     <div className="flex-1">
+      <h3 className="text-white text-lg font-semibold tracking-tight">{title}</h3>
+      <p className="text-sm text-white/60">$ {price}</p>
+    </div>
+    <button className="inline-flex mt-4 items-center justify-center rounded-xl px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-black font-medium shadow-lg transition">
+      Available for purchase soon
+    </button>
+  </div>
+);
+
+const ProductCardOthers = ({ title, price, image }: any) => (
+  <div className="rounded-2xl bg-white/5 border border-white/10 p-6 flex flex-col gap-1 min-h-[360px]">
+    <div className="flex-1 w-full flex items-center justify-center">
+      <img src={image} alt={title} className="w-[170px] h-auto object-contain drop-shadow-2xl" />
+    </div>
+    <div className="w-full flex flex-col items-start justify-end mt-4">
       <h3 className="text-white text-lg font-semibold tracking-tight">{title}</h3>
       <p className="text-sm text-white/60">$ {price}</p>
     </div>
@@ -137,11 +152,13 @@ export default function SavvyFarmShop() {
            */}
           <section id="shop" className="relative z-10" style={{ background: 'transparent' }}>
             <div className="mx-auto max-w-7xl px-6">
-              <h2 className="text-3lg md:text-2xl font-small text-center mb-10">Check out our <span className='text-primary'>products</span></h2>
+              <h2 className="text-3lg md:text-2xl font-small text-center mb-4">Check out our <span className='text-primary'>products</span></h2>
+              <p className="text-white/60 text-sm mb-10 text-center">You purchase a product on-chain using your favorite network and receive the corresponding NFT.<br /> You can gift it or redeem it at any time and have the product delivered to your home!</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <ProductCard title="SavvyGirl World Shirt" price="10.00" imgColor="#0f0f10" />
-                <ProductCard title="SavvyGirl World Shirt" price="10.00" imgColor="#a31111" />
-                <ProductCard title="SavvyGirl World Shirt" price="10.00" imgColor="#c7c9cc" />
+                <ProductCardOthers title="Goglz Plush" price="24.00" image="/images/shop/shop-goglz.png" />
+                <ProductCardOthers title="SonicLabs Cup" price="15.00" image="/images/shop/shop-4.png" />
+                <ProductCard title="Shirt" price="10.00" image="/images/shop/shop-base.png" />
               </div>
             </div>
           </section>
