@@ -49,10 +49,11 @@ export function Web3Provider({ children }: { children: ReactNode }) {
             '--w3m-qr-color': '#99E39E',
         },
         enableReconnect: true,
-        networks: [/** sonic, base, **/ bscTestnet, sonicTestnet, baseSepolia, /** baseGoerli, **/ monadTestnet],
+        networks: [/** sonic, base, **/ bscTestnet, sonicTestnet, baseSepolia, /** baseGoerli, **/],
         chainImages: {
             146: 'https://resources.cryptocompare.com/asset-management/17157/1727687183179.png',
             64_165: 'https://resources.cryptocompare.com/asset-management/17157/1727687183179.png',
+            14601: 'https://resources.cryptocompare.com/asset-management/17157/1727687183179.png',
             57054: 'https://resources.cryptocompare.com/asset-management/17157/1727687183179.png',
             97: 'https://cdn-icons-png.flaticon.com/128/12114/12114208.png',
             9745: 'https://cdn-icons-png.flaticon.com/128/12114/12114208.png',
@@ -74,6 +75,6 @@ export function Web3Provider({ children }: { children: ReactNode }) {
 }
 
 export const wagmiAdapter = new WagmiAdapter({
-    networks: [/** sonic, base,*/ bscTestnet, sonicTestnet, baseSepolia, /** baseGoerli */ monadTestnet],
+    networks: [/** sonic, base,*/ bscTestnet, sonicTestnet, baseSepolia, /** baseGoerli */],
     projectId,
 })

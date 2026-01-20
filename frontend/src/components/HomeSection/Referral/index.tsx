@@ -55,18 +55,8 @@ const SavvyFarmReferral = () => {
   ]
 
   const handleLink = () => {
-    if (address) {
-      const encodedText = btoa(unescape(encodeURIComponent(address as string)));
-      const url = `${window.location.origin}/?refer=${encodedText}`;
-
-      navigator.clipboard.writeText(url);
-      toast.dismiss();
-      toast('Copied link', {
-        position: 'top-center',
-      })
-    } else {
-      window.open('https://t.me/', '_blank');
-    }
+    // Redirect users to the Telegram group regardless of wallet connection
+    window.open('https://t.me/Savvy_Talks', '_blank');
   }
 
   const fetchFeeToReferral = async () => {

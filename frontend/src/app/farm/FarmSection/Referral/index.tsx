@@ -48,7 +48,7 @@ const SavvyFarmReferral = () => {
   const handleLink = () => {
     if (address) {
       const encodedText = btoa(unescape(encodeURIComponent(address as string)));
-      const url = `${window.location.origin}/?refer=${encodedText}`;
+      const url = `${window.location.origin}/farm?refer=${encodedText}`;
 
       navigator.clipboard.writeText(url);
       toast.dismiss();
@@ -136,7 +136,7 @@ const SavvyFarmReferral = () => {
                 <button
                   className='bg-primary border border-primary rounded-lg text-21 font-medium hover:bg-transparent hover:text-primary text-darkmode py-2 px-7'
                   onClick={handleLink}>
-                  TELEGRAM GROUP
+                  COPY REFERRAL LINK
                 </button>
               </div>
               {!isConnected && (
