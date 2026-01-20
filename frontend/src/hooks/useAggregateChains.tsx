@@ -38,7 +38,7 @@ export const useAggregateChains = () => {
     const fetchAggregateFarmData = async () => {
         setIsLoading(true);
 
-        const chainList = [bscTestnet, sonicTestnet, baseSepolia, monadTestnet];
+        const chainList = [bscTestnet, sonicTestnet, baseSepolia];
 
         try {
             let totalTvl = 0;
