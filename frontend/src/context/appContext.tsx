@@ -216,18 +216,21 @@ const AppContextProvider = ({ children }: any) => {
       poolList = poolList.filter(item => item != null);
 
       const poolsLp: PoolLP[] = poolList.filter(p => p && p.token0) as PoolLP[];
-      const poolsSingleSided: PoolSingle[] = poolList.filter(p => p && !p.token0)
-        .filter((v, i, self) => i === self.findIndex(t => t?.token?.name === v?.token?.name)) as PoolSingle[];
+      const poolsSingleSided: PoolSingle[] = poolList.filter(p => p && !p.token0) as PoolSingle[];
+
+      // Sort by multiplier descending
+      const poolsLpSorted = poolsLp.slice().sort((a, b) => (b.multiplier || 0) - (a.multiplier || 0));
+      const poolsSingleSidedSorted = poolsSingleSided.slice().sort((a, b) => (b.multiplier || 0) - (a.multiplier || 0));
 
       // Total farm TVL
-      const totalTvl = [...poolsLp, ...poolsSingleSided].reduce((acc, pool) => acc + (pool?.tvl || 0), 0);
+      const totalTvl = [...poolsLpSorted, ...poolsSingleSidedSorted].reduce((acc, pool) => acc + (pool?.tvl || 0), 0);
 
       // Set farm info
-      setPoolsFarm(poolsLp);
-      setPoolsTokenFarm(poolsSingleSided);
+      setPoolsFarm(poolsLpSorted);
+      setPoolsTokenFarm(poolsSingleSidedSorted);
       setTvl(totalTvl);
 
-      return poolsLp;
+      return poolsLpSorted;
     } catch (err) {
       console.error('Error fetching pools:', err);
       return [];
