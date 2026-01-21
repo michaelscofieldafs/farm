@@ -130,13 +130,6 @@ export const useAggregateChains = () => {
                                         {
                                             address: lpToken as Address,
                                             abi: getPairContractV2ABIByChainId(chain.id) as Abi,
-                                            functionName: 'balanceOf',
-                                            args: [masterChefAddress as Address],
-                                            chainId: chain.id,
-                                        },
-                                        {
-                                            address: lpToken as Address,
-                                            abi: getPairContractV2ABIByChainId(chain.id) as Abi,
                                             functionName: 'decimals',
                                             chainId: chain.id,
                                         },
@@ -175,6 +168,7 @@ export const useAggregateChains = () => {
                                     (Number(price1) * Number(reserves[1]) / 10 ** decimals1);
 
                                 const tvlFarm = ((Number(farmBalance) / 10 ** decimals) * tvlTotal) / (Number(totalSupply) / 10 ** decimals || 1);
+
                                 return tvlFarm;
                             }
 
