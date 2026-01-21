@@ -65,7 +65,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
   const { pool } = props;
   const { token0, token1, fee, multiplier, poolAddress, poolMasterchef, decimals } = pool;
   const totalSupply = Number(pool.farmBalance) / 10 ** Number(decimals);
-  const { farmTokenUSDCPrice } = useContext(AppContext);
+  const { farmTokenUSDCPrice, fetchDataFarm } = useContext(AppContext);
 
   const env = import.meta.env;
 
@@ -198,7 +198,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
         fetchPoolDataByWalletConnect();
         play();
         showTransactionEffect();
-
+        fetchDataFarm();
         toast.dismiss();
         toast("Withdrawal completed successfully!", {
           type: 'success',
@@ -353,6 +353,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
           fetchPoolDataByWalletConnect();
           play();
           showTransactionEffect();
+          fetchDataFarm();
 
           toast.dismiss();
           toast("Deposit completed successfully!", {

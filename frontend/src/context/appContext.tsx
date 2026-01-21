@@ -11,7 +11,7 @@ import { wagmiAdapter } from '@/components/Web3Provider';
 import { getPairContractV2ABIByChainId } from '@/utils/pairContractABIProvider';
 import { getTokenContractABIByChainId } from '@/utils/tokenContractABIProvider';
 import { useAppKitNetwork } from '@reown/appkit/react';
-import { watchBlocks } from '@wagmi/core';
+import { readContracts, watchBlocks } from '@wagmi/core';
 import { createContext, useEffect, useRef, useState } from "react";
 import Web3 from "web3";
 import { getBlocksPerYearByChainId } from '../utils/blocksPerYearProvider';
@@ -25,6 +25,8 @@ import { getSavvyTokenByChainId, getStableTokenByChainId, getUSDTTokenByChainId 
 import { PoolLP, PoolSingle } from './interfaces';
 import { base, baseSepolia, bsc, bscTestnet } from 'viem/chains';
 import { fetchChainBase } from '@/utils/helpers';
+import { Abi, Address } from 'viem';
+import { ZERO_ADDRESS } from '@/utils/constants';
 
 interface AppContextType {
   stableTokenUSDCPrice: number;
@@ -39,6 +41,7 @@ interface AppContextType {
   poolsFarm: PoolLP[];
   poolsTokenFarm: PoolSingle[];
   isLoadingPoolsFarm: boolean;
+  fetchDataFarm: () => void;
 }
 
 export const AppContext = createContext<AppContextType>({
@@ -54,6 +57,7 @@ export const AppContext = createContext<AppContextType>({
   poolsFarm: [],
   poolsTokenFarm: [],
   isLoadingPoolsFarm: false,
+  fetchDataFarm: () => { },
 });
 
 const AppContextProvider = ({ children }: any) => {
@@ -73,6 +77,13 @@ const AppContextProvider = ({ children }: any) => {
   const { chainId } = useAppKitNetwork();
   const web3Ref = useRef(new Web3(getRpcProviderByChainId(Number(chainId))));
   const chainIdRef = useRef(fetchChainBase(Number(chainId)));
+  const farmPriceRef = useRef(0)
+  const stablePriceRef = useRef(0)
+
+  const unwrap = (res: any, fallback: any): any => {
+    if (!res || res.status !== 'success') return fallback;
+    return res.result as any;
+  };
 
   const fetchPoolsFromMasterchef = async (savvyTokenPriceUSDC = 0, stableTokenPriceUSDC = 0) => {
     setIsLoadingPoolsFarm(true);
@@ -85,15 +96,43 @@ const AppContextProvider = ({ children }: any) => {
         masterChefAddress
       );
 
-      const poolLength = Number(await safeCall(masterChefContract.methods.poolLength(), 0));
+      console.log("ReadContrat")
+      const [poolLengthRaw, savvyPerBlockRaw, totalAllocPointRaw] =
+        await readContracts(wagmiAdapter.wagmiConfig, {
+          contracts: [
+            {
+              address: masterChefAddress as Address,
+              abi: getMasterchefABIByChainId(chainIdBase) as Abi,
+              functionName: 'poolLength',
+              chainId: chainIdBase,
+            },
+            {
+              address: masterChefAddress as Address,
+              abi: getMasterchefABIByChainId(chainIdBase) as Abi,
+              functionName: 'savvyPerBlock',
+              chainId: chainIdBase,
+            },
+            {
+              address: masterChefAddress as Address,
+              abi: getMasterchefABIByChainId(chainIdBase) as Abi,
+              functionName: 'totalAllocPoint',
+              chainId: chainIdBase,
+            },
+          ],
+          allowFailure: true
+        },);
 
-      const novaPerBlock = Number(await safeCall(masterChefContract.methods.savvyPerBlock(), 0)) / 10 ** 18;
-      const totalAllocPoint = Number(await safeCall(masterChefContract.methods.totalAllocPoint(), 1));
+      const poolLength = Number(unwrap(poolLengthRaw, 0));
+      const savvyPerBlock = Number(unwrap(savvyPerBlockRaw, 0)) / 1e18;
+      const totalAllocPoint = Number(unwrap(totalAllocPointRaw, 1));
 
-      setFarmTokenPerBlock(novaPerBlock);
+      console.log(`Masterchef Info: Pools ${poolLength}, SavvyPerBlock: ${savvyPerBlock}, TotalAllocPoint: ${totalAllocPoint}`);
+
+      setFarmTokenPerBlock(savvyPerBlock);
 
       const poolPromises = Array.from({ length: poolLength }, (_, i) =>
         (async () => {
+          console.log(`Fetching pool ${i + 1} of ${poolLength}`);
           try {
             const poolInfo = await safeCall(masterChefContract.methods.poolInfo(i));
             if (!poolInfo) return null;
@@ -108,41 +147,137 @@ const AppContextProvider = ({ children }: any) => {
 
             // LP Pool
             if (symbol.endsWith('-LP') || symbol.includes('LP') || symbol.includes('UNI-V2')) {
-              const pairContract = new web3Ref.current.eth.Contract(getPairContractV2ABIByChainId(chainIdBase), lpToken);
 
+              console.log("ReadContrat")
               // Fetch base if of pair contract
-              const [token0Address, token1Address, reserves, farmBalance, totalSupply, decimals] = await Promise.all([
-                safeCall(pairContract.methods.token0()),
-                safeCall(pairContract.methods.token1()),
-                safeCall(pairContract.methods.getReserves(), [0, 0]),
-                safeCall(pairContract.methods.balanceOf(masterChefAddress), 0),
-                safeCall(pairContract.methods.totalSupply(), 1),
-                safeCall(pairContract.methods.decimals(), 18),
-              ]);
+              const [
+                token0Res,
+                token1Res,
+                reservesRes,
+                farmBalanceRes,
+                totalSupplyRes,
+                decimalsRes,
+              ] = await readContracts(wagmiAdapter.wagmiConfig, {
+                allowFailure: true,
+                contracts: [
+                  {
+                    address: lpToken as Address,
+                    abi: getPairContractV2ABIByChainId(chainIdBase) as Abi,
+                    functionName: 'token0',
+                    chainId: chainIdBase,
+                  },
+                  {
+                    address: lpToken as Address,
+                    abi: getPairContractV2ABIByChainId(chainIdBase) as Abi,
+                    functionName: 'token1',
+                    chainId: chainIdBase,
+                  },
+                  {
+                    address: lpToken as Address,
+                    abi: getPairContractV2ABIByChainId(chainIdBase) as Abi,
+                    functionName: 'getReserves',
+                    chainId: chainIdBase,
+                  },
+                  {
+                    address: lpToken as Address,
+                    abi: getPairContractV2ABIByChainId(chainIdBase) as Abi,
+                    functionName: 'balanceOf',
+                    args: [masterChefAddress as Address],
+                    chainId: chainIdBase,
+                  },
+                  {
+                    address: lpToken as Address,
+                    abi: getPairContractV2ABIByChainId(chainIdBase) as Abi,
+                    functionName: 'totalSupply',
+                    chainId: chainIdBase,
+                  },
+                  {
+                    address: lpToken as Address,
+                    abi: getPairContractV2ABIByChainId(chainIdBase) as Abi,
+                    functionName: 'decimals',
+                    chainId: chainIdBase,
+                  },
+                ],
+              });
+
+              const token0Address = token0Res?.result ?? ZERO_ADDRESS;
+              const token1Address = token1Res?.result ?? ZERO_ADDRESS;
+              const reserves = reservesRes?.result ?? [0, 0, 0] as any;
+              const farmBalance = farmBalanceRes?.result ?? 0;
+              const totalSupply = totalSupplyRes?.result ?? 1;
+              const decimals = Number(decimalsRes?.result ?? 18);
 
               // If both token is null break
               if (!token0Address || !token1Address) return null;
-
-              const token0 = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(chainIdBase), token0Address);
-              const token1 = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(chainIdBase), token1Address);
-
+              console.log("ReadContrat")
               // Basic if of tokens
-              const [decimals0, symbol0, name0] = await Promise.all([
-                Number(await safeCall(token0.methods.decimals(), 18)),
-                safeCall(token0.methods.symbol(), ''),
-                safeCall(token0.methods.name(), ''),
-              ]);
+              const [
+                decimals0Res,
+                symbol0Res,
+                name0Res,
+                decimals1Res,
+                symbol1Res,
+                name1Res,
+              ] = await readContracts(
+                wagmiAdapter.wagmiConfig,
+                {
+                  allowFailure: true,
+                  contracts: [
+                    // token0
+                    {
+                      address: token0Address as Address,
+                      abi: getTokenContractABIByChainId(chainIdBase) as Abi,
+                      functionName: 'decimals',
+                      chainId: chainIdBase,
+                    },
+                    {
+                      address: token0Address as Address,
+                      abi: getTokenContractABIByChainId(chainIdBase) as Abi,
+                      functionName: 'symbol',
+                      chainId: chainIdBase,
+                    },
+                    {
+                      address: token0Address as Address,
+                      abi: getTokenContractABIByChainId(chainIdBase) as Abi,
+                      functionName: 'name',
+                      chainId: chainIdBase,
+                    },
 
-              const [decimals1, symbol1, name1] = await Promise.all([
-                Number(await safeCall(token1.methods.decimals(), 18)),
-                safeCall(token1.methods.symbol(), ''),
-                safeCall(token1.methods.name(), ''),
-              ]);
+                    // token1
+                    {
+                      address: token1Address as Address,
+                      abi: getTokenContractABIByChainId(chainIdBase) as Abi,
+                      functionName: 'decimals',
+                      chainId: chainIdBase,
+                    },
+                    {
+                      address: token1Address as Address,
+                      abi: getTokenContractABIByChainId(chainIdBase) as Abi,
+                      functionName: 'symbol',
+                      chainId: chainIdBase,
+                    },
+                    {
+                      address: token1Address as Address,
+                      abi: getTokenContractABIByChainId(chainIdBase) as Abi,
+                      functionName: 'name',
+                      chainId: chainIdBase,
+                    },
+                  ],
+                }
+              );
+
+              const decimals0 = Number(decimals0Res.result ?? 18);
+              const symbol0 = symbol0Res.result ?? '';
+              const name0 = name0Res.result ?? '';
+
+              const decimals1 = Number(decimals1Res.result ?? 18);
+              const symbol1 = symbol1Res.result ?? '';
+              const name1 = name1Res.result ?? '';
 
               // Fetch prices of tokens in pair
               const [price0, price1] = await Promise.all([
-                fetchTokenPriceV2(token0Address, savvyTokenPriceUSDC, stableTokenPriceUSDC).catch(() => 0),
-                fetchTokenPriceV2(token1Address, savvyTokenPriceUSDC, stableTokenPriceUSDC).catch(() => 0),
+                fetchTokenPriceV2(token0Address as Address, savvyTokenPriceUSDC, stableTokenPriceUSDC).catch(() => 0),
+                fetchTokenPriceV2(token1Address as Address, savvyTokenPriceUSDC, stableTokenPriceUSDC).catch(() => 0),
               ]);
 
               // Calculate TVL pool
@@ -151,11 +286,9 @@ const AppContextProvider = ({ children }: any) => {
 
               const tvlFarm = ((Number(farmBalance) / 10 ** Number(decimals)) * tvlTotal) / (Number(totalSupply) / 10 ** 18 || 1);
 
-              console.log(`token ${name0} \ ${name1}\n${price0} \ ${price1} \ Tvl: ${tvlFarm}`)
-
               // Calculate APR of pool
               const blocksPerYear: number = getBlocksPerYearByChainId(chainIdBase);
-              const poolTokensPerBlock = novaPerBlock * (Number(allocPoint) / totalAllocPoint);
+              const poolTokensPerBlock = savvyPerBlock * (Number(allocPoint) / totalAllocPoint);
               const totalRewardPricePerYear = savvyTokenPriceUSDC * poolTokensPerBlock * blocksPerYear;
               const apr = tvlFarm > 0 ? (totalRewardPricePerYear / tvlFarm) * 100 : 0;
 
@@ -174,25 +307,59 @@ const AppContextProvider = ({ children }: any) => {
                 apr,
               };
             }
-
             // Single-sided pool
             // Basic info of token
-            const [decimals, farmBalance, symbolToken, nameToken, price] = await Promise.all([
-              Number(await safeCall(tokenContract.methods.decimals(), 18)),
-              safeCall(tokenContract.methods.balanceOf(masterChefAddress), 0),
-              safeCall(tokenContract.methods.symbol(), ''),
-              safeCall(tokenContract.methods.name(), ''),
-              fetchTokenPriceV2(lpToken, savvyTokenPriceUSDC, stableTokenPriceUSDC).catch(() => 0),
-            ]);
+            const [decimalsRes, balanceRes, symbolRes, nameRes] = await readContracts(
+              wagmiAdapter.wagmiConfig,
+              {
+                allowFailure: true,
+                contracts: [
+                  {
+                    address: lpToken as Address,
+                    abi: getTokenContractABIByChainId(chainIdBase) as Abi,
+                    functionName: 'decimals',
+                    chainId: chainIdBase,
+                  },
+                  {
+                    address: lpToken as Address,
+                    abi: getTokenContractABIByChainId(chainIdBase) as Abi,
+                    functionName: 'balanceOf',
+                    args: [masterChefAddress as Address],
+                    chainId: chainIdBase,
+                  },
+                  {
+                    address: lpToken as Address,
+                    abi: getTokenContractABIByChainId(chainIdBase) as Abi,
+                    functionName: 'symbol',
+                    chainId: chainIdBase,
+                  },
+                  {
+                    address: lpToken as Address,
+                    abi: getTokenContractABIByChainId(chainIdBase) as Abi,
+                    functionName: 'name',
+                    chainId: chainIdBase,
+                  },
+                ],
+              }
+            );
+            const price = await
+              fetchTokenPriceV2(lpToken, savvyTokenPriceUSDC, stableTokenPriceUSDC).catch(() => 0)
+
+            const decimals = Number(decimalsRes.result ?? 18);
+            const farmBalance = balanceRes.result ?? 0;
+            const symbolToken = symbolRes.result ?? '';
+            const nameToken = nameRes.result ?? '';
 
             // Calculate TVL pool
             const tvl = (Number(farmBalance) / 10 ** decimals) * price;
 
             //Calculate APR pool
             const blocksPerYear = getBlocksPerYearByChainId(chainIdBase);
-            const poolTokensPerBlock = novaPerBlock * (Number(allocPoint) / totalAllocPoint);
+            const poolTokensPerBlock = savvyPerBlock * (Number(allocPoint) / totalAllocPoint);
             const totalRewardPricePerYear = savvyTokenPriceUSDC * poolTokensPerBlock * blocksPerYear;
             const apr = tvl > 0 ? (totalRewardPricePerYear / tvl) * 100 : 0;
+
+            console.log(`Single Token ${nameToken} (${symbolToken}) - Decimals: ${decimals}\nPrice: ${price}\nTvl: ${tvl}\nAPR: ${apr}`);
 
             return {
               token: { id: lpToken, symbol: symbolToken, name: nameToken, decimals, price },
@@ -240,14 +407,14 @@ const AppContextProvider = ({ children }: any) => {
     }
   };
 
-
   // Fetch token price v2
   const fetchTokenPriceV2 = async (address: string, savvyPriceUSDC = farmTokenUSDCPrice, stableTokenPriceUSDC = stableTokenUSDCPrice) => {
     try {
       if (getSavvyTokenByChainId(Number(chainIdRef.current)).toLowerCase() == address.toLowerCase()) return savvyPriceUSDC;
       if (getStableTokenByChainId(Number(chainIdRef.current)).toLowerCase() == address.toLowerCase()) return stableTokenPriceUSDC;
+      if (getUSDTTokenByChainId(Number(chainIdRef.current)).toLowerCase() == address.toLowerCase()) return 1;
 
-      const price = await calcTokenPrice(address, stableTokenPriceUSDC);
+      const price = await calcTokenPrice(address);
       return price;
     } catch (err) {
       return 0;
@@ -264,19 +431,15 @@ const AppContextProvider = ({ children }: any) => {
         case bscTestnet.id:
         case base.id: {
           // Prices of stable token prices in USDC
-          const [stableTokenPriceUSD, savvyTokenStablePrice] = await Promise.all([
-            calcStableTokenPriceInUSDCPancake(),
-            calcTokenPriceInStableTokenPancake(getSavvyTokenByChainId(Number(chainIdRef.current)))
-          ]);
+          const stableTokenPriceUSD = await
+            calcStableTokenPriceInUSDCPancake();
 
-          const farmTokenUSDC = savvyTokenStablePrice * stableTokenPriceUSD;
+          const farmTokenUSDC = await calcTokenPriceInUSDCViaNativePancake(getSavvyTokenByChainId(Number(chainIdRef.current)));
 
-          console.log("Preço stable token usdc " + stableTokenPriceUSD);
-          console.log("Preço savvy token em stable token " + savvyTokenStablePrice);
+          console.log("Preço token nativo usdc " + stableTokenPriceUSD);
           console.log("Preço savvy token usdc " + farmTokenUSDC);
 
           setStableTokenUSDCPrice(stableTokenPriceUSD);
-          setFarmTokenPrice(savvyTokenStablePrice);
           setFarmTokenUSDCPrice(farmTokenUSDC);
 
 
@@ -288,8 +451,8 @@ const AppContextProvider = ({ children }: any) => {
 
         default: {
           const [stableTokenPriceUSD, savvyTokenPrice] = await Promise.all([
-            calcStableTokenPriceInUSDC(),
-            calcTokenPriceUSDCSingleCall(getSavvyTokenByChainId(Number(chainIdRef.current)))
+            calcStableTokenPriceInUSDCShadow(),
+            calcTokenPriceUSDCSingleCallShadow(getSavvyTokenByChainId(Number(chainIdRef.current)))
           ]);
 
           setStableTokenUSDCPrice(stableTokenPriceUSD);
@@ -336,17 +499,17 @@ const AppContextProvider = ({ children }: any) => {
   }
 
   // Calculate the price of any token except Savvy and stable tokens
-  const calcTokenPrice = async (tokenAddress: string, stableTokenPriceUSDC = stableTokenUSDCPrice): Promise<number> => {
+  const calcTokenPrice = async (tokenAddress: string): Promise<number> => {
     switch (chainIdRef.current) {
       case bsc.id:
       case bscTestnet.id:
       case base.id: {
-        const price = await calcTokenPriceInStableTokenPancake(tokenAddress);
+        const price = await calcTokenPriceInUSDCViaNativePancake(tokenAddress);
 
-        return price * stableTokenPriceUSDC;
+        return price;
       }
       default: {
-        return calcTokenPriceUSDCSingleCall(tokenAddress);
+        return calcTokenPriceUSDCSingleCallShadow(tokenAddress);
       }
     }
   }
@@ -356,30 +519,53 @@ const AppContextProvider = ({ children }: any) => {
  * @param tokenAddress Address of the token that will be pegged to the stablecoin.
  * @returns Return the price of a specific token based on the chain's stablecoin
  */
-  const calcTokenPriceUSDCSingleCall = async (tokenAddress: string): Promise<number> => {
-    let tokenToSell = web3Ref.current.utils.toWei("1", "ether");
+  const calcTokenPriceUSDCSingleCallShadow = async (
+    tokenAddress: string
+  ): Promise<number> => {
+    const amountIn = web3Ref.current.utils.toWei('1', 'ether');
 
-    let amountOut;
     try {
-      let router = new web3Ref.current.eth.Contract(getRouterABIByChainId(Number(chainIdRef.current)), getRouterAddressByChainId(Number(chainIdRef.current)).toLowerCase());
-      const tokenContract = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(Number(chainIdRef.current)), getUSDTTokenByChainId(Number(chainIdRef.current)));
+      const chainId = Number(chainIdRef.current);
 
-      const decimals = await safeCall(tokenContract.methods.decimals(), 6);
+      const router = new web3Ref.current.eth.Contract(
+        getRouterABIByChainId(chainId),
+        getRouterAddressByChainId(chainId).toLowerCase()
+      );
 
-      const tokenIn = tokenAddress;
-      const tokenOut = getStableTokenByChainId(Number(chainIdRef.current));
-      const amountIn = tokenToSell;
+      const usdcAddress = getUSDTTokenByChainId(chainId);
+      const wrappedNative = getStableTokenByChainId(chainId);
 
-      const routes = [[tokenIn, tokenOut, false], [tokenOut, getUSDTTokenByChainId(Number(chainIdRef.current)), false]];
+      const usdcContract = new web3Ref.current.eth.Contract(
+        getTokenContractABIByChainId(chainId),
+        usdcAddress
+      );
 
-      amountOut = await router.methods.getAmountsOut(amountIn, routes).call();
-      amountOut = Number(amountOut![2]) / 10 ** Number(decimals);
+      const usdcDecimals = await safeCall(usdcContract.methods.decimals(), 6);
 
-      return amountOut;
-    } catch (error: any) {
+      const routes = [
+        {
+          from: tokenAddress,
+          to: wrappedNative,
+          stable: false,
+        },
+        {
+          from: wrappedNative,
+          to: usdcAddress,
+          stable: true,
+        },
+      ];
+
+      const amounts = (await router.methods
+        .getAmountsOut(amountIn, routes)
+        .call()) as string[];
+
+      const usdcOut = Number(amounts[amounts.length - 1]) / 10 ** Number(usdcDecimals);
+
+      return usdcOut;
+    } catch {
       return 0;
     }
-  }
+  };
 
   /**
    * 
@@ -412,7 +598,7 @@ const AppContextProvider = ({ children }: any) => {
    * 
    * @returns Returns the value of the chain’s stablecoin in USDC
    */
-  const calcStableTokenPriceInUSDC = async (): Promise<number> => {
+  const calcStableTokenPriceInUSDCShadow = async (): Promise<number> => {
     let tokenToSell = web3Ref.current.utils.toWei("1", "ether");
     let amountOut;
     try {
@@ -456,6 +642,55 @@ const AppContextProvider = ({ children }: any) => {
       return 0;
     }
   }
+
+  const calcTokenPriceInUSDCViaNativePancake = async (
+    tokenAddress: string
+  ): Promise<number> => {
+    try {
+      const chainId = Number(chainIdRef.current);
+
+      const router = new web3Ref.current.eth.Contract(
+        getRouterABIByChainId(chainId),
+        getRouterAddressByChainId(chainId)
+      );
+
+      const tokenContract = new web3Ref.current.eth.Contract(
+        getTokenContractABIByChainId(chainId),
+        tokenAddress
+      );
+
+      const usdcAddress = getUSDTTokenByChainId(chainId);
+      const nativeWrapped = getStableTokenByChainId(chainId);
+
+      const tokenDecimals = Number(
+        await safeCall(tokenContract.methods.decimals(), 18)
+      );
+
+      const oneToken = BigInt(10) ** BigInt(tokenDecimals);
+
+      const path = [tokenAddress, nativeWrapped, usdcAddress];
+
+      const amountsOut = await router.methods
+        .getAmountsOut(oneToken.toString(), path)
+        .call();
+
+      if (!amountsOut || !amountsOut[2]) return 0;
+
+      // decimals do USDC
+      const usdcContract = new web3Ref.current.eth.Contract(
+        getTokenContractABIByChainId(chainId),
+        usdcAddress
+      );
+
+      const usdcDecimals = Number(
+        await safeCall(usdcContract.methods.decimals(), 6)
+      );
+
+      return Number(amountsOut[2]) / 10 ** usdcDecimals;
+    } catch {
+      return 0;
+    }
+  };
 
   /**
    * 
@@ -520,7 +755,7 @@ const AppContextProvider = ({ children }: any) => {
       const unwatch = watchBlocks(wagmiAdapter.wagmiConfig, {
         chainId: Number(fetchChainBase(chainIdRef.current)),
         blockTag: 'latest',
-        pollingInterval: 4000,
+        pollingInterval: 10000,
         onBlock(block) {
           console.log(`Block ${block.number} of ${chainIdRef.current}`);
           fetchDataFarm();
@@ -551,6 +786,7 @@ const AppContextProvider = ({ children }: any) => {
       poolsFarm,
       poolsTokenFarm,
       isLoadingPoolsFarm,
+      fetchDataFarm,
     }}>
       {children}
     </AppContext.Provider>

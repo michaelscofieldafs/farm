@@ -86,7 +86,7 @@ export default function SavvyFarmStatisticsDashboard() {
 
         const interval = setInterval(() => {
             fetchAggregateFarmData();
-        }, 15000);
+        }, 60000);
 
         return () => clearInterval(interval);
     }, []);
