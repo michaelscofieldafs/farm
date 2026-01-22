@@ -56,7 +56,7 @@ const SavvyFarmReferral = () => {
         position: 'top-center',
       })
     } else {
-      window.open('https://t.me/', '_blank');
+      //window.open('https://t.me/', '_blank');
     }
   }
 

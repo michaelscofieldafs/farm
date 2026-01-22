@@ -96,7 +96,7 @@ const AppContextProvider = ({ children }: any) => {
         masterChefAddress
       );
 
-      console.log("ReadContrat")
+      //console.log("ReadContrat")
       const [poolLengthRaw, savvyPerBlockRaw, totalAllocPointRaw] =
         await readContracts(wagmiAdapter.wagmiConfig, {
           contracts: [
@@ -126,13 +126,13 @@ const AppContextProvider = ({ children }: any) => {
       const savvyPerBlock = Number(unwrap(savvyPerBlockRaw, 0)) / 1e18;
       const totalAllocPoint = Number(unwrap(totalAllocPointRaw, 1));
 
-      console.log(`Masterchef Info: Pools ${poolLength}, SavvyPerBlock: ${savvyPerBlock}, TotalAllocPoint: ${totalAllocPoint}`);
+      //console.log(`Masterchef Info: Pools ${poolLength}, SavvyPerBlock: ${savvyPerBlock}, TotalAllocPoint: ${totalAllocPoint}`);
 
       setFarmTokenPerBlock(savvyPerBlock);
 
       const poolPromises = Array.from({ length: poolLength }, (_, i) =>
         (async () => {
-          console.log(`Fetching pool ${i + 1} of ${poolLength}`);
+          //console.log(`Fetching pool ${i + 1} of ${poolLength}`);
           try {
             const poolInfo = await safeCall(masterChefContract.methods.poolInfo(i));
             if (!poolInfo) return null;
@@ -148,7 +148,7 @@ const AppContextProvider = ({ children }: any) => {
             // LP Pool
             if (symbol.endsWith('-LP') || symbol.includes('LP') || symbol.includes('UNI-V2')) {
 
-              console.log("ReadContrat")
+              //console.log("ReadContrat")
               // Fetch base if of pair contract
               const [
                 token0Res,
@@ -209,7 +209,7 @@ const AppContextProvider = ({ children }: any) => {
 
               // If both token is null break
               if (!token0Address || !token1Address) return null;
-              console.log("ReadContrat")
+              //console.log("ReadContrat")
               // Basic if of tokens
               const [
                 decimals0Res,
@@ -359,7 +359,7 @@ const AppContextProvider = ({ children }: any) => {
             const totalRewardPricePerYear = savvyTokenPriceUSDC * poolTokensPerBlock * blocksPerYear;
             const apr = tvl > 0 ? (totalRewardPricePerYear / tvl) * 100 : 0;
 
-            console.log(`Single Token ${nameToken} (${symbolToken}) - Decimals: ${decimals}\nPrice: ${price}\nTvl: ${tvl}\nAPR: ${apr}`);
+            //console.log(`Single Token ${nameToken} (${symbolToken}) - Decimals: ${decimals}\nPrice: ${price}\nTvl: ${tvl}\nAPR: ${apr}`);
 
             return {
               token: { id: lpToken, symbol: symbolToken, name: nameToken, decimals, price },
@@ -425,19 +425,19 @@ const AppContextProvider = ({ children }: any) => {
   const fetchDataFarm = async () => {
     try {
       // Prices of stable token prices in USDC
-      console.log("carregando os precos da chain " + chainIdRef.current)
+      //console.log("carregando os precos da chain " + chainIdRef.current)
       switch (chainIdRef.current) {
         case bsc.id:
         case bscTestnet.id:
         case base.id: {
           // Prices of stable token prices in USDC
-          const stableTokenPriceUSD = await
-            calcStableTokenPriceInUSDCPancake();
+          const [stableTokenPriceUSD, farmTokenUSDC] = await Promise.all([
+            calcStableTokenPriceInUSDCPancake(),
+            calcTokenPriceInUSDCViaNativePancake(getSavvyTokenByChainId(Number(chainIdRef.current))),
+          ]);
 
-          const farmTokenUSDC = await calcTokenPriceInUSDCViaNativePancake(getSavvyTokenByChainId(Number(chainIdRef.current)));
-
-          console.log("Preço token nativo usdc " + stableTokenPriceUSD);
-          console.log("Preço savvy token usdc " + farmTokenUSDC);
+          //console.log("Preço token nativo usdc " + stableTokenPriceUSD);
+          //console.log("Preço savvy token usdc " + farmTokenUSDC);
 
           setStableTokenUSDCPrice(stableTokenPriceUSD);
           setFarmTokenUSDCPrice(farmTokenUSDC);
@@ -458,8 +458,8 @@ const AppContextProvider = ({ children }: any) => {
           setStableTokenUSDCPrice(stableTokenPriceUSD);
           setFarmTokenUSDCPrice(savvyTokenPrice);
 
-          console.log("Preço stable token usdc " + stableTokenPriceUSD);
-          console.log("Preço savvy token usdc " + savvyTokenPrice);
+          //console.log("Preço stable token usdc " + stableTokenPriceUSD);
+          //console.log("Preço savvy token usdc " + savvyTokenPrice);
 
           fetchCirculatingSupply(savvyTokenPrice);
           await fetchPoolsFromMasterchef(savvyTokenPrice, stableTokenPriceUSD);
@@ -717,7 +717,7 @@ const AppContextProvider = ({ children }: any) => {
 
   // Clear all farm data
   const clearFarmData = (): void => {
-    console.log('clear farm data');
+    //console.log('clear farm data');
     setTvl(0);
     setMarketCap(0);
     setCirculatingSupply(0);
@@ -742,7 +742,7 @@ const AppContextProvider = ({ children }: any) => {
       }
       */
 
-      console.log(`Change network to ${chainId}`);
+      //console.log(`Change network to ${chainId}`);
       chainIdRef.current = Number(fetchChainBase(Number(chainId)));
       web3Ref.current = new Web3(getRpcProviderByChainId(Number(chainId)));
       clearFarmData();
@@ -757,7 +757,7 @@ const AppContextProvider = ({ children }: any) => {
         blockTag: 'latest',
         pollingInterval: 10000,
         onBlock(block) {
-          console.log(`Block ${block.number} of ${chainIdRef.current}`);
+          //console.log(`Block ${block.number} of ${chainIdRef.current}`);
           fetchDataFarm();
         },
         onError(error) {

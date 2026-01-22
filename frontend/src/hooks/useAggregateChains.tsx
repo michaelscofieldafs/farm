@@ -179,7 +179,7 @@ export const useAggregateChains = () => {
                                 fetchTokenPriceV2(lpToken, chain.id).catch(() => 0),
                             ]);
 
-                            console.log('Single-sided pool:', lpToken, 'Price:', price, 'Chain:', chain.name, 'farmBalance:', farmBalance);
+                            //console.log('Single-sided pool:', lpToken, 'Price:', price, 'Chain:', chain.name, 'farmBalance:', farmBalance);
 
                             return (Number(farmBalance) / 10 ** decimals) * price;
                         } catch {

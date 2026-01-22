@@ -9,6 +9,10 @@ import { AppContext } from '@/context/appContext'
 import axios from 'axios'
 import { CircleLoader } from 'react-spinners'
 import { useNavigate } from 'react-router-dom'
+import { useAccount } from 'wagmi'
+import { sonicTestnet } from '@/components/Web3Provider'
+import { getSavvyTokenByChainId } from '@/utils/tokenAddressProvider'
+import { baseSepolia, bscTestnet } from 'viem/chains'
 
 export interface HeroProps {
   farmTokenPrice: number;
@@ -26,6 +30,8 @@ const SavvyFarmIntro = () => {
   const appContext = useContext(AppContext);
 
   const { farmTokenUSDCPrice, marketCap, tvl, circulatingSupply, isLoading } = appContext;
+
+  const { chain } = useAccount();
 
   const [coins, setCoins] = useState([]);
 
@@ -88,7 +94,32 @@ const SavvyFarmIntro = () => {
   }
 
   const handleBuySavvy = (): void => {
+    if (chain == null) {
+      return;
+    }
+    if (chain?.id === sonicTestnet.id) {
+      window.open(`https://www.shadow.so/trade?outputCurrency=${getSavvyTokenByChainId(Number(chain.id))}`, '_blank');
+    }
+    else if (chain?.id === bscTestnet.id) {
+      window.open(`https://pancakeswap.finance/swap?chain=bscTestnet&outputCurrency=${getSavvyTokenByChainId(Number(chain.id))}`, '_blank');
+    }
+    else if (chain?.id === baseSepolia.id) {
+      window.open(`https://pancakeswap.finance/swap?chain=baseSepolia&outputCurrency=${getSavvyTokenByChainId(Number(chain.id))}`, '_blank');
+    }
+  }
 
+  function formatTokenBalanceFromFarm(value: number): string {
+
+    const formatter = new Intl.NumberFormat('en-US', {
+      notation: 'compact',
+      compactDisplay: 'short',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    });
+
+    const formattedValue = formatter.format(value);
+
+    return formattedValue;
   }
 
   useEffect(() => {
@@ -125,7 +156,11 @@ const SavvyFarmIntro = () => {
                 GO TO FARM
               </button>
             </div>
-            <div className='flex items-center md:justify-start justify-center gap-12 mt-20 w-full'>
+            <p className='text-primary text-xs mt-4 max-w-xl md:text-left text-center leading-tight'>
+              • Sonic and Base do NOT have public DEXes on testnet.<br />
+              • Prices on Testnet are not an indicative of future prices on Mainnet.
+            </p>
+            <div className='flex items-center md:justify-start justify-center gap-12 mt-15 w-full'>
               <motion.div
                 whileInView={{ y: 0, opacity: 1 }}
                 initial={{ y: '100%', opacity: 0 }}
@@ -196,12 +231,7 @@ const SavvyFarmIntro = () => {
                           duration: 4,
                         })}
                         value={circulatingSupply}
-                        formatValue={(value: number) => `${Number(value).toLocaleString('en-US', {
-                          style: 'currency',
-                          currency: 'USD',
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}`}
+                        formatValue={(value: number) => formatTokenBalanceFromFarm(value)}
                       />}</span>
                   </p>
                 </div>

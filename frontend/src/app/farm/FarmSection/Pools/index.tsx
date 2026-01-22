@@ -45,7 +45,7 @@ const SavvyFarmPools = () => {
   }
 
   return (
-    <section className='relative pt-28 md:pt-40 pb-20 md:pb-28 overflow-hidden z-1 bg-gradient-to-b from-[#071019] to-[#0b1418]' id='pools'>
+    <section className='relative pt-28 md:pt-40 pb-20 md:pb-10 overflow-hidden z-1 bg-gradient-to-b from-[#071019] to-[#0b1418]' id='pools'>
       <div className="pointer-events-none fixed inset-0 opacity-40">
         <div className="absolute -top-40 -left-40 size-[520px] rounded-full bg-emerald-500 blur-[140px]" />
         <div className="absolute top-1/2 -right-40 size-[520px] rounded-full bg-cyan-500 blur-[160px]" />

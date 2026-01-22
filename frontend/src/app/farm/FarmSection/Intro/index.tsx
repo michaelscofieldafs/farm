@@ -194,7 +194,7 @@ const SavvyFarmIntro = () => {
                         />}</span>
                   </p>
                   <p className='flex-1 sm:text-28 text-18 text-muted mb-4'>
-                    Circulating Supply <br /> <span className='text-primary'>
+                    Circulating Supplsy <br /> <span className='text-primary'>
                       {isLoading ? <CircleLoader color="#fff" loading={isLoading} size={15} /> : <AnimatedNumber
                         includeComma
                         transitions={() => ({
@@ -202,12 +202,7 @@ const SavvyFarmIntro = () => {
                           duration: 4,
                         })}
                         value={circulatingSupply}
-                        formatValue={(value: number) => `${Number(value).toLocaleString('en-US', {
-                          style: 'currency',
-                          currency: 'USD',
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}`}
+                        formatValue={(value: number) => value}
                       />}</span>
                   </p>
                 </div>

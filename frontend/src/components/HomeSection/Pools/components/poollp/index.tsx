@@ -118,7 +118,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
           fontFamily: 'Trebuchet MS, sans-serif',
         }
       });
- console.log("handleRewards4");
+      //console.log("handleRewards4");
       const hash = await writeContract(wagmiAdapter.wagmiConfig, {
         abi: getMasterchefABIByChainId(chainId),
         address: getMastChefAddressByChainId(chainId) as Address,

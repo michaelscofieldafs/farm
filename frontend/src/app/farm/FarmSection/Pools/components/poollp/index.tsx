@@ -121,7 +121,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
       });
 
 
-      console.log("handleRewards5 -> amountToDeposit = ", amountToDeposit);
+      //console.log("handleRewards5 -> amountToDeposit = ", amountToDeposit);
       const hash = await writeContract(wagmiAdapter.wagmiConfig, {
         abi: getMasterchefABIByChainId(chainId),
         address: getMastChefAddressByChainId(chainId) as Address,
@@ -182,7 +182,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
       }
 
       setIsLoadingDeposit(true);
-      console.log("handleRewards2");
+      //console.log("handleRewards2");
       const hash = await writeContract(wagmiAdapter.wagmiConfig, {
         abi: getMasterchefABIByChainId(chainId),
         address: getMastChefAddressByChainId(chainId) as Address,

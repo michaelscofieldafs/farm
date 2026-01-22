@@ -6,6 +6,8 @@ import HeaderLink from '../Header/Navigation/HeaderLink'
 import { headerData } from '../Header/Navigation/menuData'
 import MobileHeaderLink from '../Header/Navigation/MobileHeaderLink'
 import Logo from './Logo'
+import { Link } from 'react-router-dom'
+import { Icon } from '@iconify/react'
 
 const Header: React.FC = () => {
   const [navbarOpen, setNavbarOpen] = useState(false)
@@ -69,6 +71,22 @@ const Header: React.FC = () => {
         <div className='container px-4 flex items-center justify-between px-4'>
           <Logo />
           <nav className='hidden lg:flex grow items-center gap-8 justify-center'>
+            <Link to='https://t.me/Savvy_Talks' className='group'>
+              <Icon
+                icon='fa6-brands:telegram'
+                width='24'
+                height='24'
+                className='text-primary group-hover:text-primary transition-colors'
+              />
+            </Link>
+            <Link to='https://x.com/SavvyGirl2004' className='group'>
+              <Icon
+                icon='fa6-brands:x-twitter'
+                width='24'
+                height='24'
+                className='text-primary group-hover:text-primary'
+              />
+            </Link>
             {headerData.map((item, index) => (
               <HeaderLink key={index} item={item} />
             ))}
@@ -110,6 +128,24 @@ const Header: React.FC = () => {
             {headerData.map((item, index) => (
               <MobileHeaderLink key={index} item={item} />
             ))}
+            <div className='flex mt-4'>
+              <Link to='https://t.me/Savvy_Talks' className='group mr-4'>
+                <Icon
+                  icon='fa6-brands:telegram'
+                  width='24'
+                  height='24'
+                  className='text-primary group-hover:text-primary'
+                />
+              </Link>
+              <Link to='https://x.com/SavvyGirl2004' className='group'>
+                <Icon
+                  icon='fa6-brands:x-twitter'
+                  width='24'
+                  height='24'
+                  className='text-primary group-hover:text-primary'
+                />
+              </Link>
+            </div>
           </nav>
         </div>
       </div>
