@@ -13,6 +13,7 @@ import { useAccount } from 'wagmi'
 import { sonicTestnet } from '@/components/Web3Provider'
 import { getSavvyTokenByChainId } from '@/utils/tokenAddressProvider'
 import { baseSepolia, bscTestnet } from 'viem/chains'
+import { useAppKitNetwork } from '@reown/appkit/react'
 
 export interface HeroProps {
   farmTokenPrice: number;
@@ -32,6 +33,8 @@ const SavvyFarmIntro = () => {
   const { farmTokenUSDCPrice, marketCap, tvl, circulatingSupply, isLoading } = appContext;
 
   const { chain } = useAccount();
+
+  const { caipNetwork } = useAppKitNetwork();
 
   const [coins, setCoins] = useState([]);
 
@@ -94,17 +97,17 @@ const SavvyFarmIntro = () => {
   }
 
   const handleBuySavvy = (): void => {
-    if (chain == null) {
-      return;
+    if (caipNetwork?.id === sonicTestnet.id) {
+      window.open(`https://www.shadow.so/trade?outputCurrency=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');
     }
-    if (chain?.id === sonicTestnet.id) {
-      window.open(`https://www.shadow.so/trade?outputCurrency=${getSavvyTokenByChainId(Number(chain.id))}`, '_blank');
+    else if (caipNetwork?.id === bscTestnet.id) {
+      window.open(`https://pancakeswap.finance/swap?chain=bscTestnet&outputCurrency=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');
     }
-    else if (chain?.id === bscTestnet.id) {
-      window.open(`https://pancakeswap.finance/swap?chain=bscTestnet&outputCurrency=${getSavvyTokenByChainId(Number(chain.id))}`, '_blank');
+    else if (caipNetwork?.id === baseSepolia.id) {
+      window.open(`https://pancakeswap.finance/swap?chain=baseSepolia&outputCurrency=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');
     }
-    else if (chain?.id === baseSepolia.id) {
-      window.open(`https://pancakeswap.finance/swap?chain=baseSepolia&outputCurrency=${getSavvyTokenByChainId(Number(chain.id))}`, '_blank');
+    else {
+      window.open(`https://pancakeswap.finance/swap?chain=bscTestnet&outputCurrency=${getSavvyTokenByChainId(Number(bscTestnet.id))}`, '_blank');
     }
   }
 
@@ -177,12 +180,51 @@ const SavvyFarmIntro = () => {
                           duration: 4,
                         })}
                         value={farmTokenUSDCPrice}
-                        formatValue={(value: number) => `${Number(value).toLocaleString('en-US', {
-                          style: 'currency',
-                          currency: 'USD',
-                          minimumFractionDigits: 4,
-                          maximumFractionDigits: 4,
-                        })}`}
+                        formatValue={(value: number) => {
+                          if (!value || value === 0) {
+                            return '$0.00';
+                          }
+
+                          const abs = Math.abs(value);
+
+                          // Valores "normais"
+                          if (abs >= 0.01) {
+                            return value.toLocaleString('en-US', {
+                              style: 'currency',
+                              currency: 'USD',
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            });
+                          }
+
+                          // Valores pequenos
+                          const str = value.toString();
+
+                          // Se vier em notação científica
+                          if (str.includes('e')) {
+                            return `$${value.toFixed(8).replace(/\.?0+$/, '')}`;
+                          }
+
+                          const [, decimals = ''] = str.split('.');
+                          let resultDecimals = '';
+                          let nonZeroFound = false;
+                          let nonZeroCount = 0;
+
+                          for (const char of decimals) {
+                            resultDecimals += char;
+
+                            if (char !== '0') {
+                              nonZeroFound = true;
+                              nonZeroCount++;
+                            }
+
+                            if (nonZeroFound && nonZeroCount === 2) {
+                              break;
+                            }
+                          }
+
+                          return `$0.${resultDecimals}`;
+                        }}
                       />}</span>
                   </p>
                   <p className='flex-1 sm:text-28 text-18 text-muted mb-4'>

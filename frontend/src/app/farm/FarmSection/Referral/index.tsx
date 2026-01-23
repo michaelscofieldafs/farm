@@ -2,7 +2,7 @@
 import { getMasterchefABIByChainId } from '@/utils/masterChefABIProvider'
 import { getMastChefAddressByChainId } from '@/utils/masterchefAddressProvider'
 import { getRpcProviderByChainId } from '@/utils/rpcProviderUtils'
-import { useAppKitNetwork } from '@reown/appkit/react'
+import { useAppKit, useAppKitNetwork } from '@reown/appkit/react'
 import { Web3Button } from '@web3modal/react'
 import { motion, useInView } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
@@ -17,6 +17,7 @@ const SavvyFarmReferral = () => {
   const [feeToReferral, setFeeToReferral] = useState(50);
 
   const { chainId } = useAppKitNetwork();
+  const { open } = useAppKit();
 
   const TopAnimation = {
     initial: { y: '-100%', opacity: 0 },
@@ -46,6 +47,11 @@ const SavvyFarmReferral = () => {
   ]
 
   const handleLink = () => {
+    if (!isConnected) {
+      open();
+      return;
+    }
+
     if (address) {
       const encodedText = btoa(unescape(encodeURIComponent(address as string)));
       const url = `${window.location.origin}/farm?refer=${encodedText}`;
@@ -136,7 +142,7 @@ const SavvyFarmReferral = () => {
                 <button
                   className='bg-primary border border-primary rounded-lg text-21 font-medium hover:bg-transparent hover:text-primary text-darkmode py-2 px-7'
                   onClick={handleLink}>
-                  COPY REFERRAL LINK
+                  {isConnected ? `COPY REFERRAL LINK` : `CONNECT WALLET TO GET LINK`}
                 </button>
               </div>
               {!isConnected && (

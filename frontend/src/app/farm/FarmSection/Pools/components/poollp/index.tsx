@@ -684,20 +684,21 @@ const FarmPoolCard = (props: { pool: any; }) => {
                   {isLoading ? <SkeletonTheme baseColor="#202020" highlightColor="#444">
                     <Skeleton count={1} height={5} width={45} />
                   </SkeletonTheme> :
-                    <AnimatedNumber
-                      includeComma
-                      transitions={(index: any) => ({
-                        type: "spring",
-                        duration: 4,
-                      })}
-                      value={pool.apr}
-                      formatValue={(value: any) => `${Number(value).toLocaleString('en-US', {
-                        style: 'currency',
-                        currency: 'USD',
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }).replace('$', '')}%`}
-                    />}
+                    pool.apr === 0 ? 'Infinity' :
+                      <AnimatedNumber
+                        includeComma
+                        transitions={(index: any) => ({
+                          type: "spring",
+                          duration: 4,
+                        })}
+                        value={pool.apr}
+                        formatValue={(value: any) => `${Number(value).toLocaleString('en-US', {
+                          style: 'currency',
+                          currency: 'USD',
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }).replace('$', '')}%`}
+                      />}
                 </h3>
               </PoolSectionValueDescriptionContainer>
             </a>

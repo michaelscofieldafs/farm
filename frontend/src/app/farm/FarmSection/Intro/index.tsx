@@ -148,12 +148,29 @@ const SavvyFarmIntro = () => {
                           duration: 4,
                         })}
                         value={farmTokenUSDCPrice}
-                        formatValue={(value: number) => `${Number(value).toLocaleString('en-US', {
-                          style: 'currency',
-                          currency: 'USD',
-                          minimumFractionDigits: 4,
-                          maximumFractionDigits: 4,
-                        })}`}
+                        formatValue={(value: number) => {
+                          if (!value || value === 0) {
+                            return '$0.00';
+                          }
+
+                          const abs = Math.abs(value);
+
+                          // Valores "normais"
+                          if (abs >= 0.01) {
+                            return value.toLocaleString('en-US', {
+                              style: 'currency',
+                              currency: 'USD',
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            });
+                          }
+
+                          // Valores muito pequenos → todas as casas necessárias
+                          const full = value.toFixed(18); // limite seguro
+                          const trimmed = full.replace(/\.?0+$/, '');
+
+                          return `$${trimmed}`;
+                        }}
                       />}</span>
                   </p>
                   <p className='flex-1 sm:text-28 text-18 text-muted mb-4'>
@@ -194,7 +211,7 @@ const SavvyFarmIntro = () => {
                         />}</span>
                   </p>
                   <p className='flex-1 sm:text-28 text-18 text-muted mb-4'>
-                    Circulating Supplsy <br /> <span className='text-primary'>
+                    Circulating Supply <br /> <span className='text-primary'>
                       {isLoading ? <CircleLoader color="#fff" loading={isLoading} size={15} /> : <AnimatedNumber
                         includeComma
                         transitions={() => ({
