@@ -156,9 +156,11 @@ export default function SavvyFarmShop() {
               <p className="text-white/60 text-sm mb-10 text-center">You purchase a product on-chain using your favorite network and receive the corresponding NFT.<br /> You can gift it or redeem it at any time and have the product delivered to your home!</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <ProductCard title="SavvyGirl World Shirt" price="10.00" imgColor="#0f0f10" />
+                <ProductCardOthers title="SavvyGirl.app Shirt" price="10.00" image="/images/shop/shop-savvygirlapp.png" />
                 <ProductCardOthers title="Goglz Plush" price="24.00" image="/images/shop/shop-goglz.png" />
                 <ProductCardOthers title="SonicLabs Cup" price="15.00" image="/images/shop/shop-4.png" />
-                <ProductCard title="Shirt" price="10.00" image="/images/shop/shop-base.png" />
+                <ProductCard title="Base Shirt" price="10.00" image="/images/shop/shop-base.png" />
+                <ProductCardOthers title="Base Cushion" price="13.99" image="/images/shop/shop-base-pup.png" />
               </div>
             </div>
           </section>
