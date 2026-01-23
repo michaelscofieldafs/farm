@@ -1,9 +1,18 @@
 // SPDX-License-Identifier: MIT
+/*
+SavvyGirlOnchainTicTacToe
+Copyright (c) 2025 SavvyGirl
+
+Author: @SavvyGirl2004 (X)
+Community / Dev:
+- t.me/SavvyGirlDev
+- t.me/Savvy_Talks
+*/
+
 pragma solidity ^0.8.19;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "hardhat/console.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract SavvyGirlOnchainTicTacToe is ReentrancyGuard, Ownable {
