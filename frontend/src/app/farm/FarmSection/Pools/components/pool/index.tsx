@@ -633,12 +633,12 @@ const FarmPoolCard = (props: { pool: any; }) => {
         <HeaderDetailsContainer style={{ zIndex: 999 }}>
           <div onClick={() => { }} style={{ display: 'flex', alignContent: 'center', justifyContent: 'start' }}>
             <h3 className='text-white sm:text-18 text-18 font-bold' style={{ textShadow: '1px 1px 1px #fff', textAlign: 'start', marginRight: 4 }}>
-              {token.symbol.toUpperCase()}
+              {token?.symbol.toUpperCase()}
             </h3>
           </div>
           <TokenContainer>
             <h3 className='text-white sm:text-14 text-14 font-normal'>
-              {token.name}
+              {token.name != null && token.name !== '' ? token.name : token.symbol.toUpperCase()}
             </h3>
           </TokenContainer>
           <div style={{ display: 'flex' }}>

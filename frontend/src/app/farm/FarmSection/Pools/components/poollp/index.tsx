@@ -651,7 +651,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
           </div>
           <TokenContainer>
             <h3 className='text-white sm:text-14 text-14 font-normal'>
-              {`${token0.name}/${token1.name}`}
+              {`${token0.name != null && token0.name != '' ? token0.name ?? token0.symbol : token0.symbol}/${token1.name != null && token1.name != '' ? token1.name ?? token1.symbol : token1.symbol}`}
             </h3>
           </TokenContainer>
           <div style={{ display: 'flex' }}>
