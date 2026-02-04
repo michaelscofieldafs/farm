@@ -72,7 +72,7 @@ const Header: React.FC = () => {
           <Logo />
           <nav className='hidden lg:flex grow items-center gap-8 justify-center'>
             <Link to='https://t.me/Savvy_Talks' className='group' aria-label='Telegram'>
-              <img src='/images/icons/icon-telegram.png' alt='Telegram' className='w-8 h-8' />
+              <img src='/images/icons/icon-telegram.png' width={128} height={128} alt='Telegram' className='w-8 h-8' />
             </Link>
             <Link to='https://x.com/SavvyGirl2004' className='group'>
               <span className='bg-black rounded-full w-10 h-10 flex items-center justify-center' style={{ display: 'inline-flex' }}>
@@ -127,7 +127,7 @@ const Header: React.FC = () => {
             ))}
             <div className='flex mt-4'>
               <Link to='https://t.me/Savvy_Talks' className='group mr-4' aria-label='Telegram'>
-                <img src='/images/icons/icon-telegram.png' alt='Telegram' className='w-8 h-8' />
+                <img src='/images/icons/icon-telegram.png' width={128} height={128} alt='Telegram' className='w-8 h-8' />
               </Link>
               <Link to='https://x.com/SavvyGirl2004' className='group'>
                 <span className='bg-black rounded-full w-10 h-10 flex items-center justify-center' style={{ display: 'inline-flex' }}>

@@ -5,9 +5,14 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import './globals.css';
 
+import { injectAnalytics } from './analytics'
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
+injectAnalytics();
+
 root.render(
   <React.StrictMode>
     <App />
