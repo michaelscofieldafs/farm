@@ -13,21 +13,18 @@ const Footer: FC = () => {
           <div className='flex flex-col gap-8'>
             <Logo />
             <div className='flex gap-6 items-center'>
-              <Link to='https://t.me/Savvy_Talks' className='group'>
-                <Icon
-                  icon='fa6-brands:telegram'
-                  width='24'
-                  height='24'
-                  className='text-white group-hover:text-primary'
-                />
+              <Link to='https://t.me/Savvy_Talks' className='group' aria-label='Telegram'>
+                <img src='/images/icons/icon-telegram.png' alt='Telegram' className='w-8 h-8' />
               </Link>
               <Link to='https://x.com/SavvyGirl2004' className='group'>
-                <Icon
-                  icon='fa6-brands:x-twitter'
-                  width='24'
-                  height='24'
-                  className='text-white group-hover:text-primary'
-                />
+                <span className='bg-black rounded-full w-10 h-10 flex items-center justify-center' style={{ display: 'inline-flex' }}>
+                  <Icon
+                    icon='fa6-brands:x-twitter'
+                    width='20'
+                    height='20'
+                    style={{ color: '#FFFFFF' }}
+                  />
+                </span>
               </Link>
             </div>
             <div className='flex-col sm:flex-row sm:gap-4 mt-4 mb-10'>
