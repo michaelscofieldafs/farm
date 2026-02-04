@@ -20,6 +20,7 @@ const leftAnimation = {
 export default function Farm() {
     return isShowFarm ? (
         <section>
+
             <SavvyFarmPools />
             <SavvyFarmReferral />
             {/**
