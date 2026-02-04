@@ -134,9 +134,19 @@ const SavvyFarmIntro = () => {
       className='relative md:pt-40 md:pb-28 py-20 overflow-hidden z-1'
       id='main-banner'>
       <div className='container px-4'>
+        <>
+          <div className="flex flex-col gap-3 max-w-[920px] mx-auto">
+            <div className="relative overflow-hidden rounded-xl px-5 py-4 shadow-lg backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/0 via-yellow-700/50 to-yellow-700/0" />
+              <p className="relative z-10 font-extrabold text-sm md:text-base leading-snug tracking-wide text-center text-white">
+                We are currently on testnet! Mainnet coming soon! Values shown here are not real.
+              </p>
+            </div>
+          </div>
+        </>
         <div className='grid grid-cols-8'>
           <motion.div {...leftAnimation} className='lg:col-span-5 col-span-12'>
-            <div className='flex gap-6 items-center lg:justify-start justify-center mb-5 mt-24'>
+            <div className='flex gap-6 items-center lg:justify-start justify-center mb-5 mt-15'>
               <p className='text-white sm:text-28 text-18 mb-0'>
                 Play, Earn, Trade & Shop – All in One Web3 <span className='text-primary'></span>
               </p>

@@ -50,8 +50,18 @@ const SavvyFarmPools = () => {
         <div className="absolute -top-40 -left-40 size-[520px] rounded-full bg-emerald-500 blur-[140px]" />
         <div className="absolute top-1/2 -right-40 size-[520px] rounded-full bg-cyan-500 blur-[160px]" />
       </div>
-      <div className='lg:px-16 mt-10 px-4'>
-        <div className='text-center'>
+      <div className='lg:px-16 px-4'>
+        <>
+          <div className="flex flex-col gap-3 max-w-[920px] mx-auto">
+            <div className="relative overflow-hidden rounded-xl px-5 py-4 shadow-lg backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-700/0 via-yellow-700/50 to-yellow-400/0" />
+              <p className="relative z-10 font-extrabold text-sm md:text-base leading-snug tracking-wide text-center text-white">
+                We are currently on testnet! Mainnet coming soon! Values shown here are not real.
+              </p>
+            </div>
+          </div>
+        </>
+        <div className='text-center mt-10'>
           <motion.div
             {...rightAnimation}>
             <div className="flex flex-col justify-center items-center">
