@@ -100,7 +100,7 @@ export default function SavvyFarmShop() {
               <div className="flex flex-col justify-center items-center">
                 <p className='text-white sm:text-28 text-18 mb-3'><span className='text-primary'>Savvy</span> Shop</p>
               </div>
-              <h2 className='text-white sm:text-40 text-20 font-medium mt-3'>
+              <h2 className='text-white sm:text-30 text-20 font-medium mt-3'>
                 Buy personalized products and contribute to the SavvyFarm ecosystem
               </h2>
               {/**

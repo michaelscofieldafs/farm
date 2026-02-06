@@ -31,6 +31,8 @@ import { ActionButtonSeparator, ActionButtonWalletContainer, ActionContainer, Fe
 import { fetchImageByAddress } from "@/utils/fetchTokenImage";
 import { ElectricBorderShow } from "@/components/ElectricBorder";
 import { isAppChain } from "@/utils/helpers";
+import { base, baseSepolia, bsc, bscTestnet, sonic, sonicTestnet } from "viem/chains";
+import { getSavvyTokenByChainId } from "@/utils/tokenAddressProvider";
 const transactionSound = '/sounds/transaction.mp3';
 
 enum StatusTransaction {
@@ -57,6 +59,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
   const [totalTokensDepositedBalance, setTotalTokensDepositedBalance] = useState<BigNumber>(BigNumber.from(0));
   const [isLoadingDeposit, setIsLoadingDeposit] = useState(false);
   const [statusTranscation, setStatusTranscation] = useState<StatusTransaction | null>(null);
+  const { caipNetwork } = useAppKitNetwork();
 
   const [play] = useSound(transactionSound);
 
@@ -616,6 +619,30 @@ const FarmPoolCard = (props: { pool: any; }) => {
     }, 3400)
   }
 
+  const handleGoToLp = (): void => {
+    if (caipNetwork?.id === sonicTestnet.id) {
+      window.open(`https://www.shadow.so/liquidity/${poolAddress}`, '_blank');
+    }
+    else if (caipNetwork?.id === bscTestnet.id) {
+      window.open(`https://pancakeswap.finance/liquidity/pool/bsc/${poolAddress}`, '_blank');
+    }
+    else if (caipNetwork?.id === baseSepolia.id) {
+      window.open(`https://app.uniswap.org/positions/v2/base/${poolAddress}`, '_blank');
+    }
+    if (caipNetwork?.id === sonic.id) {
+      window.open(`https://www.shadow.so/liquidity/${poolAddress}`, '_blank');
+    }
+    else if (caipNetwork?.id === bsc.id) {
+      window.open(`https://pancakeswap.finance/liquidity/pool/bsc/${poolAddress}`, '_blank');
+    }
+    else if (caipNetwork?.id === base.id) {
+      window.open(`https://app.uniswap.org/positions/v2/base/${poolAddress}`, '_blank');
+    }
+    else {
+      window.open(`https://pancakeswap.finance/swap?chain=bscTestnet&outputCurrency=${getSavvyTokenByChainId(Number(bscTestnet.id))}`, '_blank');
+    }
+  }
+
   useEffect(() => {
     fetchLpWallet();
     fetchPoolDataByWalletConnect();
@@ -644,7 +671,9 @@ const FarmPoolCard = (props: { pool: any; }) => {
           e.currentTarget.src = '/images/icons/icon-token.png';
         }} />
         <HeaderDetailsContainer style={{ zIndex: 999 }}>
-          <div onClick={() => { }} className='clickable-title-div' style={{ display: 'flex', alignContent: 'center', justifyContent: 'start' }}>
+          <div onClick={() => {
+            handleGoToLp();
+          }} className='clickable-title-div' style={{ display: 'flex', alignContent: 'center', justifyContent: 'start' }}>
             <h3 className='text-white sm:text-18 text-18 font-bold' style={{ textShadow: '1px 1px 1px #fff', textAlign: 'start', marginRight: 4 }}>
               {`${token0.symbol.toUpperCase()}/${token1.symbol.toUpperCase()}`}
             </h3>

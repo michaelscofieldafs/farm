@@ -42,19 +42,19 @@ export const getSavvyTokenByChainId = (chainId?: number | string): string => {
 export const getStableTokenByChainId = (chainId?: number | string): string => {
     switch (chainId) {
         case bsc.id:
-            return env.VITE_APP_SAVVY_STABLE_TOKEN_BSC_ADDRESS?.toLowerCase() ?? '';
+            return env.VITE_APP_SAVVY_NATIVE_TOKEN_BSC_ADDRESS?.toLowerCase() ?? '';
         case bscTestnet.id:
-            return env.VITE_APP_SAVVY_STABLE_TOKEN_BSC_TESTNET_ADDRESS?.toLowerCase() ?? '';
+            return env.VITE_APP_SAVVY_NATIVE_TOKEN_BSC_TESTNET_ADDRESS?.toLowerCase() ?? '';
         case sonic.id:
-            return env.VITE_APP_SAVVY_STABLE_TOKEN_SONIC_ADDRESS?.toLowerCase() ?? '';
+            return env.VITE_APP_SAVVY_NATIVE_TOKEN_SONIC_ADDRESS?.toLowerCase() ?? '';
         case sonicTestnet.id:
-            return env.VITE_APP_SAVVY_STABLE_TOKEN_SONIC_TESTNET_ADDRESS?.toLowerCase() ?? '';
+            return env.VITE_APP_SAVVY_NATIVE_TOKEN_SONIC_TESTNET_ADDRESS?.toLowerCase() ?? '';
         case baseSepolia.id:
-            return env.VITE_APP_SAVVY_STABLE_TOKEN_BASE_TESTNET_ADDRESS?.toLowerCase() ?? '';
+            return env.VITE_APP_SAVVY_NATIVE_TOKEN_BASE_TESTNET_ADDRESS?.toLowerCase() ?? '';
         case base.id:
-            return env.VITE_APP_SAVVY_STABLE_TOKEN_BASE_ADDRESS?.toLowerCase() ?? '';
+            return env.VITE_APP_SAVVY_NATIVE_TOKEN_BASE_ADDRESS?.toLowerCase() ?? '';
         default:
-            return env.VITE_APP_SAVVY_STABLE_TOKEN_BSC_TESTNET_ADDRESS?.toLowerCase() ?? '';
+            return env.VITE_APP_SAVVY_NATIVE_TOKEN_BSC_TESTNET_ADDRESS?.toLowerCase() ?? '';
     }
 };
 

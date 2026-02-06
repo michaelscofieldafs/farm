@@ -834,7 +834,7 @@ export default function TicTacToeOnChain() {
                             </p>
                         </div>
 
-                        <h2 className='text-white sm:text-40 text-20 font-medium mt-3'>
+                        <h2 className='text-white sm:text-30 text-20 font-medium mt-3'>
                             Show your skills in on-chain games, bet tokens against other players, and contribute to the evolution of the ecosystem!
                         </h2>
                         <div className="mt-10">

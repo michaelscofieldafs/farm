@@ -86,7 +86,7 @@ const SavvyFarmPools = () => {
               </p>
             </div>
             <div className='container'>
-              <h2 className='text-white sm:text-40 text-30 font-medium lg:w-80% mx-auto mb-10'>
+              <h2 className='text-white sm:text-30 text-20 font-medium lg:w-80% mx-auto mb-10'>
                 Take advantage of the amazing APRs in our LP and single-sided token pools.
               </h2>
               <div className='w-full items-center justify-center '>
@@ -95,79 +95,15 @@ const SavvyFarmPools = () => {
                   initial={{ y: '100%', opacity: 0 }}
                   transition={{ duration: 0.6 }}
                 >
-                  <div className='flex items-center justify-between gap-4 w-full mx-auto'>
-                    <p className='flex-1 sm:text-24 text-16 text-muted mb-4'>
-                      $SAVVY <br /> <span className='text-primary'>{isLoading ? <CircleLoader color="#fff" loading={isLoading} size={15} /> :
-                        <AnimatedNumber
-                          includeComma
-                          transitions={() => ({
-                            type: "spring",
-                            duration: 4,
-                          })}
-                          value={farmTokenUSDCPrice}
-                          formatValue={(value: number) => {
-                            if (!value || value === 0) {
-                              return '$0.00';
-                            }
-
-                            const abs = Math.abs(value);
-
-                            if (abs >= 0.01) {
-                              return value.toLocaleString('en-US', {
-                                style: 'currency',
-                                currency: 'USD',
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              });
-                            }
-
-                            const str = value.toString();
-
-                            if (str.includes('e')) {
-                              return `$${value.toFixed(8).replace(/\.?0+$/, '')}`;
-                            }
-
-                            const [, decimals = ''] = str.split('.');
-                            let resultDecimals = '';
-                            let nonZeroFound = false;
-                            let nonZeroCount = 0;
-
-                            for (const char of decimals) {
-                              resultDecimals += char;
-
-                              if (char !== '0') {
-                                nonZeroFound = true;
-                                nonZeroCount++;
-                              }
-
-                              if (nonZeroFound && nonZeroCount === 2) {
-                                break;
-                              }
-                            }
-
-                            return `$0.${resultDecimals}`;
-                          }}
-                        />}</span>
-                    </p>
-                    <p className='flex-1 sm:text-24 text-16 text-muted mb-4'>
-                      Market Cap <br /> <span className='text-primary'>
-                        {isLoading ? <CircleLoader color="#fff" loading={isLoading} size={15} /> : <AnimatedNumber
-                          includeComma
-                          transitions={() => ({
-                            type: "spring",
-                            duration: 4,
-                          })}
-                          value={marketCap}
-                          formatValue={(value: number) => `${Number(value).toLocaleString('en-US', {
-                            style: 'currency',
-                            currency: 'USD',
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}`}
-                        />}</span>
-                    </p>
-                    <p className='flex-1 sm:text-24 text-16 text-muted mb-4'>
-                      TVL <br /> <span className='text-primary'>
+                  <div>
+                    <p className='flex-1 sm:text-30 text-2xl text-muted mb-4'>
+                      Total Value Locked (TVL) <br /> <span className='font-extrabold
+    bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-200
+    bg-clip-text text-transparent
+    drop-shadow-[0_0_6px_rgba(255,215,0,0.9)]
+    drop-shadow-[0_0_14px_rgba(255,200,0,0.7)]
+    drop-shadow-[0_0_24px_rgba(255,180,0,0.5)]
+    tracking-wide'>
                         {isLoading ? <CircleLoader color="#fff" loading={isLoading} size={15} /> :
                           <AnimatedNumber
                             includeComma
@@ -184,18 +120,90 @@ const SavvyFarmPools = () => {
                             })}`}
                           />}</span>
                     </p>
-                    <p className='flex-1 sm:text-24 text-16 text-muted mb-4'>
-                      Circulating Supply <br /> <span className='text-primary'>
-                        {isLoading ? <CircleLoader color="#fff" loading={isLoading} size={15} /> : <AnimatedNumber
-                          includeComma
-                          transitions={() => ({
-                            type: "spring",
-                            duration: 4,
-                          })}
-                          value={circulatingSupply}
-                          formatValue={(value: number) => formatTokenBalanceFromFarm(value)}
-                        />}</span>
-                    </p>
+                    <div className='flex items-center justify-between gap-4 mt-4 w-full mx-auto'>
+                      <p className='flex-1 sm:text-24 text-16 text-muted mb-4'>
+                        $SAVVY <br /> <span className='text-primary'>{isLoading ? <CircleLoader color="#fff" loading={isLoading} size={15} /> :
+                          <AnimatedNumber
+                            includeComma
+                            transitions={() => ({
+                              type: "spring",
+                              duration: 4,
+                            })}
+                            value={farmTokenUSDCPrice}
+                            formatValue={(value: number) => {
+                              if (!value || value === 0) {
+                                return '$0.00';
+                              }
+
+                              const abs = Math.abs(value);
+
+                              if (abs >= 0.01) {
+                                return value.toLocaleString('en-US', {
+                                  style: 'currency',
+                                  currency: 'USD',
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                });
+                              }
+
+                              const str = value.toString();
+
+                              if (str.includes('e')) {
+                                return `$${value.toFixed(8).replace(/\.?0+$/, '')}`;
+                              }
+
+                              const [, decimals = ''] = str.split('.');
+                              let resultDecimals = '';
+                              let nonZeroFound = false;
+                              let nonZeroCount = 0;
+
+                              for (const char of decimals) {
+                                resultDecimals += char;
+
+                                if (char !== '0') {
+                                  nonZeroFound = true;
+                                  nonZeroCount++;
+                                }
+
+                                if (nonZeroFound && nonZeroCount === 2) {
+                                  break;
+                                }
+                              }
+
+                              return `$0.${resultDecimals}`;
+                            }}
+                          />}</span>
+                      </p>
+                      <p className='flex-1 sm:text-24 text-16 text-muted mb-4'>
+                        Market Cap <br /> <span className='text-primary'>
+                          {isLoading ? <CircleLoader color="#fff" loading={isLoading} size={15} /> : <AnimatedNumber
+                            includeComma
+                            transitions={() => ({
+                              type: "spring",
+                              duration: 4,
+                            })}
+                            value={marketCap}
+                            formatValue={(value: number) => `${Number(value).toLocaleString('en-US', {
+                              style: 'currency',
+                              currency: 'USD',
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })}`}
+                          />}</span>
+                      </p>
+                      <p className='flex-1 sm:text-24 text-16 text-muted mb-4'>
+                        Circulating Supply <br /> <span className='text-primary'>
+                          {isLoading ? <CircleLoader color="#fff" loading={isLoading} size={15} /> : <AnimatedNumber
+                            includeComma
+                            transitions={() => ({
+                              type: "spring",
+                              duration: 4,
+                            })}
+                            value={circulatingSupply}
+                            formatValue={(value: number) => formatTokenBalanceFromFarm(value)}
+                          />}</span>
+                      </p>
+                    </div>
                   </div>
                 </motion.div>
               </div>

@@ -12,7 +12,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAccount } from 'wagmi'
 import { sonicTestnet } from '@/components/Web3Provider'
 import { getSavvyTokenByChainId } from '@/utils/tokenAddressProvider'
-import { baseSepolia, bscTestnet } from 'viem/chains'
+import { base, baseSepolia, bsc, bscTestnet, sonic } from 'viem/chains'
 import { useAppKitNetwork } from '@reown/appkit/react'
 
 export interface HeroProps {
@@ -105,6 +105,15 @@ const SavvyFarmIntro = () => {
     }
     else if (caipNetwork?.id === baseSepolia.id) {
       window.open(`https://pancakeswap.finance/swap?chain=baseSepolia&outputCurrency=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');
+    }
+    if (caipNetwork?.id === sonic.id) {
+      window.open(`https://www.shadow.so/trade?outputCurrency=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');
+    }
+    else if (caipNetwork?.id === bsc.id) {
+      window.open(`https://pancakeswap.finance/swap?chain=bsc&outputCurrency=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');
+    }
+    else if (caipNetwork?.id === base.id) {
+      window.open(`https://app.uniswap.org/swap?chain=base&inputCurrency=ETH&outputCurrency=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');
     }
     else {
       window.open(`https://pancakeswap.finance/swap?chain=bscTestnet&outputCurrency=${getSavvyTokenByChainId(Number(bscTestnet.id))}`, '_blank');
