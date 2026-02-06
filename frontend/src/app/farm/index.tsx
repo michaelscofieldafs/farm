@@ -22,7 +22,7 @@ export default function Farm() {
         <section>
 
             <SavvyFarmPools />
-            
+
             <SavvyFarmReferral />
             {/**
       <Portfolio />
@@ -31,7 +31,9 @@ export default function Farm() {
             {/**
       <SavvyFarmShop />
        */}
+            {/**
             <SavvyFarmStatisticsDashboard />
+             */}
             <SavvyFarmMarketing />
             <SavvyFarmEcosystem />
         </section>

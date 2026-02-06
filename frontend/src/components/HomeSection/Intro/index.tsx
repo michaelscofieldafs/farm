@@ -135,7 +135,7 @@ const SavvyFarmIntro = () => {
       id='main-banner'>
       <div className='container px-4'>
         <>
-          <div className="flex flex-col gap-3 max-w-[920px] mx-auto">
+          <div className="flex flex-col gap-3 max-w-[920px] mx-auto mt-10 md:mt-0">
             <div className="relative overflow-hidden rounded-xl px-5 py-4 shadow-lg backdrop-blur-sm">
               <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/0 via-yellow-700/50 to-yellow-700/0" />
               <p className="relative z-10 font-extrabold text-sm md:text-base leading-snug tracking-wide text-center text-white">
