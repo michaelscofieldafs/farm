@@ -49,7 +49,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
             '--w3m-qr-color': '#99E39E',
         },
         enableReconnect: true,
-        networks: [/** sonic, base, **/ bscTestnet, sonicTestnet, baseSepolia, /** baseGoerli, **/],
+        networks: [sonic, base, bsc, bscTestnet, sonicTestnet, baseSepolia, /** baseGoerli, **/],
         chainImages: {
             146: 'https://resources.cryptocompare.com/asset-management/17157/1727687183179.png',
             64_165: 'https://resources.cryptocompare.com/asset-management/17157/1727687183179.png',
@@ -75,6 +75,6 @@ export function Web3Provider({ children }: { children: ReactNode }) {
 }
 
 export const wagmiAdapter = new WagmiAdapter({
-    networks: [/** sonic, base,*/ bscTestnet, sonicTestnet, baseSepolia, /** baseGoerli */],
+    networks: [sonic, base, bsc, bscTestnet, sonicTestnet, baseSepolia, /** baseGoerli */],
     projectId,
 })
