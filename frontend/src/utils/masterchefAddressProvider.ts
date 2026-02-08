@@ -18,7 +18,7 @@ export const getMastChefAddressByChainId = (chainId?: number | string): string =
         case bscTestnet.id:
             return import.meta.env.VITE_APP_SAVVY_BSC_TESNET_MASTER_CHEF_ADDRESS ?? '';
         case sonic.id:
-            return import.meta.env.VITE_APP_SAVVY_BSC_TESNET_MASTER_CHEF_ADDRESS ?? '';
+            return import.meta.env.VITE_APP_SAVVY_SONIC_MASTER_CHEF_ADDRESS ?? '';
         case sonicTestnet.id:
             return import.meta.env.VITE_APP_SAVVY_SONIC_TESTNET_MASTER_CHEF_ADDRESS ?? '';
         case monadTestnet.id:
