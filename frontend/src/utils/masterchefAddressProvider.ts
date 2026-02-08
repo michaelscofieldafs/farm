@@ -14,7 +14,7 @@ import {
 export const getMastChefAddressByChainId = (chainId?: number | string): string => {
     switch (chainId) {
         case bsc.id:
-            return import.meta.env.VITE_APP_SAVVY_BSC_TESNET_MASTER_CHEF_ADDRESS ?? '';
+            return import.meta.env.VITE_APP_SAVVY_BSC_MASTER_CHEF_ADDRESS ?? '';
         case bscTestnet.id:
             return import.meta.env.VITE_APP_SAVVY_BSC_TESNET_MASTER_CHEF_ADDRESS ?? '';
         case sonic.id:
