@@ -11,7 +11,7 @@ import { CircleLoader } from 'react-spinners'
 import { useNavigate } from 'react-router-dom'
 import { useAccount } from 'wagmi'
 import { sonicTestnet } from '@/components/Web3Provider'
-import { getSavvyTokenByChainId } from '@/utils/tokenAddressProvider'
+import { getSavvyTokenByChainId, getStableTokenByChainId } from '@/utils/tokenAddressProvider'
 import { base, baseSepolia, bsc, bscTestnet, sonic } from 'viem/chains'
 import { useAppKitNetwork } from '@reown/appkit/react'
 
@@ -98,7 +98,7 @@ const SavvyFarmIntro = () => {
 
   const handleBuySavvy = (): void => {
     if (caipNetwork?.id === sonicTestnet.id) {
-      window.open(`https://equalizer.exchange/swap?toToken=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');
+      window.open(`https://equalizer.exchange/swap?fromToken=${getStableTokenByChainId(Number(caipNetwork.id))}&toToken=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');
     }
     else if (caipNetwork?.id === bscTestnet.id) {
       window.open(`https://pancakeswap.finance/swap?chain=bscTestnet&outputCurrency=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');
