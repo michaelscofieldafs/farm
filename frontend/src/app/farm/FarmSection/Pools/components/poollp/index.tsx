@@ -671,12 +671,22 @@ const FarmPoolCard = (props: { pool: any; }) => {
           e.currentTarget.src = '/images/icons/icon-token.png';
         }} />
         <HeaderDetailsContainer style={{ zIndex: 999 }}>
-          <div onClick={() => {
-            handleGoToLp();
-          }} className='clickable-title-div' style={{ display: 'flex', alignContent: 'center', justifyContent: 'start' }}>
-            <h3 className='text-white sm:text-18 text-18 font-bold' style={{ textShadow: '1px 1px 1px #fff', textAlign: 'start', marginRight: 4 }}>
+          <div className='clickable-title-div' style={{ display: 'flex', alignContent: 'center', justifyContent: 'start', alignItems: 'center' }} onClick={() => { handleGoToLp(); }}>
+            <h3 className='text-white sm:text-18 text-18 font-bold' style={{ textShadow: '1px 1px 1px #fff', textAlign: 'start', marginRight: 8, display: 'flex', alignItems: 'center' }}>
               {`${token0.symbol.toUpperCase()}/${token1.symbol.toUpperCase()}`}
             </h3>
+            <button
+              onClick={(e) => { e.stopPropagation(); handleGoToLp(); }}
+              aria-label="Open liquidity page"
+              title="Open liquidity page"
+              style={{ background: 'transparent', border: 'none', padding: 0, display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#fff' }}>
+                <path d="M18 13v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+            </button>
           </div>
           <TokenContainer>
             <h3 className='text-white sm:text-14 text-14 font-normal'>
