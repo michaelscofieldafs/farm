@@ -98,7 +98,7 @@ const SavvyFarmIntro = () => {
 
   const handleBuySavvy = (): void => {
     if (caipNetwork?.id === sonicTestnet.id) {
-      window.open(`https://www.shadow.so/trade?outputCurrency=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');
+      window.open(`https://equalizer.exchange/swap?toToken=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');
     }
     else if (caipNetwork?.id === bscTestnet.id) {
       window.open(`https://pancakeswap.finance/swap?chain=bscTestnet&outputCurrency=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');
@@ -107,7 +107,7 @@ const SavvyFarmIntro = () => {
       window.open(`https://pancakeswap.finance/swap?chain=baseSepolia&outputCurrency=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');
     }
     if (caipNetwork?.id === sonic.id) {
-      window.open(`https://www.shadow.so/trade?outputCurrency=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');
+      window.open(`https://equalizer.exchange/swap?toToken=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');
     }
     else if (caipNetwork?.id === bsc.id) {
       window.open(`https://pancakeswap.finance/swap?chain=bsc&outputCurrency=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');

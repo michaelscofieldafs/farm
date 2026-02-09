@@ -23,7 +23,7 @@ import { getRouterAddressByChainId } from '../utils/routerProvider';
 import { getRpcProviderByChainId } from '../utils/rpcProviderUtils';
 import { getSavvyTokenByChainId, getStableTokenByChainId, getUSDTTokenByChainId } from '../utils/tokenAddressProvider';
 import { PoolLP, PoolSingle } from './interfaces';
-import { base, baseSepolia, bsc, bscTestnet } from 'viem/chains';
+import { base, baseSepolia, bsc, bscTestnet, sonic } from 'viem/chains';
 import { fetchChainBase } from '@/utils/helpers';
 import { Abi, Address } from 'viem';
 import { ZERO_ADDRESS } from '@/utils/constants';
@@ -146,7 +146,7 @@ const AppContextProvider = ({ children }: any) => {
             if (symbol === null) return null;
 
             // LP Pool
-            if (symbol.endsWith('-LP') || symbol.includes('LP') || symbol.includes('UNI-V2') || symbol === '') {
+            if (symbol.endsWith('-LP') || symbol.includes('LP') || symbol.includes('UNI-V2') || symbol === '' || symbol.includes('V-')) {
 
               //console.log("ReadContrat")
               // Fetch base if of pair contract
@@ -529,8 +529,10 @@ const AppContextProvider = ({ children }: any) => {
 
       const router = new web3Ref.current.eth.Contract(
         getRouterABIByChainId(chainId),
-        getRouterAddressByChainId(chainId).toLowerCase()
+        tokenAddress.toLowerCase() === getSavvyTokenByChainId(chainId) ? '0x7635cD591CFE965bE8beC60Da6eA69b6dcD27e4b'.toLowerCase() : getRouterAddressByChainId(chainId).toLowerCase()
       );
+
+      console.log('Usando o router ' + (tokenAddress.toLowerCase() === getSavvyTokenByChainId(Number(chainIdRef.current)) ? '0x7635cD591CFE965bE8beC60Da6eA69b6dcD27e4b'.toLowerCase() : getRouterAddressByChainId(chainId).toLowerCase()));
 
       const usdcAddress = getUSDTTokenByChainId(chainId);
       const wrappedNative = getStableTokenByChainId(chainId);
@@ -542,18 +544,21 @@ const AppContextProvider = ({ children }: any) => {
 
       const usdcDecimals = await safeCall(usdcContract.methods.decimals(), 6);
 
-      const routes = [
-        {
-          from: tokenAddress,
-          to: wrappedNative,
-          stable: false,
-        },
-        {
-          from: wrappedNative,
-          to: usdcAddress,
-          stable: true,
-        },
-      ];
+      const routes = tokenAddress.toLowerCase() === getSavvyTokenByChainId(chainId) ? [
+        [tokenAddress, wrappedNative, false],
+        [wrappedNative, usdcAddress, false],
+      ] : [{
+        from: tokenAddress,
+        to: wrappedNative,
+        stable: false,
+      },
+      {
+        from: wrappedNative,
+        to: usdcAddress,
+        stable: false,
+      },];
+
+      console.log('Calculando preço do token ' + tokenAddress + ' usando a rota de preço: ', routes)
 
       const amounts = (await router.methods
         .getAmountsOut(amountIn, routes)

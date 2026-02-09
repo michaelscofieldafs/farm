@@ -621,7 +621,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
   const handleGoToLp = (): void => {
     if (caipNetwork?.id === sonicTestnet.id) {
-      window.open(`https://www.shadow.so/liquidity/${poolAddress}`, '_blank');
+      window.open(`https://equalizer.exchange/liquidity/${poolAddress}/add`, '_blank');
     }
     else if (caipNetwork?.id === bscTestnet.id) {
       window.open(`https://pancakeswap.finance/liquidity/pool/bsc/${poolAddress}`, '_blank');
@@ -630,7 +630,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
       window.open(`https://app.uniswap.org/positions/v2/base/${poolAddress}`, '_blank');
     }
     if (caipNetwork?.id === sonic.id) {
-      window.open(`https://www.shadow.so/liquidity/${poolAddress}`, '_blank');
+      window.open(`https://equalizer.exchange/liquidity/${poolAddress}/add`, '_blank');
     }
     else if (caipNetwork?.id === bsc.id) {
       window.open(`https://pancakeswap.finance/liquidity/pool/bsc/${poolAddress}`, '_blank');
