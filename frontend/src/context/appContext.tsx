@@ -143,10 +143,10 @@ const AppContextProvider = ({ children }: any) => {
             const tokenContract = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(chainIdBase), lpToken);
             const symbol = (await safeCall(tokenContract.methods.symbol(), '')).toUpperCase();
 
-            if (symbol === '') return null;
+            if (symbol === null) return null;
 
             // LP Pool
-            if (symbol.endsWith('-LP') || symbol.includes('LP') || symbol.includes('UNI-V2')) {
+            if (symbol.endsWith('-LP') || symbol.includes('LP') || symbol.includes('UNI-V2') || symbol === '') {
 
               //console.log("ReadContrat")
               // Fetch base if of pair contract
