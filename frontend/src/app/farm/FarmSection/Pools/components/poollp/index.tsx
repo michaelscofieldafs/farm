@@ -713,13 +713,13 @@ const FarmPoolCard = (props: { pool: any; }) => {
           <PoolSectionValueContainer>
             <a className="totalSupply" style={{ display: 'flex', flex: 1 }}>
               <PoolSectionValueDescriptionContainer>
-                <h3 className='text-white sm:text-16 text-16 font-bold'>
+                <h3 className='text-16 sm:text-16 font-bold bg-gradient-to-b from-yellow-200 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-[0_0_6px_rgba(255,215,0,0.8)] drop-shadow-[0_0_18px_rgba(255,200,0,0.6)]'>
                   APR:
                 </h3>
               </PoolSectionValueDescriptionContainer>
               <Separator />
               <PoolSectionValueDescriptionContainer>
-                <h3 className='text-white sm:text-16 text-16 font-bold'>
+                <h3 className='text-16 sm:text-16 font-bold bg-gradient-to-b from-yellow-200 via-yellow-400 to-yellow-600 bg-clip-text text-transparent drop-shadow-[0_0_6px_rgba(255,215,0,0.8)] drop-shadow-[0_0_18px_rgba(255,200,0,0.6)]'>
                   {isLoading ? <SkeletonTheme baseColor="#202020" highlightColor="#444">
                     <Skeleton count={1} height={5} width={45} />
                   </SkeletonTheme> :
