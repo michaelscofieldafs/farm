@@ -378,7 +378,7 @@ const AppContextProvider = ({ children }: any) => {
       );
 
       // Run all the functions in parallel
-      let poolList = await Promise.all([...poolPromises, ...poolPromises, ...poolPromises, ...poolPromises, ...poolPromises, ...poolPromises]);
+      let poolList = await Promise.all(poolPromises);
 
       poolList = poolList.filter(item => item != null);
 
