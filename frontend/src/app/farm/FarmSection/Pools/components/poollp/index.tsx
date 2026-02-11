@@ -560,12 +560,12 @@ const FarmPoolCard = (props: { pool: any; }) => {
     }
 
     // For regular values (>= 0.001) use compact notation with 3 decimals
-    if (readable >= 0.001) {
+    if (readable >= 0.01) {
       const formatter = new Intl.NumberFormat('en-US', {
         notation: 'compact',
         compactDisplay: 'short',
-        minimumFractionDigits: 3,
-        maximumFractionDigits: 3,
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
       });
 
       const formattedValue = formatter.format(readable);
@@ -607,19 +607,56 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
   function formatTokenBalanceFromFarmUSDC(
   ): string {
-    const balanceReadable = parseFloat(utils.formatUnits(totalTokensDepositedBalance, decimals));
+    const totalValue = parseFloat(utils.formatUnits(totalTokensDepositedBalance, pool.decimals));
 
-    const prefix = balanceReadable > 0 && balanceReadable < 0.01 ? '~ ' : '';
+    if (totalValue === 0 || Number.isNaN(totalValue)) {
+      return `$0.00`;
+    }
 
-    const formatted = balanceReadable.toLocaleString('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 4,
-    });
+    // For regular USD values (>= $0.01) format normally with 2 decimals
+    if (totalValue >= 0.01) {
+      const formatted = totalValue.toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
 
-    return `${prefix}${formatted}`;
+      return formatted;
+    }
+
+    // For very small USD values (< $0.01) show enough decimal places so
+    // the first 3 non-zero decimal digits are visible (e.g. $0.00000444)
+    const totalStr = totalValue.toFixed(18);
+    const parts = totalStr.split('.');
+    if (parts.length === 1) {
+      return `$${parts[0]}`;
+    }
+
+    const integer = parts[0];
+    const decimals = parts[1] || '';
+
+    let nonZeroCount = 0;
+    let lastIndex = -1;
+    for (let i = 0; i < decimals.length; i++) {
+      if (decimals[i] !== '0') nonZeroCount++;
+      if (nonZeroCount >= 3) {
+        lastIndex = i;
+        break;
+      }
+    }
+
+    const displayDecimals = lastIndex >= 0 ? lastIndex + 1 : decimals.length;
+    let truncated = decimals.slice(0, displayDecimals);
+    truncated = truncated.replace(/0+$/g, '');
+    if (truncated.length === 0) {
+      truncated = decimals.slice(0, Math.min(3, decimals.length));
+    }
+
+    const prefix = totalValue > 0 && totalValue < 0.01 ? '~ ' : '';
+    return `${prefix}$${integer}.${truncated}`;
   }
+
 
   function formatPercentageFromFarm(
   ): string {
