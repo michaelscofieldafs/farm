@@ -615,7 +615,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      maximumFractionDigits: 10,
     });
 
     return `${prefix}${formatted}`;
@@ -875,15 +875,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
                   <Skeleton count={1} height={5} width={45} />
                 </SkeletonTheme> :
                   <div style={{ display: 'flex' }}>
-                    <AnimatedNumber
-                      includeComma
-                      transitions={(index: any) => ({
-                        type: "spring",
-                        duration: 4,
-                      })}
-                      value={totalTokensDepositedBalance}
-                      formatValue={(value: any) => formatTokenBalanceFromFarmUSDC()}
-                    />
+                    {formatTokenBalanceFromFarmUSDC()}
                   </div>}
               </h3>
             </div>
