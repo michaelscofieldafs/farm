@@ -615,7 +615,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
       style: 'currency',
       currency: 'USD',
       minimumFractionDigits: 2,
-      maximumFractionDigits: 10,
+      maximumFractionDigits: 4,
     });
 
     return `${prefix}${formatted}`;
