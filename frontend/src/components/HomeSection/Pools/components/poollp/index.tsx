@@ -597,7 +597,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
   }
 
   function fromWeiWithDecimals(valueInWei: BigNumber): string {
-    return ethers.utils.formatUnits(valueInWei, pool.decimais);
+    return ethers.utils.formatUnits(valueInWei, pool.decimals);
   }
 
   const showTransactionEffect = (): void => {

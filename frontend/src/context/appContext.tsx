@@ -532,8 +532,6 @@ const AppContextProvider = ({ children }: any) => {
         tokenAddress.toLowerCase() === getSavvyTokenByChainId(chainId) ? '0x7635cD591CFE965bE8beC60Da6eA69b6dcD27e4b'.toLowerCase() : getRouterAddressByChainId(chainId).toLowerCase()
       );
 
-      console.log('Usando o router ' + (tokenAddress.toLowerCase() === getSavvyTokenByChainId(Number(chainIdRef.current)) ? '0x7635cD591CFE965bE8beC60Da6eA69b6dcD27e4b'.toLowerCase() : getRouterAddressByChainId(chainId).toLowerCase()));
-
       const usdcAddress = getUSDTTokenByChainId(chainId);
       const wrappedNative = getStableTokenByChainId(chainId);
 
@@ -557,8 +555,6 @@ const AppContextProvider = ({ children }: any) => {
         to: usdcAddress,
         stable: false,
       },];
-
-      console.log('Calculando preço do token ' + tokenAddress + ' usando a rota de preço: ', routes)
 
       const amounts = (await router.methods
         .getAmountsOut(amountIn, routes)

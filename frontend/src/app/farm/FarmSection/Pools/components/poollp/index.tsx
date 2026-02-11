@@ -476,7 +476,8 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
         const amountBN = BigNumber.from(amount);
         const farmBalanceBN = BigNumber.from(pool.farmBalance);
-        const tvlBN = utils.parseUnits(pool.tvl.toString(), Number(decimals));
+        const tvlFixed = Number(pool.tvl).toFixed(decimals);
+        const tvlBN = utils.parseUnits(tvlFixed, Number(decimals));
 
         let totalStakedBN = BigNumber.from(0);
 
@@ -551,23 +552,62 @@ const FarmPoolCard = (props: { pool: any; }) => {
   }
 
   function formatTokenBalanceFromFarm(): string {
-    const readable = parseFloat(utils.formatUnits(totalTokensDeposited, token0.decimals));
+    const readableStr = utils.formatUnits(totalTokensDeposited, pool.decimals);
+    const readable = parseFloat(readableStr);
 
-    const formatter = new Intl.NumberFormat('en-US', {
-      notation: 'compact',
-      compactDisplay: 'short',
-      minimumFractionDigits: readable > 0 ? 1 : 0,
-      maximumFractionDigits: readable < 1 ? 3 : 1,
-    });
+    if (readable === 0 || Number.isNaN(readable)) {
+      return `0 LP`;
+    }
 
-    const formattedValue = formatter.format(readable);
+    // For regular values (>= 0.001) use compact notation with 3 decimals
+    if (readable >= 0.001) {
+      const formatter = new Intl.NumberFormat('en-US', {
+        notation: 'compact',
+        compactDisplay: 'short',
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3,
+      });
 
-    return `${readable > 0 && readable < 0.001 ? `~ ${formattedValue}` : formattedValue} LP`;
+      const formattedValue = formatter.format(readable);
+      return `${formattedValue} LP`;
+    }
+
+    // For very small values (< 0.001) show enough decimal places so
+    // that the first 3 non-zero decimal digits are visible (e.g. 0.00000444)
+    const parts = readableStr.split('.');
+    if (parts.length === 1) {
+      return `${parts[0]} LP`;
+    }
+
+    const integer = parts[0];
+    const decimals = parts[1] || '';
+
+    let nonZeroCount = 0;
+    let lastIndex = -1;
+
+    for (let i = 0; i < decimals.length; i++) {
+      if (decimals[i] !== '0') nonZeroCount++;
+      if (nonZeroCount >= 3) {
+        lastIndex = i;
+        break;
+      }
+    }
+
+    const displayDecimals = lastIndex >= 0 ? lastIndex + 1 : decimals.length;
+    let truncated = decimals.slice(0, displayDecimals);
+    truncated = truncated.replace(/0+$/g, '');
+    if (truncated.length === 0) {
+      truncated = decimals.slice(0, Math.min(3, decimals.length));
+    }
+
+    const prefix = readable > 0 && readable < 0.001 ? '~ ' : '';
+
+    return `${prefix}${integer}.${truncated} LP`;
   }
 
   function formatTokenBalanceFromFarmUSDC(
   ): string {
-    const balanceReadable = parseFloat(utils.formatUnits(totalTokensDepositedBalance, token0.decimals));
+    const balanceReadable = parseFloat(utils.formatUnits(totalTokensDepositedBalance, decimals));
 
     const prefix = balanceReadable > 0 && balanceReadable < 0.01 ? '~ ' : '';
 
@@ -604,7 +644,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
   }
 
   function fromWeiWithDecimals(valueInWei: BigNumber): string {
-    return ethers.utils.formatUnits(valueInWei, pool.decimais);
+    return ethers.utils.formatUnits(valueInWei, pool.decimals);
   }
 
   const openNetworkModal = () => {
@@ -621,7 +661,12 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
   const handleGoToLp = (): void => {
     if (caipNetwork?.id === sonicTestnet.id) {
-      window.open(`https://equalizer.exchange/liquidity/${poolAddress}/add`, '_blank');
+      if (token0.id.toLowerCase() === getSavvyTokenByChainId(Number(chainId)).toLowerCase() || token1.id.toLowerCase() === getSavvyTokenByChainId(Number(chainId)).toLowerCase()) {
+        window.open(`https://equalizer.exchange/liquidity/${poolAddress}/add`, '_blank');
+      }
+      else {
+        window.open(`https://www.shadow.so/liquidity/${poolAddress}/add`, '_blank');
+      }
     }
     else if (caipNetwork?.id === bscTestnet.id) {
       window.open(`https://pancakeswap.finance/liquidity/pool/bsc/${poolAddress}`, '_blank');
@@ -630,7 +675,12 @@ const FarmPoolCard = (props: { pool: any; }) => {
       window.open(`https://app.uniswap.org/positions/v2/base/${poolAddress}`, '_blank');
     }
     if (caipNetwork?.id === sonic.id) {
-      window.open(`https://equalizer.exchange/liquidity/${poolAddress}/add`, '_blank');
+      if (token0.id.toLowerCase() === getSavvyTokenByChainId(Number(chainId)).toLowerCase() || token1.id.toLowerCase() === getSavvyTokenByChainId(Number(chainId)).toLowerCase()) {
+        window.open(`https://equalizer.exchange/liquidity/${poolAddress}/add`, '_blank');
+      }
+      else {
+        window.open(`https://www.shadow.so/liquidity/${poolAddress}/add`, '_blank');
+      }
     }
     else if (caipNetwork?.id === bsc.id) {
       window.open(`https://pancakeswap.finance/liquidity/pool/bsc/${poolAddress}`, '_blank');

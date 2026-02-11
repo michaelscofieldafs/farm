@@ -462,7 +462,8 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
         const amountBN = BigNumber.from(amount);
         const farmBalanceBN = BigNumber.from(pool.farmBalance);
-        const tvlBN = utils.parseUnits(pool.tvl.toString(), Number(token.decimals));
+        const tvlFixed = Number(pool.tvl).toFixed(token.decimals);
+        const tvlBN = utils.parseUnits(tvlFixed, Number(token.decimals));
 
         let totalStakedBN = BigNumber.from(0);
 
@@ -506,18 +507,60 @@ const FarmPoolCard = (props: { pool: any; }) => {
   };
 
   function formatTokenBalanceFromWallet(): string {
-    const readable = parseFloat(utils.formatUnits(balanceWallet, token.decimals));
+    const readableStr = utils.formatUnits(balanceWallet, token.decimals);
+    const readable = parseFloat(readableStr);
 
-    const formatter = new Intl.NumberFormat('en-US', {
-      notation: 'compact',
-      compactDisplay: 'short',
-      minimumFractionDigits: 3,
-      maximumFractionDigits: 3,
-    });
+    if (readable === 0 || Number.isNaN(readable)) {
+      return `0 $${token.symbol.toUpperCase()}`;
+    }
 
-    const formattedValue = formatter.format(readable);
+    // For regular values (>= 0.001) use compact notation with 3 decimals
+    if (readable >= 0.001) {
+      const formatter = new Intl.NumberFormat('en-US', {
+        notation: 'compact',
+        compactDisplay: 'short',
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3,
+      });
 
-    return `${formattedValue} $${token.symbol.toUpperCase()}`;
+      const formattedValue = formatter.format(readable);
+      return `${formattedValue} $${token.symbol.toUpperCase()}`;
+    }
+
+    // For very small values (< 0.001) show enough decimal places so
+    // that the first 3 non-zero decimal digits are visible (e.g. 0.00000444)
+    const parts = readableStr.split('.');
+    if (parts.length === 1) {
+      return `${parts[0]} $${token.symbol.toUpperCase()}`;
+    }
+
+    const integer = parts[0];
+    const decimals = parts[1] || '';
+
+    let nonZeroCount = 0;
+    let lastIndex = -1;
+
+    for (let i = 0; i < decimals.length; i++) {
+      if (decimals[i] !== '0') nonZeroCount++;
+      if (nonZeroCount >= 3) {
+        lastIndex = i;
+        break;
+      }
+    }
+
+    const displayDecimals = lastIndex >= 0 ? lastIndex + 1 : decimals.length;
+    // slice the decimals up to the determined index
+    let truncated = decimals.slice(0, displayDecimals);
+
+    // remove trailing zeros introduced by slicing, but ensure at least 3 min decimals
+    truncated = truncated.replace(/0+$/g, '');
+
+    // if removing trailing zeros left nothing, keep minimal 3 decimals or what's available
+    if (truncated.length === 0) {
+      truncated = decimals.slice(0, Math.min(3, decimals.length));
+    }
+
+    return `${integer}.${truncated} $${token.symbol.toUpperCase()}`;
   }
 
   function formatTokenBalanceFromWalletUSDC(): string {
@@ -538,34 +581,110 @@ const FarmPoolCard = (props: { pool: any; }) => {
   }
 
   function formatTokenBalanceFromFarm(): string {
-    const readable = parseFloat(utils.formatUnits(totalTokensDeposited, token.decimals));
+    const readableStr = utils.formatUnits(totalTokensDeposited, token.decimals);
+    const readable = parseFloat(readableStr);
 
-    const formatter = new Intl.NumberFormat('en-US', {
-      notation: 'compact',
-      compactDisplay: 'short',
-      minimumFractionDigits: readable > 0 ? 1 : 0,
-      maximumFractionDigits: readable < 1 ? 3 : 1,
-    });
+    if (readable === 0 || Number.isNaN(readable)) {
+      return `0 $${token.symbol.toUpperCase()}`;
+    }
 
-    const formattedValue = formatter.format(readable);
+    // For regular values (>= 0.001) use compact notation with 3 decimals
+    if (readable >= 0.001) {
+      const formatter = new Intl.NumberFormat('en-US', {
+        notation: 'compact',
+        compactDisplay: 'short',
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3,
+      });
 
-    return `${readable > 0 && readable < 0.001 ? `~ ${formattedValue}` : formattedValue} $${token.symbol.toUpperCase()}`;
+      const formattedValue = formatter.format(readable);
+      return `${formattedValue} $${token.symbol.toUpperCase()}`;
+    }
+
+    // For very small values (< 0.001) show enough decimal places so
+    // that the first 3 non-zero decimal digits are visible (e.g. 0.00000444)
+    const parts = readableStr.split('.');
+    if (parts.length === 1) {
+      return `${parts[0]} $${token.symbol.toUpperCase()}`;
+    }
+
+    const integer = parts[0];
+    const decimals = parts[1] || '';
+
+    let nonZeroCount = 0;
+    let lastIndex = -1;
+
+    for (let i = 0; i < decimals.length; i++) {
+      if (decimals[i] !== '0') nonZeroCount++;
+      if (nonZeroCount >= 3) {
+        lastIndex = i;
+        break;
+      }
+    }
+
+    const displayDecimals = lastIndex >= 0 ? lastIndex + 1 : decimals.length;
+    let truncated = decimals.slice(0, displayDecimals);
+    truncated = truncated.replace(/0+$/g, '');
+    if (truncated.length === 0) {
+      truncated = decimals.slice(0, Math.min(3, decimals.length));
+    }
+
+    const prefix = readable > 0 && readable < 0.001 ? '~ ' : '';
+
+    return `${prefix}${integer}.${truncated} $${token.symbol.toUpperCase()}`;
   }
 
   function formatTokenBalanceFromFarmUSDC(
   ): string {
-    const balanceReadable = parseFloat(utils.formatUnits(totalTokensDepositedBalance, token.decimals));
+    const balanceToken = parseFloat(utils.formatUnits(totalTokensDepositedBalance, token.decimals));
+    const totalValue = balanceToken * (token.price ?? 0);
 
-    const prefix = balanceReadable > 0 && balanceReadable < 0.01 ? '~ ' : '';
+    if (totalValue === 0 || Number.isNaN(totalValue)) {
+      return `$0.00`;
+    }
 
-    const formatted = balanceReadable.toLocaleString('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
+    // For regular USD values (>= $0.01) format normally with 2 decimals
+    if (totalValue >= 0.01) {
+      const formatted = totalValue.toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
 
-    return `${prefix}${formatted}`;
+      return formatted;
+    }
+
+    // For very small USD values (< $0.01) show enough decimal places so
+    // the first 3 non-zero decimal digits are visible (e.g. $0.00000444)
+    const totalStr = totalValue.toFixed(18);
+    const parts = totalStr.split('.');
+    if (parts.length === 1) {
+      return `$${parts[0]}`;
+    }
+
+    const integer = parts[0];
+    const decimals = parts[1] || '';
+
+    let nonZeroCount = 0;
+    let lastIndex = -1;
+    for (let i = 0; i < decimals.length; i++) {
+      if (decimals[i] !== '0') nonZeroCount++;
+      if (nonZeroCount >= 3) {
+        lastIndex = i;
+        break;
+      }
+    }
+
+    const displayDecimals = lastIndex >= 0 ? lastIndex + 1 : decimals.length;
+    let truncated = decimals.slice(0, displayDecimals);
+    truncated = truncated.replace(/0+$/g, '');
+    if (truncated.length === 0) {
+      truncated = decimals.slice(0, Math.min(3, decimals.length));
+    }
+
+    const prefix = totalValue > 0 && totalValue < 0.01 ? '~ ' : '';
+    return `${prefix}$${integer}.${truncated}`;
   }
 
   function formatPercentageFromFarm(
@@ -591,7 +710,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
   }
 
   function fromWeiWithDecimals(valueInWei: BigNumber): string {
-    return ethers.utils.formatUnits(valueInWei, token.decimais);
+    return ethers.utils.formatUnits(valueInWei, token.decimals);
   }
 
   const openNetworkModal = () => {
@@ -787,7 +906,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
               </h3>
             </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+          <div style={{ display: 'flex', flex: 1, flexDirection: 'column', alignItems: 'flex-end' }}>
             <h3 className='text-white sm:text-14 text-14 font-bold'>
               Your rewards
             </h3>
