@@ -28,7 +28,7 @@ import { fetchChainBase } from '@/utils/helpers';
 import { Abi, Address } from 'viem';
 import { ZERO_ADDRESS } from '@/utils/constants';
 
-import { parseEther } from "viem";
+import { parseUnits } from "viem";
 
 interface AppContextType {
   stableTokenUSDCPrice: number;
@@ -669,7 +669,7 @@ const AppContextProvider = ({ children }: any) => {
         await safeCall(tokenContract.methods.decimals(), 18)
       );
 
-      const oneToken = parseEther("5");
+      const oneToken = parseUnits("5", tokenDecimals);
 
       const path = [tokenAddress, nativeWrapped, usdcAddress];
 
@@ -764,7 +764,7 @@ const AppContextProvider = ({ children }: any) => {
       const unwatch = watchBlocks(wagmiAdapter.wagmiConfig, {
         chainId: Number(fetchChainBase(chainIdRef.current)),
         blockTag: 'latest',
-        pollingInterval: 10000,
+        pollingInterval: 15000,
         onBlock(block) {
           //console.log(`Block ${block.number} of ${chainIdRef.current}`);
           fetchDataFarm();
