@@ -28,6 +28,8 @@ import { fetchChainBase } from '@/utils/helpers';
 import { Abi, Address } from 'viem';
 import { ZERO_ADDRESS } from '@/utils/constants';
 
+import { parseEther } from "viem";
+
 interface AppContextType {
   stableTokenUSDCPrice: number;
   farmTokenPrice: number;
@@ -667,14 +669,20 @@ const AppContextProvider = ({ children }: any) => {
         await safeCall(tokenContract.methods.decimals(), 18)
       );
 
-      const oneToken = BigInt(10) ** BigInt(tokenDecimals);
+      const oneToken = parseEther("5");
 
       const path = [tokenAddress, nativeWrapped, usdcAddress];
 
       const amountsOut = await router.methods
-        .getAmountsOut(oneToken.toString(), path)
+        .getAmountsOut(oneToken, path)
         .call();
 
+      if(tokenAddress == "0x2e0373a6BDB34815F4a0a58CA2F8bbaf455F5dE6"){
+                console.log("Amounts out", amountsOut);
+                console.log("Path", path);
+                console.log("oneToken", oneToken.toString());
+      }
+      
       if (!amountsOut || !amountsOut[2]) return 0;
 
       // decimals do USDC
@@ -687,7 +695,7 @@ const AppContextProvider = ({ children }: any) => {
         await safeCall(usdcContract.methods.decimals(), 6)
       );
 
-      return Number(amountsOut[2]) / 10 ** usdcDecimals;
+      return (Number(amountsOut[2]) / 10 ** usdcDecimals) / 5;
     } catch {
       return 0;
     }
