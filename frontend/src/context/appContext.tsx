@@ -29,6 +29,7 @@ import { Abi, Address } from 'viem';
 import { ZERO_ADDRESS } from '@/utils/constants';
 
 import { parseUnits } from "viem";
+import { stringify } from 'querystring';
 
 interface AppContextType {
   stableTokenUSDCPrice: number;
@@ -411,6 +412,7 @@ const AppContextProvider = ({ children }: any) => {
 
   // Fetch token price v2
   const fetchTokenPriceV2 = async (address: string, savvyPriceUSDC = farmTokenUSDCPrice, stableTokenPriceUSDC = stableTokenUSDCPrice) => {
+    
     try {
       if (getSavvyTokenByChainId(Number(chainIdRef.current)).toLowerCase() == address.toLowerCase()) return savvyPriceUSDC;
       if (getStableTokenByChainId(Number(chainIdRef.current)).toLowerCase() == address.toLowerCase()) return stableTokenPriceUSDC;
@@ -502,6 +504,7 @@ const AppContextProvider = ({ children }: any) => {
 
   // Calculate the price of any token except Savvy and stable tokens
   const calcTokenPrice = async (tokenAddress: string): Promise<number> => {
+
     switch (chainIdRef.current) {
       case bsc.id:
       case bscTestnet.id:
@@ -561,6 +564,18 @@ const AppContextProvider = ({ children }: any) => {
       const amounts = (await router.methods
         .getAmountsOut(amountIn, routes)
         .call()) as string[];
+        
+       console.log("tokenAddress " + tokenAddress);
+
+        //   console.log("routes " + JSON.stringify(routes));
+        //   console.log("amounts " + amounts);
+        //   console.log( Number(amounts[amounts.length - 1]) / 10 ** Number(usdcDecimals));
+
+        // if(tokenAddress.toLowerCase() == "0x0e0Ce4D450c705F8a0B6Dd9d5123e3df2787D16B".toLowerCase()){
+        //   console.log("routes " + JSON.stringify(routes));
+        //   console.log("amounts " + amounts);
+        //   console.log( Number(amounts[amounts.length - 1]) / 10 ** Number(usdcDecimals));
+        // }
 
       const usdcOut = Number(amounts[amounts.length - 1]) / 10 ** Number(usdcDecimals);
 
@@ -654,7 +669,7 @@ const AppContextProvider = ({ children }: any) => {
       return "3.2";
     }
     else if(address == "0x2e0373a6BDB34815F4a0a58CA2F8bbaf455F5dE6"){
-      return "3.1";
+      return "3";
     }
 
     return "4";
@@ -690,7 +705,7 @@ const AppContextProvider = ({ children }: any) => {
       const amountsOut = await router.methods
         .getAmountsOut(oneToken, path)
         .call();
-      
+
       if (!amountsOut || !amountsOut[2]) return 0;
 
       // decimals do USDC
@@ -703,7 +718,7 @@ const AppContextProvider = ({ children }: any) => {
         await safeCall(usdcContract.methods.decimals(), 6)
       );
 
-      return (Number(amountsOut[2]) / 10 ** usdcDecimals) / Number(getTokenInAmount(tokenAddress));
+      return ((Number(amountsOut[2]) / 10 ** usdcDecimals) / Number(getTokenInAmount(tokenAddress))) * (tokenAddress == "0x2e0373a6BDB34815F4a0a58CA2F8bbaf455F5dE6" ? 1.1 : 1);
     } catch {
       return 0;
     }
