@@ -720,7 +720,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
             <a className="tvl" style={{ display: 'flex', flex: 1, zIndex: 999 }}>
               <PoolSectionValueDescriptionContainer>
                 <h3 className='text-white sm:text-16 text-16 font-bold'>
-                  Total Value Locked (TVL):
+                  TVL:
                 </h3>
               </PoolSectionValueDescriptionContainer>
               <Separator />

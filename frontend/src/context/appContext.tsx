@@ -565,8 +565,6 @@ const AppContextProvider = ({ children }: any) => {
         .getAmountsOut(amountIn, routes)
         .call()) as string[];
         
-       console.log("tokenAddress " + tokenAddress);
-
         //   console.log("routes " + JSON.stringify(routes));
         //   console.log("amounts " + amounts);
         //   console.log( Number(amounts[amounts.length - 1]) / 10 ** Number(usdcDecimals));
