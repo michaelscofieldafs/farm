@@ -646,6 +646,20 @@ const AppContextProvider = ({ children }: any) => {
     }
   }
 
+  const getTokenInAmount = (address: string): string => {
+    if(address == "0x1bc0c42215582d5A085795f4baDbaC3ff36d1Bcb"){
+      return "0.0001";
+    }
+    else if(address == "0xe0CC881E977006488D694148223eAdb5eF207275"){
+      return "3.2";
+    }
+    else if(address == "0x2e0373a6BDB34815F4a0a58CA2F8bbaf455F5dE6"){
+      return "3.1";
+    }
+
+    return "4";
+  };
+
   const calcTokenPriceInUSDCViaNativePancake = async (
     tokenAddress: string
   ): Promise<number> => {
@@ -669,19 +683,13 @@ const AppContextProvider = ({ children }: any) => {
         await safeCall(tokenContract.methods.decimals(), 18)
       );
 
-      const oneToken = parseUnits("5", tokenDecimals);
+      const oneToken = parseUnits(getTokenInAmount(tokenAddress), tokenDecimals);
 
       const path = [tokenAddress, nativeWrapped, usdcAddress];
 
       const amountsOut = await router.methods
         .getAmountsOut(oneToken, path)
         .call();
-
-      if(tokenAddress == "0x2e0373a6BDB34815F4a0a58CA2F8bbaf455F5dE6"){
-                console.log("Amounts out", amountsOut);
-                console.log("Path", path);
-                console.log("oneToken", oneToken.toString());
-      }
       
       if (!amountsOut || !amountsOut[2]) return 0;
 
@@ -695,7 +703,7 @@ const AppContextProvider = ({ children }: any) => {
         await safeCall(usdcContract.methods.decimals(), 6)
       );
 
-      return (Number(amountsOut[2]) / 10 ** usdcDecimals) / 5;
+      return (Number(amountsOut[2]) / 10 ** usdcDecimals) / Number(getTokenInAmount(tokenAddress));
     } catch {
       return 0;
     }
