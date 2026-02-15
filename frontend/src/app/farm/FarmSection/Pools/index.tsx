@@ -2,7 +2,7 @@
 
 import { AppContext } from '@/context/appContext'
 import { motion } from 'framer-motion'
-import { useContext, useState } from 'react'
+import { useContext, useState, useMemo, useEffect, useRef } from 'react'
 import { CircleLoader } from 'react-spinners'
 import FarmPoolCard from './components/pool'
 import FarmLpPoolCard from './components/poollp'
@@ -13,6 +13,47 @@ const SavvyFarmPools = () => {
   const [isSingleSided, setIsSingleSided] = useState<boolean>(true);
 
   const { poolsFarm, poolsTokenFarm, isLoading, farmTokenUSDCPrice, marketCap, tvl, circulatingSupply, } = useContext(AppContext);
+  const [sortOption, setSortOption] = useState<'alloc' | 'singleFirst' | 'lpFirst'>('alloc');
+
+  const visiblePools = useMemo(() => {
+    const single = Array.isArray(poolsTokenFarm) ? [...poolsTokenFarm] : [];
+    const lp = Array.isArray(poolsFarm) ? [...poolsFarm] : [];
+
+    const sortByAlloc = (arr: any[]) => arr.sort((a: any, b: any) => (Number(b?.multiplier ?? 0) - Number(a?.multiplier ?? 0)));
+
+    const sortedSingle = sortByAlloc(single);
+    const sortedLp = sortByAlloc(lp);
+
+    if (sortOption === 'alloc') {
+      return isSingleSided ? sortedSingle : sortedLp;
+    }
+
+    if (sortOption === 'singleFirst') {
+      return [...sortedSingle, ...sortedLp];
+    }
+
+    return [...sortedLp, ...sortedSingle];
+  }, [poolsTokenFarm, poolsFarm, sortOption, isSingleSided]);
+
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+  const sortOptions = [
+    { value: 'alloc', label: 'ALLOC POINTS' },
+    { value: 'singleFirst', label: 'SINGLE SIDED POOLS' },
+    { value: 'lpFirst', label: 'LP POOLS' },
+  ];
+
+  useEffect(() => {
+    function handleOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleOutside);
+    return () => document.removeEventListener('mousedown', handleOutside);
+  }, []);
 
   const handleIsSingleSided = (value: boolean) => {
     setIsSingleSided(value);
@@ -208,6 +249,7 @@ const SavvyFarmPools = () => {
                 </motion.div>
               </div>
               <div className="w-full flex justify-center items-center gap-6 py-4 mt-4 mb-4">
+                {/**
                 <button
                   onClick={() => handleIsSingleSided(true)}
                   className={`relative z-10 px-6 py-2 text-[15px] rounded-lg font-semibold transition-all
@@ -231,6 +273,43 @@ const SavvyFarmPools = () => {
                 >
                   LP Pools
                 </button>
+                 */}
+                <div className="relative z-10">
+                  <label className="sr-only">Sort pools</label>
+                  <div className="flex items-center gap-3 ml-4">
+                    <span className="text-sm text-muted">Sort</span>
+                    <div ref={dropdownRef} className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setDropdownOpen(!dropdownOpen)}
+                        className="flex items-center justify-between min-w-[260px] px-3 py-2 rounded-lg border-2 border-primary bg-[rgba(11,20,24,0.95)] text-white text-sm shadow-sm hover:shadow-md transition"
+                        aria-haspopup="listbox"
+                        aria-expanded={dropdownOpen}
+                      >
+                        <span className="truncate">{sortOptions.find(o => o.value === sortOption)?.label}</span>
+                        <svg className={`ml-2 transform transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                      </button>
+
+                      {dropdownOpen && (
+                        <ul role="listbox" className="absolute right-0 mt-2 w-[320px] bg-[#071019] border border-primary rounded-lg shadow-lg py-1 z-50 overflow-hidden">
+                          {sortOptions.map(opt => (
+                            <li
+                              key={opt.value}
+                              role="option"
+                              aria-selected={sortOption === opt.value}
+                              onClick={() => { setSortOption(opt.value as any); setDropdownOpen(false); }}
+                              className={`px-3 py-2 text-sm text-white hover:bg-primary/20 cursor-pointer ${sortOption === opt.value ? 'bg-primary/20' : ''}`}
+                            >
+                              {opt.label}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -238,26 +317,14 @@ const SavvyFarmPools = () => {
             <motion.div
               {...leftAnimation}>
               <div className="flex flex-wrap justify-center gap-6 w-full pb-20 px-4">
-                {isSingleSided ? (
-                  poolsTokenFarm.length > 0 ? (
-                    poolsTokenFarm.map(item => (
-                      <div className="w-full sm:basis-[280px]">
-                        <FarmPoolCard pool={item} />
-                      </div>
-                    ))
-                  ) : (
-                    <NoPoolsAvailable />
-                  )
+                {visiblePools && visiblePools.length > 0 ? (
+                  visiblePools.map((item: any) => (
+                    <div className="w-full sm:basis-[280px]" key={item.poolAddress ?? item.id ?? Math.random()}>
+                      {item.token ? <FarmPoolCard pool={item} /> : <FarmLpPoolCard pool={item} />}
+                    </div>
+                  ))
                 ) : (
-                  poolsFarm.length > 0 ? (
-                    poolsFarm.map(item => (
-                      <div className="w-full sm:basis-[280px]">
-                        <FarmLpPoolCard pool={item} />
-                      </div>
-                    ))
-                  ) : (
-                    <NoPoolsAvailable />
-                  )
+                  <NoPoolsAvailable />
                 )}
               </div>
             </motion.div>
