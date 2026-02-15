@@ -7,8 +7,14 @@
 import { wagmiAdapter } from "@/components/Web3Provider";
 import { AppContext } from "@/context/appContext";
 import { useAppKitNetwork } from "@reown/appkit/react";
-import { writeContract, waitForTransactionReceipt, readContract } from '@wagmi/core';
+import { readContract, waitForTransactionReceipt, writeContract } from '@wagmi/core';
 // @ts-ignore
+import { ElectricBorderShow } from "@/components/ElectricBorder";
+import ModalDeposit from "@/components/ModalDeposit";
+import { fetchImageByAddress } from "@/utils/fetchTokenImage";
+import { getMastChefAddressByChainId } from "@/utils/masterchefAddressProvider";
+import { getRpcProviderByChainId } from "@/utils/rpcProviderUtils";
+import { getTokenContractABIByChainId } from "@/utils/tokenContractABIProvider";
 import AnimatedNumber from "animated-number-react";
 import { BigNumber, ethers, utils } from 'ethers';
 import numeral from 'numeral';
@@ -17,19 +23,12 @@ import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { toast } from "react-toastify";
 import { Tooltip } from 'react-tooltip';
+import useSound from 'use-sound';
 import { Address, formatUnits } from "viem";
 import { useAccount } from "wagmi";
 import Web3 from "web3";
-import { ActionButtonSeparator, ActionButtonWalletContainer, ActionContainer, FeeContainer, FeeValueContainer, HeaderContainer, HeaderDetailsContainer, ImageToken, PoolContainer, PoolSectionContainer, PoolSectionValueContainer, PoolSectionValueDescriptionContainer, Separator, TokenContainer, WalletContainer, WalletTitleContainer, WalletValueContainer, WalletValueDescriptionContainer, cardStyle } from "./styles";
-import useSound from 'use-sound';
 import { getMasterchefABIByChainId } from "../../../../../utils/masterChefABIProvider";
-import { getMastChefAddressByChainId } from "@/utils/masterchefAddressProvider";
-import { openInNewTab } from "@/utils/functions";
-import { getTokenContractABIByChainId } from "@/utils/tokenContractABIProvider";
-import { getRpcProviderByChainId } from "@/utils/rpcProviderUtils";
-import ModalDeposit from "@/components/ModalDeposit";
-import { fetchImageByAddress } from "@/utils/fetchTokenImage";
-import { ElectricBorderShow } from "@/components/ElectricBorder";
+import { ActionButtonSeparator, ActionButtonWalletContainer, ActionContainer, FeeContainer, FeeValueContainer, HeaderContainer, HeaderDetailsContainer, ImageToken, PoolContainer, PoolSectionContainer, PoolSectionValueContainer, PoolSectionValueDescriptionContainer, Separator, TokenContainer, WalletContainer, WalletTitleContainer, WalletValueContainer, WalletValueDescriptionContainer, cardStyle } from "./styles";
 const transactionSound = '/sounds/transaction.mp3';
 
 enum StatusTransaction {
@@ -587,7 +586,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
   }
 
   function fromWeiWithDecimals(valueInWei: BigNumber): string {
-    return ethers.utils.formatUnits(valueInWei, token.decimais);
+    return ethers.utils.formatUnits(valueInWei, token.decimals);
   }
 
   const showTransactionEffect = (): void => {
@@ -708,7 +707,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
             <a className="tvl" style={{ display: 'flex', flex: 1, zIndex: 999 }}>
               <PoolSectionValueDescriptionContainer>
                 <h3 className='text-white sm:text-16 text-16 font-bold'>
-                  TVL:
+                  Total Value Locked (TVL):
                 </h3>
               </PoolSectionValueDescriptionContainer>
               <Separator />

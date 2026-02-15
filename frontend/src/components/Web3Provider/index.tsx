@@ -5,8 +5,8 @@ import { bsc, bscTestnet, mainnet, sepolia, sonic, sonicBlazeTestnet, plasma, pl
 import { createAppKit } from '@reown/appkit/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactNode } from 'react'
-import { defineChain } from 'viem'
-import { WagmiProvider } from 'wagmi'
+import { defineChain, http } from 'viem'
+import { fallback, WagmiProvider } from 'wagmi'
 
 const projectId = '289396e9ac5e2ccac060651fad3b0f90'
 
@@ -77,4 +77,16 @@ export function Web3Provider({ children }: { children: ReactNode }) {
 export const wagmiAdapter = new WagmiAdapter({
     networks: [sonic, base, bsc, bscTestnet, sonicTestnet, baseSepolia, /** baseGoerli */],
     projectId,
+    transports: {
+        [base.id]: fallback(
+            [
+                http('https://base.drpc.org'),
+                http('https://base-rpc.publicnode.com'),
+            ],
+            {
+                retryCount: 1,           // evita spam
+            }
+        )
+
+    }
 })

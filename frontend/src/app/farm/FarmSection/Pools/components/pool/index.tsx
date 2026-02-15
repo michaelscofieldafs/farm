@@ -6,9 +6,16 @@
 /* eslint-disable no-unused-vars */
 import { wagmiAdapter } from "@/components/Web3Provider";
 import { AppContext } from "@/context/appContext";
-import { useAppKit, useAppKitNetwork } from "@reown/appkit/react";
-import { writeContract, waitForTransactionReceipt, readContract } from '@wagmi/core';
+import { useAppKit } from "@reown/appkit/react";
+import { readContract, waitForTransactionReceipt, writeContract } from '@wagmi/core';
 // @ts-ignore
+import { ElectricBorderShow } from "@/components/ElectricBorder";
+import ModalDeposit from "@/components/ModalDeposit";
+import { fetchImageByAddress } from "@/utils/fetchTokenImage";
+import { isAppChain } from "@/utils/helpers";
+import { getMasterchefABIByChainId } from "@/utils/masterChefABIProvider";
+import { getMastChefAddressByChainId } from "@/utils/masterchefAddressProvider";
+import { getTokenContractABIByChainId } from "@/utils/tokenContractABIProvider";
 import AnimatedNumber from "animated-number-react";
 import { BigNumber, ethers, utils } from 'ethers';
 import numeral from 'numeral';
@@ -17,20 +24,11 @@ import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { toast } from "react-toastify";
 import { Tooltip } from 'react-tooltip';
-import { Address, formatUnits } from "viem";
+import useSound from 'use-sound';
+import { Abi, Address, formatUnits } from "viem";
 import { useAccount } from "wagmi";
 import Web3 from "web3";
 import { ActionButtonSeparator, ActionButtonWalletContainer, ActionContainer, FeeContainer, FeeValueContainer, HeaderContainer, HeaderDetailsContainer, ImageToken, PoolContainer, PoolSectionContainer, PoolSectionValueContainer, PoolSectionValueDescriptionContainer, Separator, TokenContainer, WalletContainer, WalletTitleContainer, WalletValueContainer, WalletValueDescriptionContainer, cardStyle } from "./styles";
-import useSound from 'use-sound';
-import { getMastChefAddressByChainId } from "@/utils/masterchefAddressProvider";
-import { openInNewTab } from "@/utils/functions";
-import { getTokenContractABIByChainId } from "@/utils/tokenContractABIProvider";
-import { getRpcProviderByChainId } from "@/utils/rpcProviderUtils";
-import ModalDeposit from "@/components/ModalDeposit";
-import { fetchImageByAddress } from "@/utils/fetchTokenImage";
-import { ElectricBorderShow } from "@/components/ElectricBorder";
-import { getMasterchefABIByChainId } from "@/utils/masterChefABIProvider";
-import { isAppChain } from "@/utils/helpers";
 const transactionSound = '/sounds/transaction.mp3';
 
 enum StatusTransaction {
@@ -451,17 +449,33 @@ const FarmPoolCard = (props: { pool: any; }) => {
   // Fetch the pool data based on the connected wallet
   const fetchPoolDataByWalletConnect = async (): Promise<void> => {
     try {
-      const web3 = new Web3(getRpcProviderByChainId(chainId));
-
-      const masterChefContract = new web3.eth.Contract(getMasterchefABIByChainId(chainId), getMastChefAddressByChainId(chainId));
-
       if (isConnected) {
-        const userInfo = await masterChefContract.methods.userInfo(poolMasterchef, address).call();
-        const userRewards = await masterChefContract.methods.pendingSavvy(poolMasterchef, address).call();
-        const { amount } = userInfo as any;
 
-        const amountBN = BigNumber.from(amount);
-        const farmBalanceBN = BigNumber.from(pool.farmBalance);
+        const masterChefAddress = getMastChefAddressByChainId(chainId);
+        const masterChefAbi = getMasterchefABIByChainId(chainId);
+
+        const userInfo: any = await readContract(wagmiAdapter.wagmiConfig, {
+          address: masterChefAddress as Address,
+          abi: masterChefAbi as Abi,
+          functionName: 'userInfo',
+          args: [BigInt(poolMasterchef), address as Address],
+          chainId: chainId,
+        });
+
+        const userRewards = await readContract(wagmiAdapter.wagmiConfig, {
+          address: masterChefAddress as Address,
+          abi: masterChefAbi as Abi,
+          functionName: 'pendingSavvy',
+          args: [BigInt(poolMasterchef), address as Address],
+          chainId: chainId,
+        });
+
+        // 🔥 Ajuste importante (viem pode retornar struct como array)
+        const amount = userInfo?.amount ?? userInfo?.[0] ?? 0;
+
+        const amountBN = BigNumber.from(amount.toString());
+        const farmBalanceBN = BigNumber.from(pool.farmBalance.toString());
+
         const tvlFixed = Number(pool.tvl).toFixed(token.decimals);
         const tvlBN = utils.parseUnits(tvlFixed, Number(token.decimals));
 
@@ -474,7 +488,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
         setTotalTokensDeposited(amountBN);
 
         setRewards(Number(userRewards) / 10 ** 18);
-        setTotalTokensDepositedBalance(totalStakedBN)
+        setTotalTokensDepositedBalance(totalStakedBN);
       }
     }
     catch (err) {
@@ -482,7 +496,8 @@ const FarmPoolCard = (props: { pool: any; }) => {
     finally {
       setIsLoading(false);
     }
-  }
+  };
+
 
   // Fetch total tokens or lp on connected wallet
   const fetchLpWallet = async (): Promise<void> => {
@@ -492,10 +507,13 @@ const FarmPoolCard = (props: { pool: any; }) => {
     }
 
     try {
-      const web3 = new Web3(getRpcProviderByChainId(chainId));
-      const tokenContract = new web3.eth.Contract(getTokenContractABIByChainId(chainId), poolAddress);
-
-      let tokenWallet = await tokenContract.methods.balanceOf(address).call();
+      const tokenWallet = await readContract(wagmiAdapter.wagmiConfig, {
+        address: poolAddress as Address,
+        abi: getTokenContractABIByChainId(chainId) as Abi,
+        functionName: 'balanceOf',
+        args: [address as Address],
+        chainId: chainId,
+      });
 
       const balanceBN = BigNumber.from(tokenWallet);
 
@@ -568,16 +586,55 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
     const totalValue = balanceReadable * token.price;
 
-    const formatter = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      notation: 'compact',
-      compactDisplay: 'short',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
+    if (totalValue === 0 || Number.isNaN(totalValue)) {
+      return `$0.00`;
+    }
 
-    return formatter.format(totalValue);
+    // For regular USD values (>= $0.01) use normal currency formatting with 2 decimals
+    if (totalValue >= 0.01) {
+      const formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+      return formatter.format(totalValue);
+    }
+
+    // For very small values (< $0.01) display enough decimals so that
+    // we show the first non-zero decimal digit + one extra decimal (2 digits
+    // starting at the first non-zero), e.g. 0.0000043 stays 0.0000043 (or
+    // 0.00000430 if second digit is zero and exists).
+    const totalStr = totalValue.toFixed(18);
+    const parts = totalStr.split('.');
+    if (parts.length === 1) {
+      return `$${parts[0]}`;
+    }
+
+    const integer = parts[0];
+    const decimals = parts[1] || '';
+
+    let firstNonZero = -1;
+    for (let i = 0; i < decimals.length; i++) {
+      if (decimals[i] !== '0') {
+        firstNonZero = i;
+        break;
+      }
+    }
+
+    if (firstNonZero === -1) {
+      return `$${integer}.00`;
+    }
+
+    // show two digits starting from the first non-zero decimal
+    let displayLen = firstNonZero + 2;
+    if (displayLen > decimals.length) displayLen = decimals.length;
+
+    const truncated = decimals.slice(0, displayLen);
+
+    const prefix = totalValue > 0 && totalValue < 0.01 ? '~ ' : '';
+    return `${prefix}$${integer}.${truncated}`;
   }
 
   function formatTokenBalanceFromFarm(): string {
@@ -642,8 +699,9 @@ const FarmPoolCard = (props: { pool: any; }) => {
       return `$0.00`;
     }
 
+
     // For regular USD values (>= $0.01) format normally with 2 decimals
-    if (totalValue >= 0.01) {
+    if (totalValue > 0.01) {
       const formatted = totalValue.toLocaleString('en-US', {
         style: 'currency',
         currency: 'USD',

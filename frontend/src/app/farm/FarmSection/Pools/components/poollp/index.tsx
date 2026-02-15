@@ -10,11 +10,14 @@ import { AppContext } from "@/context/appContext";
 import { openInNewTab } from "@/utils/functions";
 import { getMasterchefABIByChainId } from "@/utils/masterChefABIProvider";
 import { getMastChefAddressByChainId } from "@/utils/masterchefAddressProvider";
-import { getRpcProviderByChainId } from "@/utils/rpcProviderUtils";
 import { getTokenContractABIByChainId } from "@/utils/tokenContractABIProvider";
 import { useAppKit, useAppKitNetwork } from "@reown/appkit/react";
-import { writeContract, waitForTransactionReceipt, readContract } from '@wagmi/core';
+import { readContract, waitForTransactionReceipt, writeContract } from '@wagmi/core';
 // @ts-ignore
+import { ElectricBorderShow } from "@/components/ElectricBorder";
+import { fetchImageByAddress } from "@/utils/fetchTokenImage";
+import { isAppChain } from "@/utils/helpers";
+import { getSavvyTokenByChainId } from "@/utils/tokenAddressProvider";
 import AnimatedNumber from "animated-number-react";
 import { BigNumber, ethers, utils } from 'ethers';
 import numeral from 'numeral';
@@ -24,15 +27,11 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import { toast } from "react-toastify";
 import { Tooltip } from 'react-tooltip';
 import useSound from 'use-sound';
-import { Address, formatUnits } from "viem";
+import { Abi, Address } from "viem";
+import { base, baseSepolia, bsc, bscTestnet, sonic, sonicTestnet } from "viem/chains";
 import { useAccount } from "wagmi";
 import Web3 from "web3";
 import { ActionButtonSeparator, ActionButtonWalletContainer, ActionContainer, FeeContainer, FeeValueContainer, HeaderContainer, HeaderDetailsContainer, ImageToken, PoolContainer, PoolSectionContainer, PoolSectionValueContainer, PoolSectionValueDescriptionContainer, Separator, TokenContainer, WalletContainer, WalletTitleContainer, WalletValueContainer, WalletValueDescriptionContainer, cardStyle } from "./styles";
-import { fetchImageByAddress } from "@/utils/fetchTokenImage";
-import { ElectricBorderShow } from "@/components/ElectricBorder";
-import { isAppChain } from "@/utils/helpers";
-import { base, baseSepolia, bsc, bscTestnet, sonic, sonicTestnet } from "viem/chains";
-import { getSavvyTokenByChainId } from "@/utils/tokenAddressProvider";
 const transactionSound = '/sounds/transaction.mp3';
 
 enum StatusTransaction {
@@ -465,13 +464,27 @@ const FarmPoolCard = (props: { pool: any; }) => {
   // Fetch the pool data based on the connected wallet
   const fetchPoolDataByWalletConnect = async () => {
     try {
-      const web3 = new Web3(getRpcProviderByChainId(chainId));
-
-      const masterChefContract = new web3.eth.Contract(getMasterchefABIByChainId(chainId), getMastChefAddressByChainId(chainId));
-
       if (isConnected) {
-        const userInfo = await masterChefContract.methods.userInfo(poolMasterchef, address).call();
-        const userRewards = await masterChefContract.methods.pendingSavvy(poolMasterchef, address).call();
+
+        const masterChefAddress = getMastChefAddressByChainId(chainId);
+        const masterChefAbi = getMasterchefABIByChainId(chainId);
+
+        const userInfo = await readContract(wagmiAdapter.wagmiConfig, {
+          address: masterChefAddress as Address,
+          abi: masterChefAbi as Abi,
+          functionName: 'userInfo',
+          args: [poolMasterchef, address as Address],
+          chainId: chainId,
+        });
+
+        const userRewards = await readContract(wagmiAdapter.wagmiConfig, {
+          address: masterChefAddress as Address,
+          abi: masterChefAbi as Abi,
+          functionName: 'pendingSavvy',
+          args: [poolMasterchef, address as Address],
+          chainId: chainId,
+        });
+
         const { amount } = userInfo as any;
 
         const amountBN = BigNumber.from(amount);
@@ -488,7 +501,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
         setTotalTokensDeposited(amountBN);
 
         setRewards(Number(userRewards) / 10 ** 18);
-        setTotalTokensDepositedBalance(totalStakedBN)
+        setTotalTokensDepositedBalance(totalStakedBN);
       }
     }
     catch (err) {
@@ -496,7 +509,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
     finally {
       setIsLoading(false);
     }
-  }
+  };
 
   // Fetch total tokens or lp on connected wallet
   const fetchLpWallet = async () => {
@@ -506,10 +519,13 @@ const FarmPoolCard = (props: { pool: any; }) => {
     }
 
     try {
-      const web3 = new Web3(getRpcProviderByChainId(chainId));
-      const pairContract = new web3.eth.Contract(getTokenContractABIByChainId(chainId), poolAddress);
-
-      let lpWallet: any = await pairContract.methods.balanceOf(address).call();
+      const lpWallet: any = await readContract(wagmiAdapter.wagmiConfig, {
+        address: poolAddress as Address,
+        abi: getTokenContractABIByChainId(chainId) as Abi,
+        functionName: 'balanceOf',
+        args: [address as Address],
+        chainId: chainId,
+      });
 
       const balanceBN = BigNumber.from(lpWallet);
 
@@ -517,7 +533,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
     }
     catch (err) {
     }
-  }
+  };
 
   function formatTokenBalanceFromWallet(): string {
     const readable = parseFloat(utils.formatUnits(balanceWallet, decimals));
@@ -539,16 +555,55 @@ const FarmPoolCard = (props: { pool: any; }) => {
 
     const totalValue = (pool.tvlTotal > 0 ? ((((balanceReadable) * 100 / (Number(pool.totalSupply) / 10 ** Number(decimals)))) / 100) * pool.tvlTotal : 0);
 
-    const formatter = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      notation: 'compact',
-      compactDisplay: 'short',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
+    if (totalValue === 0 || Number.isNaN(totalValue)) {
+      return `$0.00`;
+    }
 
-    return formatter.format(totalValue);
+    // For regular USD values (>= $0.01) use normal currency formatting with 2 decimals
+    if (totalValue >= 0.01) {
+      const formatted = totalValue.toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+      return formatted;
+    }
+
+    // For very small USD values (< $0.01) show two digits starting at the
+    // first non-zero decimal (so small magnitudes like 0.0000043 become
+    // $0.0000043 or $0.00000430 depending on available decimals).
+    const totalStr = totalValue.toFixed(18);
+    const parts = totalStr.split('.');
+    if (parts.length === 1) {
+      return `$${parts[0]}`;
+    }
+
+    const integer = parts[0];
+    const decimalsStr = parts[1] || '';
+
+    let firstNonZero = -1;
+    for (let i = 0; i < decimalsStr.length; i++) {
+      if (decimalsStr[i] !== '0') {
+        firstNonZero = i;
+        break;
+      }
+    }
+
+    if (firstNonZero === -1) {
+      return `$${integer}.00`;
+    }
+
+    let displayLen = firstNonZero + 2; // show 2 digits starting at first non-zero
+    if (displayLen > decimalsStr.length) displayLen = decimalsStr.length;
+
+    const truncated = decimalsStr.slice(0, displayLen).replace(/0+$/g, '');
+
+    const finalDecimals = truncated.length === 0 ? decimalsStr.slice(0, Math.min(2, decimalsStr.length)) : truncated;
+
+    const prefix = totalValue > 0 && totalValue < 0.01 ? '~ ' : '';
+    return `${prefix}$${integer}.${finalDecimals}`;
   }
 
   function formatTokenBalanceFromFarm(): string {

@@ -8,28 +8,24 @@
 'use client'
 
 import { wagmiAdapter } from '@/components/Web3Provider';
+import { ZERO_ADDRESS } from '@/utils/constants';
+import { fetchChainBase } from '@/utils/helpers';
 import { getPairContractV2ABIByChainId } from '@/utils/pairContractABIProvider';
 import { getTokenContractABIByChainId } from '@/utils/tokenContractABIProvider';
 import { useAppKitNetwork } from '@reown/appkit/react';
-import { readContracts, watchBlocks } from '@wagmi/core';
+import { readContract, readContracts, watchBlocks } from '@wagmi/core';
 import { createContext, useEffect, useRef, useState } from "react";
-import Web3 from "web3";
+import { Abi, Address, parseEther } from 'viem';
+import { base, bsc, bscTestnet } from 'viem/chains';
 import { getBlocksPerYearByChainId } from '../utils/blocksPerYearProvider';
-import { safeCall } from '../utils/functions';
 import { getMasterchefABIByChainId } from '../utils/masterChefABIProvider';
 import { getMastChefAddressByChainId } from '../utils/masterchefAddressProvider';
 import { getRouterABIByChainId } from '../utils/routerABIProvider';
 import { getRouterAddressByChainId } from '../utils/routerProvider';
-import { getRpcProviderByChainId } from '../utils/rpcProviderUtils';
 import { getSavvyTokenByChainId, getStableTokenByChainId, getUSDTTokenByChainId } from '../utils/tokenAddressProvider';
 import { PoolLP, PoolSingle } from './interfaces';
-import { base, baseSepolia, bsc, bscTestnet, sonic } from 'viem/chains';
-import { fetchChainBase } from '@/utils/helpers';
-import { Abi, Address } from 'viem';
-import { ZERO_ADDRESS } from '@/utils/constants';
 
 import { parseUnits } from "viem";
-import { stringify } from 'querystring';
 
 interface AppContextType {
   stableTokenUSDCPrice: number;
@@ -78,10 +74,7 @@ const AppContextProvider = ({ children }: any) => {
   const [poolsTokenFarm, setPoolsTokenFarm] = useState<PoolSingle[]>([]);
   const [isLoadingPoolsFarm, setIsLoadingPoolsFarm] = useState(true);
   const { chainId } = useAppKitNetwork();
-  const web3Ref = useRef(new Web3(getRpcProviderByChainId(Number(chainId))));
   const chainIdRef = useRef(fetchChainBase(Number(chainId)));
-  const farmPriceRef = useRef(0)
-  const stablePriceRef = useRef(0)
 
   const unwrap = (res: any, fallback: any): any => {
     if (!res || res.status !== 'success') return fallback;
@@ -94,10 +87,6 @@ const AppContextProvider = ({ children }: any) => {
     try {
       const chainIdBase = fetchChainBase(Number(chainIdRef.current));
       const masterChefAddress = getMastChefAddressByChainId(chainIdBase);
-      const masterChefContract = new web3Ref.current.eth.Contract(
-        getMasterchefABIByChainId(chainIdBase),
-        masterChefAddress
-      );
 
       //console.log("ReadContrat")
       const [poolLengthRaw, savvyPerBlockRaw, totalAllocPointRaw] =
@@ -137,14 +126,35 @@ const AppContextProvider = ({ children }: any) => {
         (async () => {
           //console.log(`Fetching pool ${i + 1} of ${poolLength}`);
           try {
-            const poolInfo = await safeCall(masterChefContract.methods.poolInfo(i));
+            const poolInfo = await readContract(wagmiAdapter.wagmiConfig, {
+              address: masterChefAddress as Address,
+              abi: getMasterchefABIByChainId(chainIdBase) as Abi,
+              functionName: 'poolInfo',
+              args: [i],
+              chainId: chainIdBase,
+            }) as any;
             if (!poolInfo) return null;
 
-            const { allocPoint = 0, depositFeeBP = 0, lpToken } = poolInfo;
+            const lpToken = poolInfo?.lpToken ?? poolInfo?.[0];
+            const allocPoint = poolInfo?.allocPoint ?? poolInfo?.[1] ?? 0;
+            const depositFeeBP = poolInfo?.depositFeeBP ?? poolInfo?.[4] ?? 0;
+
             if (!lpToken) return null;
 
-            const tokenContract = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(chainIdBase), lpToken);
-            const symbol = (await safeCall(tokenContract.methods.symbol(), '')).toUpperCase();
+            let symbol = '';
+
+            try {
+              const result = await readContract(wagmiAdapter.wagmiConfig, {
+                address: lpToken as Address,
+                abi: getTokenContractABIByChainId(chainIdBase) as Abi,
+                functionName: 'symbol',
+                chainId: chainIdBase,
+              });
+
+              symbol = (result as string).toUpperCase();
+            } catch {
+              symbol = '';
+            }
 
             if (symbol === null) return null;
 
@@ -412,7 +422,7 @@ const AppContextProvider = ({ children }: any) => {
 
   // Fetch token price v2
   const fetchTokenPriceV2 = async (address: string, savvyPriceUSDC = farmTokenUSDCPrice, stableTokenPriceUSDC = stableTokenUSDCPrice) => {
-    
+
     try {
       if (getSavvyTokenByChainId(Number(chainIdRef.current)).toLowerCase() == address.toLowerCase()) return savvyPriceUSDC;
       if (getStableTokenByChainId(Number(chainIdRef.current)).toLowerCase() == address.toLowerCase()) return stableTokenPriceUSDC;
@@ -479,14 +489,21 @@ const AppContextProvider = ({ children }: any) => {
   // Fetch circtulating supply of savvy token
   const fetchCirculatingSupply = async (tokenPrice = farmTokenUSDCPrice) => {
     try {
-      const tokenContract = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(Number(chainIdRef.current)), getSavvyTokenByChainId(Number(chainIdRef.current)));
-      let totalSupply: any = await tokenContract.methods.totalSupply().call();
-      totalSupply = (Number(totalSupply) / 10 ** 18);
+      const totalSupplyRaw = await readContract(wagmiAdapter.wagmiConfig, {
+        address: getSavvyTokenByChainId(Number(chainIdRef.current)) as Address,
+        abi: getTokenContractABIByChainId(Number(chainIdRef.current)),
+        functionName: 'totalSupply',
+        chainId: Number(chainIdRef.current),
+      })
 
-      setCirculatingSupply(Number(totalSupply));
-      setMarketCap(totalSupply * tokenPrice);
+      const totalSupply =
+        Number(totalSupplyRaw) / 10 ** 18
+
+      setCirculatingSupply(totalSupply)
+      setMarketCap(totalSupply * tokenPrice)
+
     } catch (err) {
-      throw err;
+      throw err
     }
   }
 
@@ -527,86 +544,71 @@ const AppContextProvider = ({ children }: any) => {
   const calcTokenPriceUSDCSingleCallShadow = async (
     tokenAddress: string
   ): Promise<number> => {
-    const amountIn = web3Ref.current.utils.toWei('1', 'ether');
-
     try {
-      const chainId = Number(chainIdRef.current);
+      const chainId = Number(chainIdRef.current)
+      const amountIn = parseEther("1");
 
-      const router = new web3Ref.current.eth.Contract(
-        getRouterABIByChainId(chainId),
-        tokenAddress.toLowerCase() === getSavvyTokenByChainId(chainId) ? '0x7635cD591CFE965bE8beC60Da6eA69b6dcD27e4b'.toLowerCase() : getRouterAddressByChainId(chainId).toLowerCase()
-      );
+      const savvyToken = getSavvyTokenByChainId(chainId).toLowerCase()
+      const specialToken = '0x50c42dEAcD8Fc9773493ED674b675bE577f2634b'.toLowerCase()
 
-      const usdcAddress = getUSDTTokenByChainId(chainId);
-      const wrappedNative = getStableTokenByChainId(chainId);
+      const routerAddress =
+        tokenAddress.toLowerCase() === savvyToken ||
+          tokenAddress.toLowerCase() === specialToken
+          ? '0x7635cD591CFE965bE8beC60Da6eA69b6dcD27e4b'.toLowerCase()
+          : getRouterAddressByChainId(chainId).toLowerCase()
 
-      const usdcContract = new web3Ref.current.eth.Contract(
-        getTokenContractABIByChainId(chainId),
-        usdcAddress
-      );
+      const usdcAddress = getUSDTTokenByChainId(chainId)
+      const wrappedNative = getStableTokenByChainId(chainId)
 
-      const usdcDecimals = await safeCall(usdcContract.methods.decimals(), 6);
+      const usdcDecimals = await readContract(wagmiAdapter.wagmiConfig, {
+        address: usdcAddress as Address,
+        abi: getTokenContractABIByChainId(chainId),
+        functionName: 'decimals',
+        chainId,
+      })
 
-      const routes = tokenAddress.toLowerCase() === getSavvyTokenByChainId(chainId) ? [
-        [tokenAddress, wrappedNative, false],
-        [wrappedNative, usdcAddress, false],
-      ] : [{
-        from: tokenAddress,
-        to: wrappedNative,
-        stable: false,
-      },
-      {
-        from: wrappedNative,
-        to: usdcAddress,
-        stable: false,
-      },];
+      const routes =
+        tokenAddress.toLowerCase() === savvyToken ||
+          tokenAddress.toLowerCase() === specialToken
+          ? [
+            [tokenAddress, wrappedNative, false],
+            [wrappedNative, usdcAddress, false],
+          ]
+          : [
+            {
+              from: tokenAddress,
+              to: wrappedNative,
+              stable: false,
+            },
+            {
+              from: wrappedNative,
+              to: usdcAddress,
+              stable: false,
+            },
+          ]
 
-      const amounts = (await router.methods
-        .getAmountsOut(amountIn, routes)
-        .call()) as string[];
-        
-        //   console.log("routes " + JSON.stringify(routes));
-        //   console.log("amounts " + amounts);
-        //   console.log( Number(amounts[amounts.length - 1]) / 10 ** Number(usdcDecimals));
+      const amounts = await readContract(wagmiAdapter.wagmiConfig, {
+        address: routerAddress as Address,
+        abi: getRouterABIByChainId(chainId),
+        functionName: 'getAmountsOut',
+        args: [amountIn, routes],
+        chainId,
+      }) as bigint[]
 
-        // if(tokenAddress.toLowerCase() == "0x0e0Ce4D450c705F8a0B6Dd9d5123e3df2787D16B".toLowerCase()){
-        //   console.log("routes " + JSON.stringify(routes));
-        //   console.log("amounts " + amounts);
-        //   console.log( Number(amounts[amounts.length - 1]) / 10 ** Number(usdcDecimals));
-        // }
+      const usdcOut =
+        Number(amounts[amounts.length - 1]) /
+        10 ** Number(usdcDecimals)
 
-      const usdcOut = Number(amounts[amounts.length - 1]) / 10 ** Number(usdcDecimals);
+      if (tokenAddress.toLowerCase() === specialToken) {
+        console.log('routes ' + JSON.stringify(routes))
+        console.log('amounts ' + amounts)
+        console.log('usdcOut ' + usdcOut)
+      }
 
-      return usdcOut;
+      return usdcOut
+
     } catch {
-      return 0;
-    }
-  };
-
-  /**
-   * 
-   * @param tokenAddress Address of the token that will be pegged to the stablecoin.
-   * @returns Return the price of a specific token based on the chain's stablecoin
-   */
-  const calcTokenPriceInStableToken = async (tokenAddress: string): Promise<number> => {
-    let tokenToSell = web3Ref.current.utils.toWei("1", "ether");
-
-    let amountOut;
-    try {
-      let router = new web3Ref.current.eth.Contract(getRouterABIByChainId(Number(chainIdRef.current)), getRouterAddressByChainId(Number(chainIdRef.current)).toLowerCase());
-
-      const tokenIn = tokenAddress;
-      const tokenOut = getStableTokenByChainId(Number(chainIdRef.current));
-      const amountIn = tokenToSell;
-
-      const routes = [[tokenIn, tokenOut, false]];
-
-      amountOut = await router.methods.getAmountsOut(amountIn, routes).call();
-      amountOut = Number(amountOut![1]) / 10 ** 18;
-
-      return amountOut;
-    } catch (error: any) {
-      return 0;
+      return 0
     }
   }
 
@@ -615,58 +617,56 @@ const AppContextProvider = ({ children }: any) => {
    * @returns Returns the value of the chain’s stablecoin in USDC
    */
   const calcStableTokenPriceInUSDCShadow = async (): Promise<number> => {
-    let tokenToSell = web3Ref.current.utils.toWei("1", "ether");
-    let amountOut;
     try {
-      let router = new web3Ref.current.eth.Contract(getRouterABIByChainId(Number(chainIdRef.current)), getRouterAddressByChainId(Number(chainIdRef.current)));
-      const tokenContract = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(Number(chainIdRef.current)), getUSDTTokenByChainId(Number(chainIdRef.current)));
+      const chainId = Number(chainIdRef.current)
 
-      const decimals = await safeCall(tokenContract.methods.decimals(), 6);
-      const amountIn = tokenToSell;
+      const amountIn = parseEther('1') // equivalente ao toWei("1", "ether")
 
-      const routes = [[getStableTokenByChainId(Number(chainIdRef.current)), getUSDTTokenByChainId(Number(chainIdRef.current)), false]];
+      const routerAddress = getRouterAddressByChainId(chainId)
+      const usdtAddress = getUSDTTokenByChainId(chainId)
+      const stableTokenAddress = getStableTokenByChainId(chainId)
 
-      amountOut = await router.methods.getAmountsOut(amountIn, routes).call();
-      amountOut = Number(amountOut![1]) / 10 ** Number(decimals);
+      // ===== pegar decimals =====
+      const decimals = await readContract(wagmiAdapter.wagmiConfig, {
+        address: usdtAddress as Address,
+        abi: getTokenContractABIByChainId(chainId),
+        functionName: 'decimals',
+        chainId,
+      })
 
-      return amountOut;
-    } catch (error) {
-      return 0;
-    }
-  }
+      // ===== montar routes =====
+      const routes = [
+        [stableTokenAddress, usdtAddress, false]
+      ]
 
-  /**
- * 
- * @param tokenAddress Address of the token that will be pegged to the stablecoin.
- * @returns Return the price of a specific token based on the chain's stablecoin
- */
-  const calcTokenPriceInStableTokenPancake = async (tokenAddress: string): Promise<number> => {
-    let tokenToSell = web3Ref.current.utils.toWei("1", "ether");
+      // ===== getAmountsOut =====
+      const amountOut = await readContract(wagmiAdapter.wagmiConfig, {
+        address: routerAddress as Address,
+        abi: getRouterABIByChainId(chainId),
+        functionName: 'getAmountsOut',
+        args: [amountIn, routes],
+        chainId,
+      }) as bigint[]
 
-    let amountOut;
-    try {
-      let router = new web3Ref.current.eth.Contract(getRouterABIByChainId(Number(chainIdRef.current)), getRouterAddressByChainId(Number(chainIdRef.current)).toLowerCase());
-      const tokenContract = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(Number(chainIdRef.current)), tokenAddress);
+      const result =
+        Number(amountOut[1]) /
+        10 ** Number(decimals)
 
-      const decimals = await safeCall(tokenContract.methods.decimals(), 18);
+      return result
 
-      amountOut = await router.methods.getAmountsOut(tokenToSell, [tokenAddress, getStableTokenByChainId(Number(chainIdRef.current))]).call() as any;
-      amountOut = Number(amountOut[1]) / 10 ** Number(decimals);
-
-      return amountOut;
-    } catch (error: any) {
-      return 0;
+    } catch {
+      return 0
     }
   }
 
   const getTokenInAmount = (address: string): string => {
-    if(address == "0x1bc0c42215582d5A085795f4baDbaC3ff36d1Bcb"){
+    if (address == "0x1bc0c42215582d5A085795f4baDbaC3ff36d1Bcb") {
       return "0.0001";
     }
-    else if(address == "0xe0CC881E977006488D694148223eAdb5eF207275"){
+    else if (address == "0xe0CC881E977006488D694148223eAdb5eF207275") {
       return "3.2";
     }
-    else if(address == "0x2e0373a6BDB34815F4a0a58CA2F8bbaf455F5dE6"){
+    else if (address == "0x2e0373a6BDB34815F4a0a58CA2F8bbaf455F5dE6") {
       return "3";
     }
 
@@ -677,71 +677,108 @@ const AppContextProvider = ({ children }: any) => {
     tokenAddress: string
   ): Promise<number> => {
     try {
-      const chainId = Number(chainIdRef.current);
+      const chainId = Number(chainIdRef.current)
 
-      const router = new web3Ref.current.eth.Contract(
-        getRouterABIByChainId(chainId),
-        getRouterAddressByChainId(chainId)
-      );
+      const routerAddress = getRouterAddressByChainId(chainId)
+      const usdcAddress = getUSDTTokenByChainId(chainId)
+      const nativeWrapped = getStableTokenByChainId(chainId)
 
-      const tokenContract = new web3Ref.current.eth.Contract(
-        getTokenContractABIByChainId(chainId),
-        tokenAddress
-      );
-
-      const usdcAddress = getUSDTTokenByChainId(chainId);
-      const nativeWrapped = getStableTokenByChainId(chainId);
-
+      // ===== token decimals =====
       const tokenDecimals = Number(
-        await safeCall(tokenContract.methods.decimals(), 18)
-      );
+        await readContract(wagmiAdapter.wagmiConfig, {
+          address: tokenAddress as Address,
+          abi: getTokenContractABIByChainId(chainId),
+          functionName: 'decimals',
+          chainId,
+        })
+      )
 
-      const oneToken = parseUnits(getTokenInAmount(tokenAddress), tokenDecimals);
+      const tokenAmountInput = getTokenInAmount(tokenAddress)
 
-      const path = [tokenAddress, nativeWrapped, usdcAddress];
+      const oneToken = parseUnits(tokenAmountInput, tokenDecimals)
 
-      const amountsOut = await router.methods
-        .getAmountsOut(oneToken, path)
-        .call();
+      // ===== path (pancake style) =====
+      const path = [tokenAddress, nativeWrapped, usdcAddress]
 
-      if (!amountsOut || !amountsOut[2]) return 0;
+      // ===== getAmountsOut =====
+      const amountsOut = await readContract(wagmiAdapter.wagmiConfig, {
+        address: routerAddress as Address,
+        abi: getRouterABIByChainId(chainId),
+        functionName: 'getAmountsOut',
+        args: [oneToken, path],
+        chainId,
+      }) as bigint[]
 
-      // decimals do USDC
-      const usdcContract = new web3Ref.current.eth.Contract(
-        getTokenContractABIByChainId(chainId),
-        usdcAddress
-      );
+      if (!amountsOut || !amountsOut[2]) return 0
 
+      // ===== usdc decimals =====
       const usdcDecimals = Number(
-        await safeCall(usdcContract.methods.decimals(), 6)
-      );
+        await readContract(wagmiAdapter.wagmiConfig, {
+          address: usdcAddress as Address,
+          abi: getTokenContractABIByChainId(chainId),
+          functionName: 'decimals',
+          chainId,
+        })
+      )
 
-      return ((Number(amountsOut[2]) / 10 ** usdcDecimals) / Number(getTokenInAmount(tokenAddress))) * (tokenAddress == "0x2e0373a6BDB34815F4a0a58CA2F8bbaf455F5dE6" ? 1.1 : 1);
+      const price =
+        (Number(amountsOut[2]) / 10 ** usdcDecimals) /
+        Number(tokenAmountInput)
+
+      return price *
+        (tokenAddress === "0x2e0373a6BDB34815F4a0a58CA2F8bbaf455F5dE6"
+          ? 1.1
+          : 1)
+
     } catch {
-      return 0;
+      return 0
     }
-  };
+  }
 
   /**
    * 
    * @returns Returns the value of the chain’s stablecoin in USDC
    */
   const calcStableTokenPriceInUSDCPancake = async (): Promise<number> => {
-    let tokenToSell = web3Ref.current.utils.toWei("1", "ether");
-    let amountOut;
     try {
-      let router = new web3Ref.current.eth.Contract(getRouterABIByChainId(Number(chainIdRef.current)), getRouterAddressByChainId(Number(chainIdRef.current)));
-      const tokenContract = new web3Ref.current.eth.Contract(getTokenContractABIByChainId(Number(chainIdRef.current)), getUSDTTokenByChainId(Number(chainIdRef.current)));
+      const chainId = Number(chainIdRef.current)
 
-      const decimals = await safeCall(tokenContract.methods.decimals(), 6);
+      const amountIn = parseEther('1') // equivalente ao toWei("1", "ether")
 
-      amountOut = await router.methods.getAmountsOut(tokenToSell, [getStableTokenByChainId(Number(chainIdRef.current)),
-      getUSDTTokenByChainId(Number(chainIdRef.current))]).call() as any;
-      amountOut = Number(amountOut[1]) / 10 ** Number(decimals);
+      const routerAddress = getRouterAddressByChainId(chainId)
+      const usdcAddress = getUSDTTokenByChainId(chainId)
+      const stableTokenAddress = getStableTokenByChainId(chainId)
 
-      return amountOut;
-    } catch (error) {
-      return 0;
+      // ===== pegar decimals do USDC =====
+      const decimals = Number(
+        await readContract(wagmiAdapter.wagmiConfig, {
+          address: usdcAddress as Address,
+          abi: getTokenContractABIByChainId(chainId),
+          functionName: 'decimals',
+          chainId,
+        })
+      )
+
+      // ===== getAmountsOut (pancake path) =====
+      const amountOut = await readContract(wagmiAdapter.wagmiConfig, {
+        address: routerAddress as Address,
+        abi: getRouterABIByChainId(chainId),
+        functionName: 'getAmountsOut',
+        args: [
+          amountIn,
+          [stableTokenAddress, usdcAddress]
+        ],
+        chainId,
+      }) as bigint[]
+
+      const result =
+        Number(amountOut[1]) /
+        10 ** decimals
+
+      return result
+
+    } catch {
+      return 0
     }
   }
 
@@ -774,7 +811,6 @@ const AppContextProvider = ({ children }: any) => {
 
       //console.log(`Change network to ${chainId}`);
       chainIdRef.current = Number(fetchChainBase(Number(chainId)));
-      web3Ref.current = new Web3(getRpcProviderByChainId(Number(chainId)));
       clearFarmData();
       fetchData();
     }
@@ -785,7 +821,7 @@ const AppContextProvider = ({ children }: any) => {
       const unwatch = watchBlocks(wagmiAdapter.wagmiConfig, {
         chainId: Number(fetchChainBase(chainIdRef.current)),
         blockTag: 'latest',
-        pollingInterval: 15000,
+        pollingInterval: 7000,
         onBlock(block) {
           //console.log(`Block ${block.number} of ${chainIdRef.current}`);
           fetchDataFarm();
