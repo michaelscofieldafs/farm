@@ -778,7 +778,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
       window.open(`https://pancakeswap.finance/liquidity/pool/bsc/${poolAddress}`, '_blank');
     }
     else if (caipNetwork?.id === base.id) {
-      window.open(`https://app.uniswap.org/positions/v2/base/${poolAddress}`, '_blank');
+      window.open(`https://app.uniswap.org/positions/create/v2?currencyA=${token0.id}&currencyB=${token1.id}&chain=base`, '_blank');
     }
     else {
       window.open(`https://pancakeswap.finance/swap?chain=bscTestnet&outputCurrency=${getSavvyTokenByChainId(Number(bscTestnet.id))}`, '_blank');
