@@ -25,7 +25,9 @@ const SavvyFarmPools = () => {
     const sortedLp = sortByAlloc(lp);
 
     if (sortOption === 'alloc') {
-      return isSingleSided ? sortedSingle : sortedLp;
+      // Include both single-sided and LP pools when sorting by allocation
+      const merged = [...sortedSingle, ...sortedLp];
+      return sortByAlloc(merged);
     }
 
     if (sortOption === 'singleFirst') {
@@ -39,7 +41,7 @@ const SavvyFarmPools = () => {
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const sortOptions = [
-    { value: 'alloc', label: 'ALLOC POINTS' },
+    { value: 'alloc', label: 'MULTIPLIER' },
     { value: 'singleFirst', label: 'SINGLE SIDED POOLS' },
     { value: 'lpFirst', label: 'LP POOLS' },
   ];
