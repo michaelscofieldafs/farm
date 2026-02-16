@@ -725,6 +725,9 @@ const AppContextProvider = ({ children }: any) => {
         (Number(amountsOut[2]) / 10 ** usdcDecimals) /
         Number(tokenAmountInput)
 
+      console.log(`Price token ${tokenAddress} in USDC: ${Number(amountsOut[2]) / 10 ** usdcDecimals}`)
+      console.log('tokenAmountInput ' + tokenAmountInput)
+
       return price *
         (tokenAddress === "0x2e0373a6BDB34815F4a0a58CA2F8bbaf455F5dE6"
           ? 1.1

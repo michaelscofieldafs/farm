@@ -86,6 +86,16 @@ export const wagmiAdapter = new WagmiAdapter({
             {
                 retryCount: 1,           // evita spam
             }
+        ),
+        [sonic.id]: fallback(
+            [
+                http('https://sonic.drpc.org'),
+                http('https://sonic-rpc.publicnode.com'),
+                http('https://rpc.soniclabs.com'),
+            ],
+            {
+                retryCount: 1,           // evita spam
+            }
         )
 
     }
