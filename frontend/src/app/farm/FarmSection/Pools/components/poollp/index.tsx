@@ -475,7 +475,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
           functionName: 'userInfo',
           args: [poolMasterchef, address as Address],
           chainId: chainId,
-        });
+        }) as any;
 
         const userRewards = await readContract(wagmiAdapter.wagmiConfig, {
           address: masterChefAddress as Address,
@@ -485,7 +485,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
           chainId: chainId,
         });
 
-        const amount = (userInfo as any)[0];
+        const amount = userInfo?.amount ?? userInfo?.[0] ?? 0;
 
         const amountBN = BigNumber.from(amount);
         const farmBalanceBN = BigNumber.from(pool.farmBalance);
