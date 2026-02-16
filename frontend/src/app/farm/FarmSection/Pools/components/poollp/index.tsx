@@ -485,7 +485,7 @@ const FarmPoolCard = (props: { pool: any; }) => {
           chainId: chainId,
         });
 
-        const { amount } = userInfo as any;
+        const amount = (userInfo as any)[0];
 
         const amountBN = BigNumber.from(amount);
         const farmBalanceBN = BigNumber.from(pool.farmBalance);
