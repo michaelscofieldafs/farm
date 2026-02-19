@@ -730,7 +730,7 @@ const AppContextProvider = ({ children }: any) => {
 
       return price *
         (tokenAddress === "0x2e0373a6BDB34815F4a0a58CA2F8bbaf455F5dE6"
-          ? 1.2
+          ? 1.125
           : 1)
 
     } catch {
