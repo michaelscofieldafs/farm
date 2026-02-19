@@ -664,10 +664,10 @@ const AppContextProvider = ({ children }: any) => {
       return "0.0001";
     }
     else if (address == "0xe0CC881E977006488D694148223eAdb5eF207275") {
-      return "3.2";
+      return "4";
     }
     else if (address == "0x2e0373a6BDB34815F4a0a58CA2F8bbaf455F5dE6") {
-      return "3";
+      return "6";
     }
 
     return "4";
@@ -730,7 +730,7 @@ const AppContextProvider = ({ children }: any) => {
 
       return price *
         (tokenAddress === "0x2e0373a6BDB34815F4a0a58CA2F8bbaf455F5dE6"
-          ? 1.1
+          ? 1.2
           : 1)
 
     } catch {
