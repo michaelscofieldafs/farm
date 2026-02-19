@@ -99,8 +99,8 @@ export const wagmiAdapter = new WagmiAdapter({
         ),
         [bsc.id]: fallback(
             [
-                http('https://bsc.drpc.org'),
                 http('https://bsc-rpc.publicnode.com'),
+                http('https://bsc.drpc.org'),
                 http('https://public-bsc-mainnet.fastnode.io'),
             ],
             {
