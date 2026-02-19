@@ -80,8 +80,8 @@ export const wagmiAdapter = new WagmiAdapter({
     transports: {
         [base.id]: fallback(
             [
-                http('https://base-rpc.publicnode.com'),
                 http('https://base.drpc.org'),
+                http('https://base-rpc.publicnode.com'),
             ],
             {
                 retryCount: 1,           // evita spam

@@ -20,6 +20,7 @@ const SavvyFarmPools = () => {
     const lp = Array.isArray(poolsFarm) ? [...poolsFarm] : [];
 
     const sortByAlloc = (arr: any[]) => arr.sort((a: any, b: any) => (Number(b?.multiplier ?? 0) - Number(a?.multiplier ?? 0)));
+    const sortByApr = (arr: any[]) => arr.sort((a: any, b: any) => (Number(b?.apr ?? 0) - Number(a?.apr ?? 0)));
 
     const sortedSingle = sortByAlloc(single);
     const sortedLp = sortByAlloc(lp);
@@ -28,6 +29,11 @@ const SavvyFarmPools = () => {
       // Include both single-sided and LP pools when sorting by allocation
       const merged = [...sortedSingle, ...sortedLp];
       return sortByAlloc(merged);
+    }
+
+    if (sortOption === 'apr') {
+      const merged = [...sortedSingle, ...sortedLp];
+      return sortByApr(merged);
     }
 
     if (sortOption === 'singleFirst') {
@@ -42,6 +48,7 @@ const SavvyFarmPools = () => {
 
   const sortOptions = [
     { value: 'alloc', label: 'MULTIPLIER' },
+    { value: 'apr', label: 'APR' },
     { value: 'singleFirst', label: 'SINGLE SIDED POOLS' },
     { value: 'lpFirst', label: 'LP POOLS' },
   ];
