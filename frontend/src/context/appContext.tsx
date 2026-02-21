@@ -141,6 +141,8 @@ const AppContextProvider = ({ children }: any) => {
 
             if (!lpToken) return null;
 
+            if (allocPoint === 0) return null;
+
             let symbol = '';
 
             try {
@@ -392,6 +394,284 @@ const AppContextProvider = ({ children }: any) => {
 
       // Run all the functions in parallel
       let poolList = await Promise.all(poolPromises);
+
+      poolList = poolList.filter(item => item != null);
+
+      const poolsLp: PoolLP[] = poolList.filter(p => p && p.token0) as PoolLP[];
+      const poolsSingleSided: PoolSingle[] = poolList.filter(p => p && !p.token0) as PoolSingle[];
+
+      // Sort by multiplier descending
+      const poolsLpSorted = poolsLp.slice().sort((a, b) => (b.multiplier || 0) - (a.multiplier || 0));
+      const poolsSingleSidedSorted = poolsSingleSided.slice().sort((a, b) => (b.multiplier || 0) - (a.multiplier || 0));
+
+      // Total farm TVL
+      const totalTvl = [...poolsLpSorted, ...poolsSingleSidedSorted].reduce((acc, pool) => acc + (pool?.tvl || 0), 0);
+
+      // Set farm info
+      setPoolsFarm(poolsLpSorted);
+      setPoolsTokenFarm(poolsSingleSidedSorted);
+      setTvl(totalTvl);
+
+      return poolsLpSorted;
+    } catch (err) {
+      console.error('Error fetching pools:', err);
+      return [];
+    } finally {
+      setIsLoadingPoolsFarm(false);
+      setIsLoadingTvl(false);
+    }
+  };
+
+  const fetchPoolsFromMasterchefSingle = async (savvyTokenPriceUSDC = 0, stableTokenPriceUSDC = 0) => {
+    setIsLoadingPoolsFarm(true);
+
+    try {
+      const chainIdBase = fetchChainBase(Number(chainIdRef.current));
+      const masterChefAddress = getMastChefAddressByChainId(chainIdBase);
+
+      //console.log("ReadContrat")
+      const [poolLengthRaw, savvyPerBlockRaw, totalAllocPointRaw] =
+        await readContracts(wagmiAdapter.wagmiConfig, {
+          contracts: [
+            {
+              address: masterChefAddress as Address,
+              abi: getMasterchefABIByChainId(chainIdBase) as Abi,
+              functionName: 'poolLength',
+              chainId: chainIdBase,
+            },
+            {
+              address: masterChefAddress as Address,
+              abi: getMasterchefABIByChainId(chainIdBase) as Abi,
+              functionName: 'savvyPerBlock',
+              chainId: chainIdBase,
+            },
+            {
+              address: masterChefAddress as Address,
+              abi: getMasterchefABIByChainId(chainIdBase) as Abi,
+              functionName: 'totalAllocPoint',
+              chainId: chainIdBase,
+            },
+          ],
+          allowFailure: true
+        },);
+
+      const poolLength = Number(unwrap(poolLengthRaw, 0));
+      const savvyPerBlock = Number(unwrap(savvyPerBlockRaw, 0)) / 1e18;
+      const totalAllocPoint = Number(unwrap(totalAllocPointRaw, 1));
+
+      //console.log(`Masterchef Info: Pools ${poolLength}, SavvyPerBlock: ${savvyPerBlock}, TotalAllocPoint: ${totalAllocPoint}`);
+
+      setFarmTokenPerBlock(savvyPerBlock);
+
+      // Read all poolInfo entries in a single multicall
+      const poolInfoCalls = Array.from({ length: poolLength }, (_, i) => ({
+        address: masterChefAddress as Address,
+        abi: getMasterchefABIByChainId(chainIdBase) as Abi,
+        functionName: 'poolInfo',
+        args: [i],
+        chainId: chainIdBase,
+      }));
+
+      const poolInfoResults = await readContracts(wagmiAdapter.wagmiConfig, { contracts: poolInfoCalls, allowFailure: true });
+      const poolInfos = (poolInfoResults || []).map((r: any) => unwrap(r, null));
+
+      const activePools = poolInfos.map((pi: any, idx: number) => {
+        if (!pi) return null;
+        const lpToken = pi?.lpToken ?? pi?.[0];
+        const allocPoint = Number(pi?.allocPoint ?? pi?.[1] ?? 0);
+        const depositFeeBP = pi?.depositFeeBP ?? pi?.[4] ?? 0;
+        return { idx, lpToken, allocPoint, depositFeeBP, raw: pi };
+      }).filter((p: any) => p && p.lpToken && p.allocPoint > 0);
+
+      if (activePools.length === 0) {
+        let poolList: any[] = [];
+        poolList = poolList.filter(item => item != null);
+        const poolsLp: PoolLP[] = poolList.filter(p => p && p.token0) as PoolLP[];
+        const poolsSingleSided: PoolSingle[] = poolList.filter(p => p && !p.token0) as PoolSingle[];
+
+        const poolsLpSorted = poolsLp.slice().sort((a, b) => (b.multiplier || 0) - (a.multiplier || 0));
+        const poolsSingleSidedSorted = poolsSingleSided.slice().sort((a, b) => (b.multiplier || 0) - (a.multiplier || 0));
+
+        const totalTvl = [...poolsLpSorted, ...poolsSingleSidedSorted].reduce((acc, pool) => acc + (pool?.tvl || 0), 0);
+        setPoolsFarm(poolsLpSorted);
+        setPoolsTokenFarm(poolsSingleSidedSorted);
+        setTvl(totalTvl);
+        return poolsLpSorted;
+      }
+
+      const poolTokens = activePools.map(p => p.lpToken as string);
+
+      // Fetch symbols for all pool tokens
+      const symbolCalls = poolTokens.map((token: string) => ({
+        address: token as Address,
+        abi: getTokenContractABIByChainId(chainIdBase) as Abi,
+        functionName: 'symbol',
+        chainId: chainIdBase,
+      }));
+
+      const symbolResults = await readContracts(wagmiAdapter.wagmiConfig, { contracts: symbolCalls, allowFailure: true });
+      const symbols = (symbolResults || []).map((r: any) => (unwrap(r, '') || '').toString().toUpperCase());
+
+      const lpIndexes: number[] = [];
+      const singleIndexes: number[] = [];
+      symbols.forEach((sym: string, i: number) => {
+        const isLp = sym.endsWith('-LP') || sym.includes('LP') || sym.includes('UNI-V2') || sym === '' || sym.includes('V-');
+        if (isLp) lpIndexes.push(i); else singleIndexes.push(i);
+      });
+
+      const poolsBuilt: any[] = [];
+
+      // Process LP pools in batch
+      if (lpIndexes.length > 0) {
+        const lpTokens = lpIndexes.map(i => poolTokens[i]);
+        const pairCalls: any[] = [];
+        lpTokens.forEach((lpToken: string) => {
+          pairCalls.push({ address: lpToken as Address, abi: getPairContractV2ABIByChainId(chainIdBase) as Abi, functionName: 'token0', chainId: chainIdBase });
+          pairCalls.push({ address: lpToken as Address, abi: getPairContractV2ABIByChainId(chainIdBase) as Abi, functionName: 'token1', chainId: chainIdBase });
+          pairCalls.push({ address: lpToken as Address, abi: getPairContractV2ABIByChainId(chainIdBase) as Abi, functionName: 'getReserves', chainId: chainIdBase });
+          pairCalls.push({ address: lpToken as Address, abi: getPairContractV2ABIByChainId(chainIdBase) as Abi, functionName: 'balanceOf', args: [masterChefAddress as Address], chainId: chainIdBase });
+          pairCalls.push({ address: lpToken as Address, abi: getPairContractV2ABIByChainId(chainIdBase) as Abi, functionName: 'totalSupply', chainId: chainIdBase });
+          pairCalls.push({ address: lpToken as Address, abi: getPairContractV2ABIByChainId(chainIdBase) as Abi, functionName: 'decimals', chainId: chainIdBase });
+        });
+
+        const pairResults = await readContracts(wagmiAdapter.wagmiConfig, { contracts: pairCalls, allowFailure: true });
+
+        // collect unique token addresses
+        const tokenSet = new Set<string>();
+        const lpData: any[] = [];
+        for (let j = 0; j < lpTokens.length; j++) {
+          const base = j * 6;
+          const token0 = unwrap(pairResults[base + 0], ZERO_ADDRESS);
+          const token1 = unwrap(pairResults[base + 1], ZERO_ADDRESS);
+          const reserves = unwrap(pairResults[base + 2], [0, 0, 0]) as any;
+          const farmBalance = unwrap(pairResults[base + 3], 0) as any;
+          const totalSupply = unwrap(pairResults[base + 4], 1) as any;
+          const decimals = Number(unwrap(pairResults[base + 5], 18));
+          tokenSet.add((token0 || ZERO_ADDRESS).toString().toLowerCase());
+          tokenSet.add((token1 || ZERO_ADDRESS).toString().toLowerCase());
+          lpData.push({ token0, token1, reserves, farmBalance, totalSupply, decimals });
+        }
+
+        const tokenAddresses = Array.from(tokenSet).filter(a => a && a !== ZERO_ADDRESS.toLowerCase());
+
+        // fetch token metadata
+        const tokenMetaCalls: any[] = [];
+        tokenAddresses.forEach(addr => {
+          tokenMetaCalls.push({ address: addr as Address, abi: getTokenContractABIByChainId(chainIdBase) as Abi, functionName: 'decimals', chainId: chainIdBase });
+          tokenMetaCalls.push({ address: addr as Address, abi: getTokenContractABIByChainId(chainIdBase) as Abi, functionName: 'symbol', chainId: chainIdBase });
+          tokenMetaCalls.push({ address: addr as Address, abi: getTokenContractABIByChainId(chainIdBase) as Abi, functionName: 'name', chainId: chainIdBase });
+        });
+
+        const tokenMetaResults = tokenMetaCalls.length > 0 ? await readContracts(wagmiAdapter.wagmiConfig, { contracts: tokenMetaCalls, allowFailure: true }) : [];
+        const tokenMetaMap: Record<string, any> = {};
+        for (let k = 0; k < tokenAddresses.length; k++) {
+          const base = k * 3;
+          const d = tokenMetaResults[base + 0] ? unwrap(tokenMetaResults[base + 0], 18) : 18;
+          const s = tokenMetaResults[base + 1] ? unwrap(tokenMetaResults[base + 1], '') : '';
+          const n = tokenMetaResults[base + 2] ? unwrap(tokenMetaResults[base + 2], '') : '';
+          tokenMetaMap[tokenAddresses[k].toLowerCase()] = { decimals: Number(d), symbol: s, name: n };
+        }
+
+        // fetch prices for unique tokens
+        const tokenPriceEntries = await Promise.all(tokenAddresses.map(addr => fetchTokenPriceV2(addr, savvyTokenPriceUSDC, stableTokenPriceUSDC).catch(() => 0)));
+        const tokenPriceMap: Record<string, number> = {};
+        tokenAddresses.forEach((addr, idx) => { tokenPriceMap[addr.toLowerCase()] = Number(tokenPriceEntries[idx] ?? 0); });
+
+        // build LP pool objects
+        for (let j = 0; j < lpTokens.length; j++) {
+          const poolIndex = lpIndexes[j];
+          const poolInfo = activePools[poolIndex];
+          const meta = lpData[j];
+          const token0 = (meta.token0 || ZERO_ADDRESS).toString().toLowerCase();
+          const token1 = (meta.token1 || ZERO_ADDRESS).toString().toLowerCase();
+          const decimals0 = tokenMetaMap[token0]?.decimals ?? 18;
+          const symbol0 = tokenMetaMap[token0]?.symbol ?? '';
+          const name0 = tokenMetaMap[token0]?.name ?? '';
+          const decimals1 = tokenMetaMap[token1]?.decimals ?? 18;
+          const symbol1 = tokenMetaMap[token1]?.symbol ?? '';
+          const name1 = tokenMetaMap[token1]?.name ?? '';
+          const price0 = tokenPriceMap[token0] ?? 0;
+          const price1 = tokenPriceMap[token1] ?? 0;
+          const reserves = meta.reserves || [0, 0, 0];
+          const farmBalance = Number(meta.farmBalance ?? 0);
+          const totalSupply = Number(meta.totalSupply ?? 1);
+          const decimals = Number(meta.decimals ?? 18);
+
+          const tvlTotal = (Number(price0) * Number(reserves[0]) / 10 ** decimals0) + (Number(price1) * Number(reserves[1]) / 10 ** decimals1);
+          const tvlFarm = ((Number(farmBalance) / 10 ** Number(decimals)) * tvlTotal) / (Number(totalSupply) / 10 ** 18 || 1);
+
+          const blocksPerYear: number = getBlocksPerYearByChainId(chainIdBase);
+          const poolTokensPerBlock = savvyPerBlock * (Number(poolInfo.allocPoint ?? 0) / totalAllocPoint);
+          const totalRewardPricePerYear = savvyTokenPriceUSDC * poolTokensPerBlock * blocksPerYear;
+          const apr = tvlFarm > 0 ? (totalRewardPricePerYear / tvlFarm) * 100 : 0;
+
+          poolsBuilt.push({
+            token0: { id: token0, symbol: symbol0, name: name0, decimals: decimals0, reserves: reserves[0], price: price0 },
+            token1: { id: token1, symbol: symbol1, name: name1, decimals: decimals1, reserves: reserves[1], price: price1 },
+            fee: Number(poolInfo.depositFeeBP ?? 0) / 100,
+            multiplier: Number(poolInfo.allocPoint ?? 0) / 100,
+            poolAddress: lpTokens[j],
+            poolMasterchef: poolInfo.idx,
+            farmBalance,
+            totalSupply,
+            tvl: tvlFarm,
+            tvlTotal,
+            decimals,
+            apr,
+          });
+        }
+      }
+
+      // Process single-sided pools in batch
+      if (singleIndexes.length > 0) {
+        const singleTokens = singleIndexes.map(i => poolTokens[i]);
+        const singleCalls: any[] = [];
+        singleTokens.forEach((t: string) => {
+          singleCalls.push({ address: t as Address, abi: getTokenContractABIByChainId(chainIdBase) as Abi, functionName: 'decimals', chainId: chainIdBase });
+          singleCalls.push({ address: t as Address, abi: getTokenContractABIByChainId(chainIdBase) as Abi, functionName: 'balanceOf', args: [masterChefAddress as Address], chainId: chainIdBase });
+          singleCalls.push({ address: t as Address, abi: getTokenContractABIByChainId(chainIdBase) as Abi, functionName: 'symbol', chainId: chainIdBase });
+          singleCalls.push({ address: t as Address, abi: getTokenContractABIByChainId(chainIdBase) as Abi, functionName: 'name', chainId: chainIdBase });
+        });
+
+        const singleResults = await readContracts(wagmiAdapter.wagmiConfig, { contracts: singleCalls, allowFailure: true });
+
+        const singleTokenAddrs = singleTokens.map(s => s.toLowerCase());
+        const singlePricesArr = await Promise.all(singleTokenAddrs.map(addr => fetchTokenPriceV2(addr, savvyTokenPriceUSDC, stableTokenPriceUSDC).catch(() => 0)));
+        const singlePriceMap: Record<string, number> = {};
+        singleTokenAddrs.forEach((addr, idx) => { singlePriceMap[addr] = Number(singlePricesArr[idx] ?? 0); });
+
+        for (let m = 0; m < singleIndexes.length; m++) {
+          const base = m * 4;
+          const decimals = Number(unwrap(singleResults[base + 0], 18));
+          const farmBalance = unwrap(singleResults[base + 1], 0);
+          const symbol = unwrap(singleResults[base + 2], '') || '';
+          const name = unwrap(singleResults[base + 3], '') || '';
+
+          const tokenAddr = singleTokens[m].toLowerCase();
+          const price = singlePriceMap[tokenAddr] ?? 0;
+          const tvl = (Number(farmBalance) / 10 ** decimals) * Number(price);
+
+          const poolInfo = activePools[singleIndexes[m]];
+          const blocksPerYear = getBlocksPerYearByChainId(chainIdBase);
+          const poolTokensPerBlock = savvyPerBlock * (Number(poolInfo.allocPoint ?? 0) / totalAllocPoint);
+          const totalRewardPricePerYear = savvyTokenPriceUSDC * poolTokensPerBlock * blocksPerYear;
+          const apr = tvl > 0 ? (totalRewardPricePerYear / tvl) * 100 : 0;
+
+          poolsBuilt.push({
+            token: { id: tokenAddr, symbol, name, decimals, price },
+            fee: Number(poolInfo.depositFeeBP ?? 0) / 100,
+            multiplier: Number(poolInfo.allocPoint ?? 0) / 100,
+            poolAddress: singleTokens[m],
+            poolMasterchef: poolInfo.idx,
+            farmBalance,
+            tvl,
+            apr,
+          });
+        }
+      }
+
+      // Final pool list
+      let poolList = poolsBuilt;
 
       poolList = poolList.filter(item => item != null);
 
