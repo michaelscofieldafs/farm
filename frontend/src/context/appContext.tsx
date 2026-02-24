@@ -69,7 +69,7 @@ const AppContextProvider = ({ children }: any) => {
   const [isLoadingTvl, setIsLoadingTvl] = useState(true);
   const [circulatingSupply, setCirculatingSupply] = useState(0);
   const [marketCap, setMarketCap] = useState(0);
-  const [runtimeConfig, setRuntimeConfig] = useState<{ SPECIAL_TOKEN_MULTIPLIER?: number } | null>(null);
+  const [runtimeConfig, setRuntimeConfig] = useState<{ BLU_SPECIAL_TOKEN_MULTIPLIER?: number } | null>(null);
   const [poolList, setPoolList] = useState([]);;
   const [poolsFarm, setPoolsFarm] = useState<PoolLP[]>([]);
   const [poolsTokenFarm, setPoolsTokenFarm] = useState<PoolSingle[]>([]);
@@ -1045,11 +1045,9 @@ const AppContextProvider = ({ children }: any) => {
 
       let multiplier = 1;
 
-      if (tokenAddress.toLowerCase() === "0x2e0373a6BDB34815F4a0a58CA2F8bbaf455F5dE6".toLowerCase()) {
-        multiplier = await fetchRuntimeConfigJson().then(config => config ? Number(config.SPECIAL_TOKEN_MULTIPLIER) : 1.5).catch(() => 1.5);
-      }
+      multiplier = await fetchRuntimeConfigJson().then(config => config ? Number(config[tokenAddress]) : 1).catch(() => 1);
 
-      return price * (tokenAddress === "0x2e0373a6BDB34815F4a0a58CA2F8bbaf455F5dE6" ? multiplier : 1);
+      return price * multiplier;
 
     } catch {
       return 0
