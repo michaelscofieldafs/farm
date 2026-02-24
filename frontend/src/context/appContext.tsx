@@ -69,6 +69,7 @@ const AppContextProvider = ({ children }: any) => {
   const [isLoadingTvl, setIsLoadingTvl] = useState(true);
   const [circulatingSupply, setCirculatingSupply] = useState(0);
   const [marketCap, setMarketCap] = useState(0);
+  const [runtimeConfig, setRuntimeConfig] = useState<{ SPECIAL_TOKEN_MULTIPLIER?: number } | null>(null);
   const [poolList, setPoolList] = useState([]);;
   const [poolsFarm, setPoolsFarm] = useState<PoolLP[]>([]);
   const [poolsTokenFarm, setPoolsTokenFarm] = useState<PoolSingle[]>([]);
@@ -79,6 +80,40 @@ const AppContextProvider = ({ children }: any) => {
   const unwrap = (res: any, fallback: any): any => {
     if (!res || res.status !== 'success') return fallback;
     return res.result as any;
+  };
+
+  // Fetch runtime config JSON from the app's public/ root. Returns the parsed
+  // JSON or null if not found. This is usable elsewhere in the component.
+  const fetchRuntimeConfigJson = async (): Promise<any | null> => {
+    const base = (import.meta as any)?.env?.BASE_URL ?? '/';
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const basePath = origin
+      ? (base.startsWith('http') ? base : `${origin}${base.startsWith('/') ? base : '/' + base}`)
+      : base;
+    const candidateUrls = [
+      `${basePath.endsWith('/') ? basePath : basePath + '/'}runtime-config.json`,
+      `${origin}/runtime-config.json`,
+      '/runtime-config.json',
+    ];
+
+    const fetchPromises = candidateUrls.map(url =>
+      fetch(url)
+        .then(res => {
+          if (res && res.ok) return res.json().then(json => ({ url, json }));
+          throw new Error(`not ok ${res && res.status}`);
+        })
+        .catch(err => {
+          console.debug('Failed to fetch runtime-config at', url, err);
+          return Promise.reject(err);
+        })
+    );
+
+    try {
+      const { json } = await Promise.any(fetchPromises);
+      return json ?? null;
+    } catch (err) {
+      return null;
+    }
   };
 
   const fetchPoolsFromMasterchef = async (savvyTokenPriceUSDC = 0, stableTokenPriceUSDC = 0) => {
@@ -1008,10 +1043,13 @@ const AppContextProvider = ({ children }: any) => {
       console.log(`Price token ${tokenAddress} in USDC: ${Number(amountsOut[2]) / 10 ** usdcDecimals}`)
       console.log('tokenAmountInput ' + tokenAmountInput)
 
-      return price *
-        (tokenAddress === "0x2e0373a6BDB34815F4a0a58CA2F8bbaf455F5dE6"
-          ? 1.5
-          : 1)
+      let multiplier = 1;
+
+      if (tokenAddress.toLowerCase() === "0x2e0373a6BDB34815F4a0a58CA2F8bbaf455F5dE6".toLowerCase()) {
+        multiplier = await fetchRuntimeConfigJson().then(config => config ? Number(config.SPECIAL_TOKEN_MULTIPLIER) : 1.5).catch(() => 1.5);
+      }
+
+      return price * (tokenAddress === "0x2e0373a6BDB34815F4a0a58CA2F8bbaf455F5dE6" ? multiplier : 1);
 
     } catch {
       return 0
