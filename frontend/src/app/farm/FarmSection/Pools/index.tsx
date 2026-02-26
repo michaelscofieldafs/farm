@@ -130,7 +130,7 @@ const SavvyFarmPools = () => {
         <>
           <div className="flex flex-col gap-3 max-w-[920px] mx-auto">
             <div className="relative overflow-hidden rounded-xl px-5 py-4 shadow-lg backdrop-blur-sm">
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-700/0 via-yellow-700/50 to-yellow-400/0" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#003444]/0 via-[#003444]/50 to-[#003444]/0" />
               <p className="relative z-10 font-extrabold text-sm md:text-base leading-snug tracking-wide text-center text-white">
                 {caipNetwork?.name ? `${caipNetwork.name.toUpperCase()} NETWORK OVERVIEW` : ''}
               </p>
@@ -146,11 +146,13 @@ const SavvyFarmPools = () => {
               </p>
             </div>
             <div className='container'>
+              {/**
               <h2 className='text-white sm:text-30 text-20 font-medium lg:w-80% mx-auto mb-10'>
                 Take advantage of the amazing APRs in our LP and single-sided token pools.
               </h2>
+               */}
               <button
-                className='bg-primary border border-primary rounded-md text-sm font-bold hover:bg-transparent hover:text-primary text-darkmode py-1 px-3 z-50'
+                className='bg-primary border border-primary rounded-md text-sm font-bold hover:bg-transparent hover:text-primary text-darkmode py-1 px-3 mt-4 z-50'
                 onClick={openNetworkModal}>
                 CHANGE NETWORK
               </button>
