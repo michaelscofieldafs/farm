@@ -915,9 +915,9 @@ const AppContextProvider = ({ children }: any) => {
         10 ** Number(usdcDecimals)
 
       if (tokenAddress.toLowerCase() === specialToken) {
-        console.log('routes ' + JSON.stringify(routes))
-        console.log('amounts ' + amounts)
-        console.log('usdcOut ' + usdcOut)
+        //console.log('routes ' + JSON.stringify(routes))
+        //console.log('amounts ' + amounts)
+        //console.log('usdcOut ' + usdcOut)
       }
 
       return usdcOut
@@ -1047,9 +1047,9 @@ const AppContextProvider = ({ children }: any) => {
         multiplier = await fetchRuntimeConfigJson().then(config => config ? Number(config[tokenAddress]) : 1).catch(() => 1);
       }
 
-      console.log(`Price token ${tokenAddress} price: ${price} multiplier: ${multiplier}`)
-      console.log(`Price token ${tokenAddress} in USDC: ${price * multiplier}`)
-      console.log('tokenAmountInput ' + tokenAmountInput)
+      //console.log(`Price token ${tokenAddress} price: ${price} multiplier: ${multiplier}`)
+      //console.log(`Price token ${tokenAddress} in USDC: ${price * multiplier}`)
+      //console.log('tokenAmountInput ' + tokenAmountInput)
 
       return price * multiplier;
 
