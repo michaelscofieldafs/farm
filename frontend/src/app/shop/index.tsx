@@ -2,6 +2,7 @@ import React from "react";
 import { motion, useInView } from 'framer-motion';
 import Orb from "@/components/Orb";
 import TextType from "@/components/Typeing";
+import { useAppKitNetwork } from "@reown/appkit/react";
 
 const ShirtMock = ({ color = '#0f0f10', image = '/images/shop/shirt.png' }) => (
   <svg viewBox="0 0 400 420" className="w-full h-auto drop-shadow-2xl">
@@ -70,6 +71,8 @@ const rightAnimation = {
 }
 
 export default function SavvyFarmShop() {
+  const { caipNetwork } = useAppKitNetwork();
+
   return (
     <section
       className='min-h-screen relative md:pt-40 md:pb-28 py-20 overflow-hidden z-1'
@@ -84,7 +87,7 @@ export default function SavvyFarmShop() {
             <div className="relative overflow-hidden rounded-xl px-5 py-4 shadow-lg backdrop-blur-sm">
               <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/0 via-yellow-700/50 to-yellow-700/0" />
               <p className="relative z-10 font-extrabold text-sm md:text-base leading-snug tracking-wide text-center text-white">
-                We are currently on testnet! Mainnet coming soon! Values shown here are not real.
+                {caipNetwork?.name ? `${caipNetwork.name.toUpperCase()} NETWORK OVERVIEW` : ''}
               </p>
             </div>
           </div>

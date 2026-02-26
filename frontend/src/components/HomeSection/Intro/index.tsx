@@ -13,7 +13,7 @@ import { useAccount } from 'wagmi'
 import { sonicTestnet } from '@/components/Web3Provider'
 import { getSavvyTokenByChainId, getStableTokenByChainId } from '@/utils/tokenAddressProvider'
 import { base, baseSepolia, bsc, bscTestnet, sonic } from 'viem/chains'
-import { useAppKitNetwork } from '@reown/appkit/react'
+import { useAppKit, useAppKitNetwork } from '@reown/appkit/react'
 
 export interface HeroProps {
   farmTokenPrice: number;
@@ -38,6 +38,8 @@ const SavvyFarmIntro = () => {
 
   const [coins, setCoins] = useState([]);
 
+  const { open } = useAppKit();
+
   const navigate = useNavigate();
 
   const handleClickOutside = useCallback(
@@ -58,6 +60,11 @@ const SavvyFarmIntro = () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [handleClickOutside])
+
+  const openNetworkModal = () => {
+    open({ view: 'Networks' });
+  };
+
 
   const fetchCoins = async () => {
     try {
@@ -148,7 +155,7 @@ const SavvyFarmIntro = () => {
             <div className="relative overflow-hidden rounded-xl px-5 py-4 shadow-lg backdrop-blur-sm">
               <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/0 via-yellow-700/50 to-yellow-700/0" />
               <p className="relative z-10 font-extrabold text-sm md:text-base leading-snug tracking-wide text-center text-white">
-                We are currently on testnet! Mainnet coming soon! Values shown here are not real.
+                {caipNetwork?.name ? `${caipNetwork.name.toUpperCase()} NETWORK OVERVIEW` : ''}
               </p>
             </div>
           </div>
@@ -179,17 +186,26 @@ const SavvyFarmIntro = () => {
               </button>
             </div>
             <p className='text-primary text-xs mt-4 max-w-xl md:text-left text-center leading-tight'>
-              • Sonic and Base do NOT have public DEXes on testnet.<br />
-              • Prices on Testnet are not an indicative of future prices on Mainnet.
+              • Metrics like TVL, market cap, and circulating supply may vary depending on the chain.<br />
             </p>
-            <div className='flex items-center md:justify-start justify-center gap-12 mt-15 w-full'>
+            <div className='flex items-center md:justify-start justify-center gap-12 mt-9 w-full'>
               <motion.div
                 whileInView={{ y: 0, opacity: 1 }}
                 initial={{ y: '100%', opacity: 0 }}
                 transition={{ duration: 0.6 }}
                 className='w-full md:w-4/5'
               >
-                <div className='flex items-center justify-between gap-8 w-full'>
+                <div className='flex items-center gap-3'>
+                  <p className='sm:text-24 text-16 text-primary mb-0'>
+                    {caipNetwork?.name ? `${caipNetwork.name.toUpperCase()} NETWORK` : ''}
+                  </p>
+                  <button
+                    className='bg-primary border border-primary rounded-md text-xs font-bold hover:bg-transparent hover:text-primary text-darkmode py-1 px-2 z-50'
+                    onClick={openNetworkModal}>
+                    CHANGE NETWORK
+                  </button>
+                </div>
+                <div className='flex items-center justify-between gap-8 w-full mt-4'>
                   <p className='flex-1 sm:text-28 text-18 text-muted mb-4'>
                     $SAVVY <br /> <span className='text-primary'>{isLoading ? <CircleLoader color="#fff" loading={isLoading} size={15} /> :
                       <AnimatedNumber
