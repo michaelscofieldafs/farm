@@ -130,7 +130,6 @@ const AppContextProvider = ({ children }: any) => {
   // JSON or null if not found. This is usable elsewhere in the component.
   const fetchRuntimeConfigJson = async (): Promise<any | null> => {
     // Return cached runtime config if already loaded (use ref so closures see updates)
-    console.log(JSON.stringify(runtimeConfigRef.current))
     if (runtimeConfigRef.current != null) return runtimeConfigRef.current;
 
     const base = (import.meta as any)?.env?.BASE_URL ?? '/';
