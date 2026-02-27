@@ -32,12 +32,19 @@ export default function RemoteHoursUntil() {
     };
 
     useEffect(() => {
-        fetchRemoteTime();
-        const id = setInterval(fetchRemoteTime, 60 * 1000);
-        return () => clearInterval(id);
+        setTimeout(() => {
+            fetchRemoteTime();
+            const id = setInterval(fetchRemoteTime, 60 * 1000);
+            return () => clearInterval(id);
+        }, 1000);
     }, []);
 
-    if (hoursDiff == null) return <div className='text-sm text-muted'></div>;
+    if (hoursDiff == null) return <div className='flex flex-col items-center'>
+        <div className='text-primary font-extrabold text-sm md:text-base tracking-wider mb-2'>BOOST 2X</div>
+        <div className='text-sm text-muted'>
+            {'--:-- until the end of the boost, and receive 2x more rewards'}
+        </div>
+    </div>;
 
     const future = hoursDiff >= 0;
     const absMs = Math.abs(hoursDiff * 60 * 60 * 1000);
