@@ -9,6 +9,7 @@ import FarmLpPoolCard from './components/poollp'
 // @ts-ignore
 import AnimatedNumber from "animated-number-react";
 import { useAppKit, useAppKitNetwork } from '@reown/appkit/react'
+import RemoteHoursUntil from '@/components/RemoteHoursUntil'
 
 const SavvyFarmPools = () => {
   const [isSingleSided, setIsSingleSided] = useState<boolean>(true);
@@ -163,6 +164,10 @@ const SavvyFarmPools = () => {
                   transition={{ duration: 0.6 }}
                 >
                   <div>
+                    <div className='flex flex-col items-center mb-4'>
+                      <RemoteHoursUntil />
+                    </div>
+
                     <p className='flex-1 sm:text-30 text-2xl text-muted mb-4'>
                       Total Value Locked (TVL) <br /> <span className='font-extrabold
     bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-200

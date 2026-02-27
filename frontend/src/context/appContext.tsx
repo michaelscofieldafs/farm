@@ -69,7 +69,7 @@ const AppContextProvider = ({ children }: any) => {
   const [isLoadingTvl, setIsLoadingTvl] = useState(true);
   const [circulatingSupply, setCirculatingSupply] = useState(0);
   const [marketCap, setMarketCap] = useState(0);
-  const [runtimeConfig, setRuntimeConfig] = useState<{ BLU_SPECIAL_TOKEN_MULTIPLIER?: number } | null>(null);
+  const runtimeConfigRef = useRef<Record<string, number> | null>(null);
   const [poolList, setPoolList] = useState([]);;
   const [poolsFarm, setPoolsFarm] = useState<PoolLP[]>([]);
   const [poolsTokenFarm, setPoolsTokenFarm] = useState<PoolSingle[]>([]);
@@ -82,38 +82,97 @@ const AppContextProvider = ({ children }: any) => {
     return res.result as any;
   };
 
+  // Local storage cache helper for total TVL
+  const TOTAL_TVL_CACHE_KEY = 'savvy_total_tvl_v1';
+
+  const readTotalTvlCache = (chainId?: number): number | null => {
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) return null;
+      const raw = localStorage.getItem(TOTAL_TVL_CACHE_KEY);
+      if (!raw) return null;
+      try {
+        const parsed = JSON.parse(raw);
+        if (typeof parsed === 'number') {
+          return parsed;
+        }
+        if (parsed && typeof parsed === 'object') {
+          const key = String(chainId ?? Number(chainIdRef.current ?? 0));
+          const v = parsed[key];
+          return v != null ? Number(v) : null;
+        }
+        return null;
+      } catch {
+        const n = Number(raw);
+        return !isNaN(n) ? n : null;
+      }
+    } catch {
+      return null;
+    }
+  };
+
+  const writeTotalTvlCache = (chainId: number, val: number) => {
+    try {
+      if (typeof window === 'undefined' || !window.localStorage) return;
+      const raw = localStorage.getItem(TOTAL_TVL_CACHE_KEY);
+      let map: Record<string, number> = {};
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') map = parsed as Record<string, number>;
+        } catch { /* ignore, start fresh */ }
+      }
+      map[String(chainId)] = Number(val);
+      localStorage.setItem(TOTAL_TVL_CACHE_KEY, JSON.stringify(map));
+    } catch { }
+  };
+
   // Fetch runtime config JSON from the app's public/ root. Returns the parsed
   // JSON or null if not found. This is usable elsewhere in the component.
   const fetchRuntimeConfigJson = async (): Promise<any | null> => {
+    // Return cached runtime config if already loaded (use ref so closures see updates)
+    console.log(JSON.stringify(runtimeConfigRef.current))
+    if (runtimeConfigRef.current != null) return runtimeConfigRef.current;
+
     const base = (import.meta as any)?.env?.BASE_URL ?? '/';
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const basePath = origin
       ? (base.startsWith('http') ? base : `${origin}${base.startsWith('/') ? base : '/' + base}`)
       : base;
     const candidateUrls = [
-      `${basePath.endsWith('/') ? basePath : basePath + '/'}runtime-config.json`,
-      `${origin}/runtime-config.json`,
-      '/runtime-config.json',
+      `${basePath.endsWith('/') ? basePath : basePath + '/'}universal-v2.json`,
+      `${origin}/universal-v2.json`,
+      '/universal-v2.json',
     ];
 
-    const fetchPromises = candidateUrls.map(url =>
-      fetch(url)
-        .then(res => {
-          if (res && res.ok) return res.json().then(json => ({ url, json }));
-          throw new Error(`not ok ${res && res.status}`);
-        })
-        .catch(err => {
-          console.debug('Failed to fetch runtime-config at', url, err);
-          return Promise.reject(err);
-        })
-    );
-
-    try {
-      const { json } = await Promise.any(fetchPromises);
-      return json ?? null;
-    } catch (err) {
-      return null;
+    for (const url of candidateUrls) {
+      try {
+        const res = await fetch(url);
+        if (res && res.ok) {
+          const json = await res.json();
+          // normalize keys to lowercase for consistent lookups
+          let normalized: Record<string, number> | null = null;
+          try {
+            if (json && typeof json === 'object') {
+              normalized = {};
+              Object.keys(json).forEach(k => {
+                try {
+                  const v = Number((json as any)[k]);
+                  if (!isNaN(v)) normalized![k.toLowerCase()] = v;
+                } catch { /* ignore invalid entries */ }
+              });
+            }
+          } catch { normalized = null; }
+          try {
+            runtimeConfigRef.current = normalized;
+          } catch { /* ignore */ }
+          return normalized ?? null;
+        }
+      } catch (err) {
+        console.debug('Failed to fetch runtime-config at', url, err);
+      }
     }
+
+    return null;
   };
 
   const fetchPoolsFromMasterchef = async (savvyTokenPriceUSDC = 0, stableTokenPriceUSDC = 0) => {
@@ -440,7 +499,16 @@ const AppContextProvider = ({ children }: any) => {
       const poolsSingleSidedSorted = poolsSingleSided.slice().sort((a, b) => (b.multiplier || 0) - (a.multiplier || 0));
 
       // Total farm TVL
-      const totalTvl = [...poolsLpSorted, ...poolsSingleSidedSorted].reduce((acc, pool) => acc + (pool?.tvl || 0), 0);
+      let totalTvl = [...poolsLpSorted, ...poolsSingleSidedSorted].reduce((acc, pool) => acc + (pool?.tvl || 0), 0);
+
+      try {
+        if (Number(totalTvl) === 0) {
+          const cachedTotal = readTotalTvlCache(chainIdBase);
+          if (cachedTotal != null) totalTvl = cachedTotal;
+        } else {
+          writeTotalTvlCache(chainIdBase, totalTvl);
+        }
+      } catch (e) { }
 
       // Set farm info
       setPoolsFarm(poolsLpSorted);

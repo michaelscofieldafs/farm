@@ -14,6 +14,7 @@ import { sonicTestnet } from '@/components/Web3Provider'
 import { getSavvyTokenByChainId, getStableTokenByChainId } from '@/utils/tokenAddressProvider'
 import { base, baseSepolia, bsc, bscTestnet, sonic } from 'viem/chains'
 import { useAppKit, useAppKitNetwork } from '@reown/appkit/react'
+import RemoteHoursUntil from '@/components/RemoteHoursUntil'
 
 export interface HeroProps {
   farmTokenPrice: number;
@@ -157,6 +158,9 @@ const SavvyFarmIntro = () => {
               <p className="relative z-10 font-extrabold text-sm md:text-base leading-snug tracking-wide text-center text-white">
                 {caipNetwork?.name ? `${caipNetwork.name.toUpperCase()} NETWORK OVERVIEW` : ''}
               </p>
+            </div>
+            <div className='flex flex-col items-center'>
+              <RemoteHoursUntil />
             </div>
           </div>
         </>
