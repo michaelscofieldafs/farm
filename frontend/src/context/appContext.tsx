@@ -1111,7 +1111,7 @@ const AppContextProvider = ({ children }: any) => {
       let multiplier = 1;
 
       if (tokenAddress.toLowerCase() === "0x2e0373a6BDB34815F4a0a58CA2F8bbaf455F5dE6".toLowerCase() || tokenAddress.toLowerCase() === "0xe0CC881E977006488D694148223eAdb5eF207275".toLowerCase()) {
-        multiplier = await fetchRuntimeConfigJson().then(config => config ? Number(config[tokenAddress]) : 1).catch(() => 1);
+        multiplier = await fetchRuntimeConfigJson().then(config => config ? Number(config[tokenAddress.toLowerCase()]) : 1).catch(() => 1);
       }
 
       //console.log(`Price token ${tokenAddress} price: ${price} multiplier: ${multiplier}`)
