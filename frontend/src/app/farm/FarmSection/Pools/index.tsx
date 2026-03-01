@@ -139,8 +139,7 @@ const SavvyFarmPools = () => {
           </div>
         </>
         <div className='text-center mt-10'>
-          <motion.div
-            {...rightAnimation}>
+          <motion.div>
             <div className="flex flex-col justify-center items-center">
               <p className='text-muted sm:text-28 text-18 mb-4'>
                 Savvy <span className='text-primary'>Farm</span>
@@ -159,8 +158,8 @@ const SavvyFarmPools = () => {
               </button>
               <div className='w-full items-center justify-center mt-10'>
                 <motion.div
-                  whileInView={{ y: 0, opacity: 1 }}
-                  initial={{ y: '100%', opacity: 0 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
                   transition={{ duration: 0.6 }}
                 >
                   <div>
@@ -346,7 +345,9 @@ const SavvyFarmPools = () => {
           </motion.div>
           {isLoading ? <div className="flex flex-wrap justify-center gap-6 w-full pb-20 px-4"> <CircleLoader className='mt-4' color="#fff" loading={isLoading} size={45} /> </div> :
             <motion.div
-              {...leftAnimation}>
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6 }}>
               <div className="flex flex-wrap justify-center gap-6 w-full pb-20 px-4">
                 {visiblePools && visiblePools.length > 0 ? (
                   visiblePools.map((item: any) => (

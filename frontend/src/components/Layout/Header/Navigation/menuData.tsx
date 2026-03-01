@@ -10,8 +10,8 @@ export const headerData: HeaderItem[] = [
   { label: "Docs & Contracts", href: "/documentation#version" },
    */
   { label: "Home", href: "/" },
-  { label: "Games", href: "/games" },
   { label: "Farm", href: "/farm" },
+  { label: "Games", href: "/games" },
   { label: "Shop", href: "/shop" },
   { label: "Dex", href: "https://dex.savvygirl.app", isUrl: true },
   { label: "Docs & Contracts", href: "https://savvygirl-app.gitbook.io/docs", isUrl: true },

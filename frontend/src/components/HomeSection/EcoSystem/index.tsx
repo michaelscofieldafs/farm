@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+// external link; open in new tab
 
 const SavvyFarmEcosystem = () => {
   return (
@@ -16,11 +16,13 @@ const SavvyFarmEcosystem = () => {
           </div>
           <div className='lg:col-span-4 col-span-12'>
             <div className='flex lg:justify-end lg:mt-0 mt-7 justify-center'>
-              <Link
-                to='#'
+              <a
+                href='https://savvygirl-app.gitbook.io/docs'
+                target='_blank'
+                rel='noopener noreferrer'
                 className='text-darkmode bg-primary border border-primary py-3 px-5 rounded-lg sm:text-21 text-18 font-medium hover:bg-transparent hover:text-primary'>
                 About us
-              </Link>
+              </a>
             </div>
           </div>
         </div>
