@@ -15,6 +15,7 @@ import { getSavvyTokenByChainId, getStableTokenByChainId } from '@/utils/tokenAd
 import { base, baseSepolia, bsc, bscTestnet, sonic } from 'viem/chains'
 import { useAppKit, useAppKitNetwork } from '@reown/appkit/react'
 import RemoteHoursUntil from '@/components/RemoteHoursUntil'
+import { get } from 'http'
 
 export interface HeroProps {
   farmTokenPrice: number;
@@ -115,7 +116,7 @@ const SavvyFarmIntro = () => {
       window.open(`https://pancakeswap.finance/swap?chain=baseSepolia&outputCurrency=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');
     }
     if (caipNetwork?.id === sonic.id) {
-      window.open(`https://equalizer.exchange/swap?toToken=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');
+      window.open(`https://equalizer.exchange/swap?fromToken=${getStableTokenByChainId(Number(caipNetwork.id))}&toToken=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');
     }
     else if (caipNetwork?.id === bsc.id) {
       window.open(`https://pancakeswap.finance/swap?chain=bsc&outputCurrency=${getSavvyTokenByChainId(Number(caipNetwork.id))}`, '_blank');
