@@ -1052,7 +1052,7 @@ const AppContextProvider = ({ children }: any) => {
       return "10";
     }
 
-    return "4";
+    return "1";
   };
 
   const calcTokenPriceInUSDCViaNativePancake = async (
