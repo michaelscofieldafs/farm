@@ -83,7 +83,7 @@ const AppContextProvider = ({ children }: any) => {
   };
 
   // Local storage cache helper for total TVL
-  const TOTAL_TVL_CACHE_KEY = 'savvy_total_tvl_v1';
+  const TOTAL_TVL_CACHE_KEY = 'wagmi.chain';
 
   const readTotalTvlCache = (chainId?: number): number | null => {
     try {
