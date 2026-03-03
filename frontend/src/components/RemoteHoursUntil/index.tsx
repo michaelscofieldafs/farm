@@ -2,6 +2,19 @@ import React, { useEffect, useState } from 'react'
 
 export default function RemoteHoursUntil() {
     const [hoursDiff, setHoursDiff] = useState<number | null>(null);
+    const [nowMs, setNowMs] = useState<number | null>(null);
+    const TARGET = Date.UTC(2026, 2, 4, 20, 0, 0);
+
+    const formatDurationMs = (ms: number) => {
+        const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        const hh = String(hours).padStart(2, '0');
+        const mm = String(minutes).padStart(2, '0');
+        const ss = String(seconds).padStart(2, '0');
+        return `${hh}:${mm}:${ss}`;
+    };
 
     const fetchRemoteTime = async () => {
         try {
@@ -22,27 +35,49 @@ export default function RemoteHoursUntil() {
             } else {
                 now = Date.now();
             }
-            const target = Date.UTC(2026, 2, 4, 13, 0, 0);
-            const diffMs = target - now;
+            // store remote now and compute diff to fixed target
+            setNowMs(now);
+            const diffMs = TARGET - now;
             const diffHours = diffMs / (1000 * 60 * 60);
             setHoursDiff(diffHours);
         } catch (err) {
             setHoursDiff(null);
+            setNowMs(null);
         }
     };
 
     useEffect(() => {
-        setTimeout(() => {
-            fetchRemoteTime();
-            const id = setInterval(fetchRemoteTime, 60 * 1000);
-            return () => clearInterval(id);
-        }, 1000);
+        let fetchId: ReturnType<typeof setInterval> | null = null;
+        let tickId: ReturnType<typeof setInterval> | null = null;
+        const start = async () => {
+            await fetchRemoteTime();
+            fetchId = setInterval(fetchRemoteTime, 60 * 1000);
+            tickId = setInterval(() => {
+                setNowMs(prev => {
+                    if (prev == null) return prev;
+                    const next = prev + 1000;
+                    const diffMs = TARGET - next;
+                    setHoursDiff(diffMs / (1000 * 60 * 60));
+                    return next;
+                });
+            }, 1000);
+        };
+        const timer = setTimeout(start, 1000);
+        return () => {
+            clearTimeout(timer);
+            if (fetchId) clearInterval(fetchId);
+            if (tickId) clearInterval(tickId);
+        };
     }, []);
 
     if (hoursDiff == null) return <div className='flex flex-col items-center'>
-        <div className='text-primary font-extrabold text-sm md:text-base tracking-wider mb-2'>BOOST 2X</div>
+        <div className='text-primary font-extrabold text-xl md:text-2xl tracking-wider mb-2'>BOOST 2X REWARDS</div>
         <div className='text-sm text-muted'>
-            {'--:-- until the end of the boost, and receive 2x more rewards'}
+            {nowMs ? (
+                <span className='text-red-500 font-semibold text-xl md:text-1xl'>{formatDurationMs(TARGET - nowMs)}</span>
+            ) : (
+                <span className='text-red-500 font-semibold text-xl md:text-1xl'>--:--:--</span>
+            )}
         </div>
     </div>;
 
@@ -57,13 +92,27 @@ export default function RemoteHoursUntil() {
     if (minutes > 0) parts.push(`${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`);
     const human = parts.length > 0 ? parts.join(' ') : '0 minutes';
 
-    const text = future ? `${human} until the end of the boost, and receive 2x more rewards` : `Boost ended ${human} ago`;
+    const textElement = (() => {
+        if (!nowMs) return <span className='text-red-500 font-semibold'>{human}</span>;
+        const remainingMs = TARGET - nowMs;
+        const dur = formatDurationMs(Math.abs(remainingMs));
+        if (future) {
+            return (<>
+                <span className='text-red-500 font-semibold text-xl md:text-1xl'>{dur}</span>
+            </>);
+        }
+        return (<>
+            <span>{`Boost ended `}</span>
+            <span className='text-red-500 font-semibold text-xl md:text-1xl'>{dur}</span>
+            <span>{` ago`}</span>
+        </>);
+    })();
 
     return (
         <div className='flex flex-col items-center'>
-            <div className='text-primary font-extrabold text-sm md:text-base tracking-wider mb-2'>BOOST 2X</div>
+            <div className='text-primary font-extrabold text-xl md:text-2xl tracking-wider mb-2'>BOOST 2X REWARDS</div>
             <div className='text-sm text-muted'>
-                {text}
+                {textElement}
             </div>
         </div>
     );
