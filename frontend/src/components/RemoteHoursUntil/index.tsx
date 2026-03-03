@@ -71,12 +71,12 @@ export default function RemoteHoursUntil() {
     }, []);
 
     if (hoursDiff == null) return <div className='flex flex-col items-center'>
-        <div className='text-primary font-extrabold text-xl md:text-2xl tracking-wider mb-2'>BOOST 2X REWARDS</div>
+        <div className='text-primary font-extrabold text-xl md:text-3xl tracking-wider mb-2'>BOOST 2X REWARDS</div>
         <div className='text-sm text-muted'>
             {nowMs ? (
-                <span className='text-red-500 font-semibold text-xl md:text-1xl'>{formatDurationMs(TARGET - nowMs)}</span>
+                <span className='text-red-500 font-semibold text-3xl md:text-3xl'>{formatDurationMs(TARGET - nowMs)}</span>
             ) : (
-                <span className='text-red-500 font-semibold text-xl md:text-1xl'>--:--:--</span>
+                <span className='text-red-500 font-semibold text-3xl md:text-3xl'>--:--:--</span>
             )}
         </div>
     </div>;
@@ -98,19 +98,19 @@ export default function RemoteHoursUntil() {
         const dur = formatDurationMs(Math.abs(remainingMs));
         if (future) {
             return (<>
-                <span className='text-red-500 font-semibold text-xl md:text-1xl'>{dur}</span>
+                <span className='text-red-500 font-semibold text-3xl md:text-3xl'>{dur}</span>
             </>);
         }
         return (<>
             <span>{`Boost ended `}</span>
-            <span className='text-red-500 font-semibold text-xl md:text-1xl'>{dur}</span>
+            <span className='text-red-500 font-semibold text-3xl md:text-3xl'>{dur}</span>
             <span>{` ago`}</span>
         </>);
     })();
 
     return (
         <div className='flex flex-col items-center'>
-            <div className='text-primary font-extrabold text-xl md:text-2xl tracking-wider mb-2'>BOOST 2X REWARDS</div>
+            <div className='text-primary font-extrabold text-xl md:text-3xl tracking-wider mb-2'>BOOST 2X REWARDS</div>
             <div className='text-sm text-muted'>
                 {textElement}
             </div>
